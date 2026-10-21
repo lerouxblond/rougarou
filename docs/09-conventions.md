@@ -26,7 +26,7 @@
 - On préfère les **unions discriminées** aux classes et à l'héritage (commandes, événements, messages).
 - On n'utilise pas d'`enum` : des unions de littéraux et des objets `as const`.
 - Les erreurs métier du moteur sont **renvoyées** (`Result`), jamais levées. On ne lève une exception que pour un bug (invariant violé).
-- Les fonctions du moteur sont pures et ne mutent pas leurs entrées (mises à jour immuables, avec `structuredClone` ou `immer` si nécessaire, à décider dans l'ADR 0007 au jalon M0).
+- Les fonctions du moteur sont pures et ne mutent pas leurs entrées. Les mises à jour sont **immuables et écrites à la main** (spread, `map`, `filter`, helpers typés) ; `structuredClone` ne sert qu'aux instantanés et aux états de référence en test. On n'utilise pas immer : voir l'ADR 0007.
 - Les imports se font par alias de package (`@rougarou/engine`), jamais en chemin relatif entre packages.
 - Exhaustivité : `switch` sur une union, avec `assertNever(x)` dans le `default`.
 

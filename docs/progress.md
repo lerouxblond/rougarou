@@ -71,7 +71,7 @@ Playwright 1.64.1.
   - Contenu : types `Result`, `EngineError`, et un `Rng` à graine déterministe (le reste du moteur est M1). Aucune dépendance au réseau, au DOM ni à l'horloge
   - Tests attendus : deux `Rng` de même graine produisent la même suite ; deux graines différentes divergent
 
-- [ ] **T6 — ADR 0007 : mises à jour immuables ou immer**
+- [x] **T6 — ADR 0007 : mises à jour immuables ou immer**
   - Fichiers : `docs/adr/0007-mises-a-jour-immuables.md`
   - Décision proposée : **mises à jour immuables natives** (spread + helpers maison), `structuredClone` pour les instantanés, **sans immer**. Motifs : le moteur reste sans dépendance (règle 3 de `CLAUDE.md`), les états de partie sont petits (au plus 25 joueurs), et on évite le coût des Proxy dans le runtime Workers. À rouvrir par un nouvel ADR si l'ergonomie coince en M3
   - Tests attendus : aucun (document). Un test d'immuabilité arrivera avec `apply` en M1
