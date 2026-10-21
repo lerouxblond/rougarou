@@ -111,7 +111,7 @@ Playwright 1.64.1.
   - Contenu : `ci.yml` (cache pnpm et Turbo, `lint`/`typecheck`/`test` en parallèle, `build`, `test:e2e`, rapport de taille) ; `deploy.yml` (preview par `versions upload` commentée sur la PR, production par `deploy` sur la branche par défaut) ; `release-please.yml`. Les migrations D1 arrivent en M2 : l'étape est présente et conditionnée
   - Tests attendus : relecture, puis CI verte sur la PR (c'est un point de la définition de « terminé »)
 
-- [ ] **T14 — README, vérification finale et rapport**
+- [x] **T14 — README, vérification finale et rapport**
   - Fichiers : `README.md`, `docs/progress.md`
   - Contenu : commandes réelles, prérequis `corepack enable pnpm`, lien vers le suivi
   - Tests attendus : `pnpm check` complet au vert, puis vérification point par point de la définition de « terminé » de M0
@@ -123,3 +123,31 @@ Trois éléments de la définition de « terminé » sortent de ce que je peux f
 1. **Secrets GitHub** `CLOUDFLARE_API_TOKEN` et `CLOUDFLARE_ACCOUNT_ID` à créer dans le dépôt.
 2. **URL de production et de preview** : elles n'existent qu'après un premier `wrangler deploy`, qui exige le compte Cloudflare connecté.
 3. **La branche courante est `master`**, alors que `docs/08` et `docs/09` parlent de `main`. Les workflows seront écrits sur `master` sauf indication contraire.
+
+### Vérification de la définition de « terminé »
+
+| Point | État | Preuve |
+|---|---|---|
+| Monorepo pnpm + Turborepo, packages et apps | ✅ | 7 paquets : `config`, `engine`, `protocol`, `i18n`, `ui`, `web`, `server`, plus le squelette `native` |
+| TS strict, ESLint, Prettier, Lefthook, commitlint, release-please | ✅ | `pnpm check` au vert ; les hooks tournent à chaque commit de ce jalon |
+| Worker Hono servant `apps/web` + `GET /api/health` | ✅ | 7 tests dans le runtime Workers, et vérification contre `wrangler dev` |
+| Shell PWA (manifest, SW, routage, i18n, tokens, fond de nuit, accueil) | ✅ | Le build produit `manifest.webmanifest` et `sw.js` ; 16 tests |
+| Ladle avec un `Button` dans les deux thèmes | ✅ | `pnpm --filter @rougarou/ui run ladle:build` aboutit |
+| `ci.yml` et `deploy.yml` (preview et production) | ✅ | Écrits et validés ; la séquence de `ci.yml` passe en local |
+| ADR 0001 à 0005 relus, puis ADR 0007 | ✅ | `docs/adr/0007-mises-a-jour-immuables.md` |
+| **L'URL de production affiche l'accueil** | ⏳ | Demande les secrets Cloudflare et un premier déploiement (action humaine) |
+| **La PWA est installable** | ✅ (local) | Manifest, service worker, icônes dont une maskable, vérifiés par test et en e2e. À reconfirmer sur l'URL de production |
+| **La CI est verte** | ⏳ | À confirmer au premier push sur GitHub |
+| **Une PR produit une URL de preview** | ⏳ | Demande les secrets Cloudflare |
+
+**Total des tests : 107 unitaires (7 paquets) + 18 e2e.**
+
+### Ce qui reste à faire par une personne
+
+1. Créer les secrets `CLOUDFLARE_API_TOKEN` et `CLOUDFLARE_ACCOUNT_ID` dans les
+   secrets du dépôt GitHub.
+2. Pousser la branche `main` et ouvrir une PR pour voir la CI et la preview.
+3. Confirmer l'installation de la PWA depuis l'URL de production.
+
+Tant que ces trois points ne sont pas faits, M0 est **complet côté code** mais sa
+définition de « terminé » n'est pas entièrement vérifiable.
