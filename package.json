@@ -10,23 +10,24 @@
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
-    "lint": "turbo run lint",
+    "lint": "eslint . --max-warnings=0 && prettier --check .",
+    "lint:fix": "eslint . --fix && prettier --write .",
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
     "test:e2e": "playwright test",
-    "check": "turbo run lint typecheck test",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
+    "check": "pnpm run lint && pnpm run typecheck && pnpm run test",
     "ladle": "pnpm --filter @rougarou/ui run ladle",
     "size": "node scripts/check-bundle-size.mjs"
   },
   "prettier": "@rougarou/config/prettier/index.json",
   "devDependencies": {
     "@commitlint/cli": "21.2.4",
-    "@commitlint/config-conventional": "^21.2.4",
+    "@commitlint/config-conventional": "21.2.4",
+    "@rougarou/config": "workspace:*",
+    "eslint": "catalog:",
     "lefthook": "2.2.2",
-    "prettier": "3.9.10",
+    "prettier": "catalog:",
     "turbo": "2.11.10",
-    "typescript": "6.0.3"
+    "typescript": "catalog:"
   }
 }

@@ -1,0 +1,22 @@
+dist/
+build/
+coverage/
+.turbo/
+.wrangler/
+playwright-report/
+test-results/
+pnpm-lock.yaml
+
+# Fixtures volontairement mal ecrites, utilisees par un test de lint.
+packages/config/test/fixtures/
+
+# La documentation est redigee a la main (tableaux alignes, retours a la ligne
+# voulus). Prettier formate le code et la configuration, pas la prose.
+*.md
+
+# Source de verite des design tokens : sa mise en page compacte est voulue, et
+# `CLAUDE.md` interdit de la modifier sans mettre a jour docs/06.
+design/tokens.css
+
+design/sprites/
+*.png

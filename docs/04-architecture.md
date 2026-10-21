@@ -57,7 +57,7 @@ web ──▶ ui, protocol, i18n          server ──▶ engine, protocol
 ui ──▶ (design/tokens)              engine ──▶ (rien d'interne sauf types de protocol)
 ```
 
-`engine` n'importe jamais `server` ni `web`. Une règle ESLint (`import/no-restricted-paths`) le vérifie en CI.
+`engine` n'importe jamais `server` ni `web`. Une règle ESLint le vérifie en CI : les imports entre paquets se faisant par alias (`@rougarou/engine`) et jamais en chemin relatif (`docs/09`), c'est `no-restricted-imports` qui interdit, paquet par paquet, tout alias absent de sa liste blanche. La carte des dépendances autorisées et la règle de pureté du moteur vivent dans `packages/config/eslint/zones.js`, et `packages/config/test/import-boundaries.test.ts` vérifie sur des fixtures qu'elles se déclenchent vraiment.
 
 ## Le moteur (`packages/engine`)
 

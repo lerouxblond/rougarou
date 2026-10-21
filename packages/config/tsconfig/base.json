@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Rougarou — base",
+  "compilerOptions": {
+    "target": "ES2023",
+    "lib": ["ES2023"],
+    "module": "preserve",
+    "moduleResolution": "bundler",
+    "moduleDetection": "force",
+    "resolveJsonModule": true,
+    "verbatimModuleSyntax": true,
+    /* Les paquets internes sont consommes en TypeScript source : rien n'est
+       compile avant d'etre importe, donc les imports portent l'extension
+       reelle. */
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    "skipLibCheck": true,
+
+    /* docs/05 : TypeScript strict partout. */
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+
+    /* docs/09 : exhaustivite et code mort. */
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "allowUnreachableCode": false,
+
+    /* docs/09 : pas d'`enum`, pas de proprietes de constructeur. Tout le
+       TypeScript doit s'effacer a la compilation. */
+    "erasableSyntaxOnly": true,
+
+    "noEmit": true,
+    "forceConsistentCasingInFileNames": true
+  }
+}

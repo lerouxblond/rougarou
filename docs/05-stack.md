@@ -2,6 +2,20 @@
 
 > Règle : au démarrage du projet (jalon M0), on installe la **dernière version stable** de chaque outil, puis on la verrouille par le lockfile et `packageManager`. Les numéros de version ci-dessous sont indicatifs. Une montée de version majeure passe par une PR dédiée.
 
+## Où vivent les versions
+
+Les versions sont écrites **une seule fois**, dans le **catalogue pnpm** de `pnpm-workspace.yaml`. Les paquets écrivent `"eslint": "catalog:"` au lieu d'un numéro, donc une montée de version se fait à un seul endroit. `packageManager` épingle pnpm lui-même.
+
+Trois versions ne sont pas la dernière publiée, et c'est volontaire (vérifié le 2026-10-21) :
+
+| Outil | Retenue | Dernière | Pourquoi |
+|---|---|---|---|
+| TypeScript | 6.0.3 | 7.0.2 | `typescript-eslint` exige `typescript >=4.8.4 <6.1.0`. Passer à TS 7 ferait perdre tout le lint typé. |
+| Vitest | 4.1.12 | 5.0.5 | `@cloudflare/vitest-pool-workers` exige `vitest ^4.1.0`, et ce pool est indispensable pour tester le Durable Object (M2). |
+| `@types/react` | 19.3.0 | — | Suit React 19.3.1. |
+
+pnpm 12 refuse par défaut les versions publiées depuis trop peu de temps (`minimumReleaseAge`). Les paquets épinglés volontairement et plus récents que ce délai sont listés dans `minimumReleaseAgeExclude`.
+
 ## Imposé
 
 | Domaine | Choix | Pourquoi |

@@ -1,24 +1,17 @@
 {
   "$schema": "https://turborepo.com/schema.json",
   "ui": "stream",
-  "globalDependencies": [
-    "design/tokens.css",
-    "packages/config/**",
-    "tsconfig.base.json",
-    ".npmrc"
-  ],
+  "globalDependencies": ["design/tokens.css", "packages/config/**", ".npmrc"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
       "outputs": ["dist/**", "!dist/.vite/**"]
     },
-    "lint": {},
     "typecheck": {
       "dependsOn": ["^build"]
     },
     "test": {
-      "dependsOn": ["^build"],
-      "outputs": ["coverage/**"]
+      "dependsOn": ["^build"]
     },
     "dev": {
       "cache": false,

@@ -31,7 +31,10 @@ vérifiés le 2026-10-21 :
 |---|---|---|---|
 | TypeScript | **6.0.3** | 7.0.2 | `typescript-eslint@8.72` exige `typescript >=4.8.4 <6.1.0` |
 | Vitest | **4.1.12** | 5.0.5 | `@cloudflare/vitest-pool-workers@0.23` exige `vitest ^4.1.0` |
-| Plugin d'imports ESLint | **eslint-plugin-import-x@4.17.1** | — | `eslint-plugin-import@2.32` ne prend pas ESLint 10 ; `import-x` est le fork maintenu et porte la même règle `no-restricted-paths` |
+
+Les versions sont centralisées dans le **catalogue pnpm** de `pnpm-workspace.yaml` : les paquets écrivent `catalog:` et non un numéro.
+
+Décision prise pendant T2 : le sens unique des dépendances est vérifié par **`no-restricted-imports`** et non par `eslint-plugin-import-x`. Les imports entre paquets se font par alias (`docs/09`), donc contrôler les alias est le test exact, ne demande aucune résolution de chemin et évite une dépendance (`docs/05` §Ajouter une dépendance).
 
 Le reste est à la dernière stable : pnpm 12.14.0, Turborepo 2.11.10, Vite 8.3.5,
 React 19.3.1, Tailwind 4.3.3, ESLint 10.13.0, typescript-eslint 8.72.0,
@@ -42,16 +45,16 @@ Playwright 1.64.1.
 
 ### Tâches
 
-- [ ] **T1 — Outillage racine du monorepo**
+- [x] **T1 — Outillage racine du monorepo**
   - Fichiers : `package.json`, `pnpm-workspace.yaml`, `turbo.json`, `.gitignore`, `.npmrc`, `.nvmrc`, `.editorconfig`
   - Contenu : `packageManager: pnpm@12.14.0`, scripts `dev`/`build`/`lint`/`typecheck`/`test`/`test:e2e`/`check`, pipeline Turbo avec dépendances et sorties de cache
   - Tests attendus : `pnpm install` aboutit ; `pnpm exec turbo run check --dry=json` liste les tâches de tous les packages
 
-- [ ] **T2 — `packages/config` : tsconfig, ESLint, Prettier, Vitest partagés**
-  - Fichiers : `packages/config/package.json`, `tsconfig/base.json`, `tsconfig/react.json`, `tsconfig/worker.json`, `eslint/index.js`, `prettier/index.json`, `vitest/base.ts`
-  - Contenu : TS strict complet (`strict`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`), interdiction de `any` et `@ts-ignore`, pas d'`enum`, et la règle de sens unique des dépendances (`import-x/no-restricted-paths`) du `docs/04`
-  - Doc mise à jour dans le même commit : `docs/04-architecture.md` (`import/no-restricted-paths` → `import-x/no-restricted-paths`) et `docs/05-stack.md` (tableau des versions retenues)
-  - Tests attendus : `packages/config/test/import-boundaries.test.ts` — lance ESLint par API sur deux fixtures et vérifie qu'un import `@rougarou/server` depuis `engine` est signalé, et qu'un import `@rougarou/protocol` ne l'est pas
+- [x] **T2 — `packages/config` : tsconfig, ESLint, Prettier, Vitest partagés**
+  - Fichiers : `packages/config/package.json`, `tsconfig/{base,react,worker}.json`, `eslint/index.js`, `eslint/zones.js`, `eslint/zones.d.ts`, `prettier/index.json`, `vitest/base.ts`, et `eslint.config.js` à la racine
+  - Contenu : TS strict complet (`strict`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, `erasableSyntaxOnly` qui refuse les `enum` à la compilation), interdiction de `any` et `@ts-ignore`, sens unique des dépendances de `docs/04` et pureté du moteur (ni horloge, ni aléa, ni réseau, ni DOM, ni Cloudflare)
+  - Doc mise à jour dans le même commit : `docs/04-architecture.md` (la règle et où elle vit) et `docs/05-stack.md` (catalogue et versions retenues)
+  - Tests attendus : `packages/config/test/import-boundaries.test.ts` — 5 cas, lancés par l'API ESLint sur des fixtures : `engine → server` refusé, `web → engine` refusé, `engine → protocol` accepté, `Date`/`Math.random` refusés dans le moteur, `enum` refusé
 
 - [ ] **T3 — Hooks Git et Conventional Commits**
   - Fichiers : `lefthook.yml`, `commitlint.config.js`, `.prettierignore`
