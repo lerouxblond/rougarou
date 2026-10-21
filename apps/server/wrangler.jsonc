@@ -1,0 +1,38 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "rougarou",
+  "main": "src/index.ts",
+  // Date de compatibilite commune au Worker et aux tests. Elle est plafonnee
+  // par le workerd embarque dans @cloudflare/vitest-plugin : la depasser ici
+  // ferait tourner les tests sur un runtime different de la production.
+  "compatibility_date": "2026-10-19",
+  "compatibility_flags": ["nodejs_compat"],
+
+  // La PWA et l'API sont servies par le meme Worker, donc par la meme origine :
+  // les cookies de session restent en `SameSite=Lax` et le web n'a pas besoin
+  // de CORS (docs/08).
+  "assets": {
+    "directory": "../web/dist",
+    "binding": "ASSETS",
+    // L'app est une SPA : une route inconnue rend `index.html`.
+    "not_found_handling": "single-page-application",
+    // ...sauf l'API et le WebSocket, qui doivent atteindre le Worker et jamais
+    // le repli SPA.
+    "run_worker_first": ["/api/*", "/ws/*"]
+  },
+
+  "observability": {
+    // Logs structures du Worker (docs/04 §Observabilite).
+    "enabled": true
+  },
+
+  "env": {
+    "preview": {
+      "name": "rougarou-preview"
+      // D1 `rougarou-db-preview` et le Durable Object `GameRoom` arrivent en M2.
+    },
+    "production": {
+      "name": "rougarou"
+    }
+  }
+}

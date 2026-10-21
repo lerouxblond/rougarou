@@ -20,3 +20,6 @@ design/tokens.css
 
 design/sprites/
 *.png
+
+# Fichier d en-tetes de Cloudflare : format maison, aucun parseur Prettier.
+apps/web/public/_headers

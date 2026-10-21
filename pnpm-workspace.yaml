@@ -28,17 +28,17 @@ minimumReleaseAgeExclude:
   - turbo@2.11.10
   - vite@8.3.5
   - i18next@26.5.4
+  - '@cloudflare/workers-types@5.20261021.1'
 
 # Catalogue : une seule version de chaque outil pour tout le monorepo. Les
 # paquets ecrivent `catalog:` au lieu d'un numero, donc une montee de version
 # se fait ici et nulle part ailleurs (docs/05).
 #
-# Trois versions ne sont pas la derniere publiee, et c'est volontaire :
+# Deux versions ne sont pas la derniere publiee, et c'est volontaire :
 #   - typescript 6.0.3 : typescript-eslint exige `typescript <6.1.0`
-#   - vitest 4.1.12    : @cloudflare/vitest-pool-workers exige `vitest ^4.1.0`
 #   - @types/react 19.3.0 : suit React 19.3.1
 catalog:
-  '@cloudflare/vitest-pool-workers': 0.23.0
+  '@cloudflare/vitest-plugin': 1.4.6
   '@cloudflare/workers-types': 5.20261021.1
   '@commitlint/cli': 21.2.4
   '@commitlint/config-conventional': 21.2.4
@@ -55,7 +55,7 @@ catalog:
   '@types/react': 19.3.0
   '@types/react-dom': 19.3.0
   '@vitejs/plugin-react': 6.1.2
-  '@vitest/coverage-v8': 4.1.12
+  '@vitest/coverage-v8': 5.0.5
   axe-core: 4.14.0
   eslint: 10.13.0
   eslint-config-prettier: 10.1.8
@@ -73,6 +73,6 @@ catalog:
   typescript-eslint: 8.72.0
   vite: 8.3.5
   vite-plugin-pwa: 2.0.0
-  vitest: 4.1.12
+  vitest: 5.0.5
   wrangler: 4.151.3
   zod: 4.6.7

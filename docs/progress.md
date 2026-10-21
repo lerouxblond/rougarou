@@ -91,7 +91,7 @@ Playwright 1.64.1.
   - Contenu : TanStack Router, i18next branché sur `@rougarou/i18n`, `tokens.css` importé, `data-phase="night"` sur `<html>` (fond de nuit hors partie), page d'accueil statique sans aucun texte en dur, manifest et service worker par `vite-plugin-pwa` (API et WS jamais mis en cache)
   - Tests attendus : `test/home.test.tsx` — l'accueil affiche le titre issu d'i18n et `axe` ne signale rien ; le build écrit `dist/manifest.webmanifest` et un service worker (`test/build-artifacts.test.ts`)
 
-- [ ] **T10 — `apps/server` : Worker Hono, assets et `/api/health`**
+- [x] **T10 — `apps/server` : Worker Hono, assets et `/api/health`**
   - Fichiers : `apps/server/package.json`, `wrangler.jsonc`, `tsconfig.json`, `vitest.config.ts`, `src/index.ts`, `src/routes/health.ts`, `test/health.test.ts`
   - Contenu : Hono sur `/api/*`, Static Assets servant `apps/web/dist` avec repli SPA, en-tête CSP strict, CORS limité aux origines PWA et `tauri://localhost` ; environnements `preview` et `production` dans `wrangler.jsonc`
   - Tests attendus : `@cloudflare/vitest-pool-workers` — `GET /api/health` renvoie 200 et un corps que le schéma `HealthResponse` de `protocol` valide ; une route `/api/` inconnue renvoie 404 JSON
