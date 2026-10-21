@@ -3,6 +3,12 @@
   "compilerOptions": {
     "types": ["node"]
   },
-  "include": ["eslint/**/*.d.ts", "vitest/**/*.ts", "test/**/*.ts", "vitest.config.ts"],
+  "include": [
+    "commitlint/**/*.d.ts",
+    "eslint/**/*.d.ts",
+    "vitest/**/*.ts",
+    "test/**/*.ts",
+    "vitest.config.ts"
+  ],
   "exclude": ["test/fixtures/**"]
 }

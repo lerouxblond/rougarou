@@ -56,7 +56,7 @@ Playwright 1.64.1.
   - Doc mise à jour dans le même commit : `docs/04-architecture.md` (la règle et où elle vit) et `docs/05-stack.md` (catalogue et versions retenues)
   - Tests attendus : `packages/config/test/import-boundaries.test.ts` — 5 cas, lancés par l'API ESLint sur des fixtures : `engine → server` refusé, `web → engine` refusé, `engine → protocol` accepté, `Date`/`Math.random` refusés dans le moteur, `enum` refusé
 
-- [ ] **T3 — Hooks Git et Conventional Commits**
+- [x] **T3 — Hooks Git et Conventional Commits**
   - Fichiers : `lefthook.yml`, `commitlint.config.js`, `.prettierignore`
   - Contenu : `pre-commit` → Prettier + ESLint sur les fichiers modifiés ; `commit-msg` → commitlint avec les scopes de `docs/09` ; `pre-push` → `typecheck`
   - Tests attendus : `commitlint.test.ts` — `feat(engine): x` passe, `broken message` et `feat(unknown): x` échouent

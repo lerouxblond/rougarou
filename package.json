@@ -21,8 +21,8 @@
   },
   "prettier": "@rougarou/config/prettier/index.json",
   "devDependencies": {
-    "@commitlint/cli": "21.2.4",
-    "@commitlint/config-conventional": "21.2.4",
+    "@commitlint/cli": "catalog:",
+    "@commitlint/config-conventional": "catalog:",
     "@rougarou/config": "workspace:*",
     "eslint": "catalog:",
     "lefthook": "2.2.2",

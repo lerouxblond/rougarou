@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "exports": {
+    "./commitlint": "./commitlint/index.js",
     "./eslint": "./eslint/index.js",
     "./prettier/index.json": "./prettier/index.json",
     "./tsconfig/base.json": "./tsconfig/base.json",
@@ -16,6 +17,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@commitlint/config-conventional": "catalog:",
     "@eslint/js": "catalog:",
     "eslint-config-prettier": "catalog:",
     "eslint-plugin-react-hooks": "catalog:",
@@ -23,6 +25,9 @@
     "typescript-eslint": "catalog:"
   },
   "devDependencies": {
+    "@commitlint/lint": "catalog:",
+    "@commitlint/load": "catalog:",
+    "@commitlint/types": "catalog:",
     "@types/node": "catalog:",
     "eslint": "catalog:",
     "prettier": "catalog:",
