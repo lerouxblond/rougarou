@@ -1,0 +1,30 @@
+{
+  "app": {
+    "name": "Rougarou",
+    "tagline": "Le Loup-garou, sans cartes ni papier.",
+    "skip_to_content": "Aller au contenu"
+  },
+  "home": {
+    "title": "La nuit tombe sur le village",
+    "intro": "Créez une partie et donnez le code à votre table, ou rejoignez celle d'un ami.",
+    "create_game": "Créer une partie",
+    "join_game": "Rejoindre une partie",
+    "code_label": "Code de la partie",
+    "code_placeholder": "6 caractères"
+  },
+  "common": {
+    "loading": "Chargement…",
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "back": "Retour"
+  },
+  "errors": {
+    "forbidden": "Vous n'avez pas le droit de faire cela.",
+    "invalid_command": "Cette action n'est pas valide.",
+    "not_your_turn": "Ce n'est pas à vous d'agir.",
+    "unknown_player": "Ce joueur est introuvable.",
+    "wrong_phase": "Cette action n'est pas possible dans cette phase.",
+    "protocol_outdated": "Votre application est trop ancienne. Mettez-la à jour pour continuer.",
+    "network": "Connexion perdue. Nouvelle tentative…"
+  }
+}

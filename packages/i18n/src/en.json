@@ -1,0 +1,30 @@
+{
+  "app": {
+    "name": "Rougarou",
+    "tagline": "Werewolf, with no cards and no paper.",
+    "skip_to_content": "Skip to content"
+  },
+  "home": {
+    "title": "Night falls on the village",
+    "intro": "Create a game and share the code with your table, or join a friend's game.",
+    "create_game": "Create a game",
+    "join_game": "Join a game",
+    "code_label": "Game code",
+    "code_placeholder": "6 characters"
+  },
+  "common": {
+    "loading": "Loading…",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "back": "Back"
+  },
+  "errors": {
+    "forbidden": "You are not allowed to do that.",
+    "invalid_command": "That action is not valid.",
+    "not_your_turn": "It is not your turn to act.",
+    "unknown_player": "That player could not be found.",
+    "wrong_phase": "That action is not possible in this phase.",
+    "protocol_outdated": "Your app is out of date. Please update it to continue.",
+    "network": "Connection lost. Retrying…"
+  }
+}

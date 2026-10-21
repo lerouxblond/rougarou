@@ -76,7 +76,7 @@ Playwright 1.64.1.
   - Décision proposée : **mises à jour immuables natives** (spread + helpers maison), `structuredClone` pour les instantanés, **sans immer**. Motifs : le moteur reste sans dépendance (règle 3 de `CLAUDE.md`), les états de partie sont petits (au plus 25 joueurs), et on évite le coût des Proxy dans le runtime Workers. À rouvrir par un nouvel ADR si l'ergonomie coince en M3
   - Tests attendus : aucun (document). Un test d'immuabilité arrivera avec `apply` en M1
 
-- [ ] **T7 — `packages/i18n` : catalogues fr/en typés**
+- [x] **T7 — `packages/i18n` : catalogues fr/en typés**
   - Fichiers : `packages/i18n/package.json`, `tsconfig.json`, `src/index.ts`, `src/fr.json`, `src/en.json`, `test/catalogs.test.ts`
   - Contenu : type dérivé des clés de `fr`, `en` avec toutes les clés présentes (valeurs non traduites admises, D-16), clés en `domaine.sous_domaine.cle`
   - Tests attendus : parité stricte des clés entre `fr` et `en` ; aucune valeur vide en `fr`
