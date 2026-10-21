@@ -106,7 +106,7 @@ Playwright 1.64.1.
   - Contenu : Chromium et WebKit mobile contre `wrangler dev`, un test de fumée (l'accueil se charge, le manifest est servi) ; le script échoue au-delà de 250 ko gzip de JS initial (`docs/08`)
   - Tests attendus : `pnpm test:e2e` passe en local ; `node scripts/check-bundle-size.mjs` sort en 0 sur le build courant
 
-- [ ] **T13 — Workflows GitHub Actions**
+- [x] **T13 — Workflows GitHub Actions**
   - Fichiers : `.github/workflows/ci.yml`, `.github/workflows/deploy.yml`, `.github/workflows/release-please.yml`, `release-please-config.json`, `.release-please-manifest.json`
   - Contenu : `ci.yml` (cache pnpm et Turbo, `lint`/`typecheck`/`test` en parallèle, `build`, `test:e2e`, rapport de taille) ; `deploy.yml` (preview par `versions upload` commentée sur la PR, production par `deploy` sur la branche par défaut) ; `release-please.yml`. Les migrations D1 arrivent en M2 : l'étape est présente et conditionnée
   - Tests attendus : relecture, puis CI verte sur la PR (c'est un point de la définition de « terminé »)

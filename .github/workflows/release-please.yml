@@ -1,0 +1,21 @@
+name: Release Please
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      # Maintient une PR de release (version semver et CHANGELOG.md) a partir
+      # des Conventional Commits. Au merge de cette PR, le tag `vX.Y.Z` est
+      # cree, ce qui declenchera `release.yml` au jalon M8 (docs/08).
+      - uses: googleapis/release-please-action@v5
+        with:
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json

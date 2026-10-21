@@ -1,0 +1,89 @@
+name: Deploiement
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  TURBO_TELEMETRY_DISABLED: 1
+  DO_NOT_TRACK: 1
+
+jobs:
+  deploy:
+    name: ${{ github.event_name == 'pull_request' && 'Preview' || 'Production' }}
+    runs-on: ubuntu-latest
+
+    # Sans les secrets Cloudflare, le job ne peut rien faire : on l'ignore
+    # plutot que de faire echouer la CI sur un depot fraichement clone.
+    if: ${{ github.event.repository.fork == false }}
+
+    permissions:
+      contents: read
+      deployments: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # Le Worker sert les assets de `apps/web/dist` : ils doivent exister.
+      - run: pnpm run build
+
+      # Les migrations D1 s'appliquent AVANT le deploiement du Worker et
+      # doivent rester retrocompatibles (docs/08). La base arrive au jalon M2,
+      # donc l'etape attend qu'un repertoire de migrations existe.
+      - name: Migrations D1
+        if: ${{ hashFiles('apps/server/migrations/*.sql') != '' }}
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: apps/server
+          command: >-
+            d1 migrations apply
+            ${{ github.event_name == 'pull_request' && 'rougarou-db-preview' || 'rougarou-db' }}
+            --remote
+
+      - name: Deploiement de preview
+        id: preview
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: apps/server
+          command: versions upload --env preview
+
+      - name: Commentaire d URL de preview
+        if: ${{ github.event_name == 'pull_request' && steps.preview.outcome == 'success' }}
+        uses: thollander/actions-comment-pull-request@v3
+        with:
+          comment-tag: preview-url
+          message: |
+            ### Preview deployee
+
+            ```
+            ${{ steps.preview.outputs.command-output }}
+            ```
+
+      - name: Deploiement en production
+        if: ${{ github.event_name == 'push' }}
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: apps/server
+          command: deploy --env production
