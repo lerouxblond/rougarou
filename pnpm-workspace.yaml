@@ -1,0 +1,26 @@
+packages:
+  - apps/*
+  - packages/*
+
+# pnpm bloque les scripts d'installation par defaut (`allowBuilds` depuis
+# pnpm 12, `onlyBuiltDependencies` avant). Seuls ces paquets en ont reellement
+# besoin : binaires natifs et hooks Git.
+allowBuilds:
+  '@tailwindcss/oxide': true
+  esbuild: true
+  lefthook: true
+  sharp: true
+  unrs-resolver: true
+  workerd: true
+
+# pnpm 12 refuse par defaut les versions publiees depuis trop peu de temps.
+# Ces paquets sont epingles volontairement (tableau des versions de
+# docs/progress.md), donc on les exclut de ce delai.
+minimumReleaseAgeExclude:
+  - '@turbo/darwin-64@2.11.10'
+  - '@turbo/darwin-arm64@2.11.10'
+  - '@turbo/linux-64@2.11.10'
+  - '@turbo/linux-arm64@2.11.10'
+  - '@turbo/windows-64@2.11.10'
+  - '@turbo/windows-arm64@2.11.10'
+  - turbo@2.11.10
