@@ -6,9 +6,11 @@ packages:
 # pnpm 12, `onlyBuiltDependencies` avant). Seuls ces paquets en ont reellement
 # besoin : binaires natifs et hooks Git.
 allowBuilds:
+  '@swc/core': true
   '@tailwindcss/oxide': true
   esbuild: true
   lefthook: true
+  msw: false
   sharp: true
   unrs-resolver: true
   workerd: true
@@ -24,6 +26,7 @@ minimumReleaseAgeExclude:
   - '@turbo/windows-64@2.11.10'
   - '@turbo/windows-arm64@2.11.10'
   - turbo@2.11.10
+  - vite@8.3.5
 
 # Catalogue : une seule version de chaque outil pour tout le monorepo. Les
 # paquets ecrivent `catalog:` au lieu d'un numero, donc une montee de version

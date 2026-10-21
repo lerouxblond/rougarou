@@ -1,0 +1,114 @@
+/* Feuille de styles du design system « Lanterne ».
+
+   `design/tokens.css` est la source de verite (docs/06) : ce fichier ne fait
+   que l'importer et exposer ses tokens aux utilitaires Tailwind. */
+
+@import 'tailwindcss';
+@import '../../../design/tokens.css';
+
+/* Tailwind v4 detecte ses sources en partant du fichier CSS. Ladle, lui, place
+   la racine de Vite dans son propre paquet, donc la detection automatique ne
+   trouve rien. On declare les sources explicitement : c'est vrai quel que soit
+   l'outil qui assemble (Ladle, Vite, Vitest). */
+@source '../src/**/*.{ts,tsx}';
+@source '../.ladle/**/*.tsx';
+
+/* Pourquoi `@utility` et non `@theme` : les tokens de `design/tokens.css`
+   portent deja les prefixes dont Tailwind se sert pour ses propres espaces de
+   noms (`--color-*`, `--font-*`, `--radius-*`). Les declarer dans `@theme`
+   produirait des declarations circulaires (`--color-accent: var(--color-accent)`)
+   dont la resolution dependrait de l'ordre de la cascade. On declare donc les
+   utilitaires a la main : chaque classe porte le nom du token de `docs/06`, et
+   le theme bascule a l'execution avec `data-phase`, sans recompiler. */
+
+@utility bg-bg {
+  background-color: var(--color-bg);
+}
+@utility bg-surface {
+  background-color: var(--color-surface);
+}
+@utility bg-surface-raised {
+  background-color: var(--color-surface-raised);
+}
+@utility bg-accent {
+  background-color: var(--color-accent);
+}
+@utility bg-danger {
+  background-color: var(--color-danger);
+}
+
+@utility text-text {
+  color: var(--color-text);
+}
+@utility text-text-muted {
+  color: var(--color-text-muted);
+}
+@utility text-accent {
+  color: var(--color-accent);
+}
+@utility text-danger {
+  color: var(--color-danger);
+}
+@utility text-on-accent {
+  color: var(--color-on-accent);
+}
+
+@utility border-border {
+  border-color: var(--color-border);
+}
+
+/* L'anneau de focus passe par `outline` plutot que par les variables d'anneau
+   de Tailwind : une seule declaration, et il reste visible sur n'importe quel
+   fond (CLAUDE.md regle 9). */
+@utility outline-focus {
+  outline-color: var(--color-focus);
+}
+
+@utility text-team-village {
+  color: var(--team-village);
+}
+@utility text-team-wolves {
+  color: var(--team-wolves);
+}
+@utility text-team-vampires {
+  color: var(--team-vampires);
+}
+@utility text-team-solo {
+  color: var(--team-solo);
+}
+
+/* Durees de mouvement (docs/06). `prefers-reduced-motion` les ramene a 0 ou a
+   120 ms directement dans `design/tokens.css`. */
+@utility duration-fast {
+  transition-duration: var(--motion-fast);
+}
+@utility duration-base {
+  transition-duration: var(--motion-base);
+}
+
+@utility ease-lantern {
+  transition-timing-function: var(--ease-out);
+}
+
+@utility rounded-pill {
+  border-radius: var(--radius-pill);
+}
+@utility rounded-card {
+  border-radius: var(--radius-card);
+}
+
+@utility font-display {
+  font-family: var(--font-display);
+}
+@utility font-body {
+  font-family: var(--font-body);
+}
+@utility font-pixel {
+  font-family: var(--font-pixel);
+}
+
+/* Zone tactile minimale de 44 px (docs/06). */
+@utility tap-target {
+  min-width: var(--tap-min);
+  min-height: var(--tap-min);
+}

@@ -74,7 +74,9 @@ export function dependencyZones(dependencies = PACKAGE_DEPENDENCIES, toGlob = de
           })),
           patterns: [
             {
-              group: ['../*/*', '../../*'],
+              // Deux niveaux au-dessus, on a quitte le paquet. En dessous, un
+              // chemin relatif reste interne et legitime (`.ladle` vers `src`).
+              group: ['../../*'],
               message:
                 'Entre paquets, importe par alias `@rougarou/<paquet>`, jamais en chemin relatif (docs/09).',
             },
@@ -115,7 +117,7 @@ export function enginePurity(files = ['packages/engine/src/**/*.ts']) {
         {
           patterns: [
             {
-              group: ['node:*', 'cloudflare:*', 'hono', 'hono/*', '../*/*', '../../*'],
+              group: ['node:*', 'cloudflare:*', 'hono', 'hono/*', '../../*'],
               message:
                 'Le moteur est pur : ni Node, ni Cloudflare, ni serveur HTTP (CLAUDE.md regle 3).',
             },

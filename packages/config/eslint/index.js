@@ -87,7 +87,10 @@ export default defineConfig(
   // Composants React (packages/ui et apps/web).
   {
     files: ['packages/ui/**/*.tsx', 'apps/web/**/*.tsx'],
-    extends: [reactHooks.configs['recommended-latest']],
+    // `configs.flat` est la variante flat config du plugin : `configs
+    // ['recommended-latest']` est encore au format eslintrc et declare
+    // `plugins` comme un tableau de chaines, ce qu'ESLint 10 refuse.
+    extends: [reactHooks.configs.flat['recommended-latest']],
     languageOptions: {
       globals: globals.browser,
     },

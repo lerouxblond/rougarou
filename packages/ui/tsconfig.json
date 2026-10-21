@@ -1,0 +1,12 @@
+{
+  "extends": "@rougarou/config/tsconfig/react.json",
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "test/**/*.ts",
+    "test/**/*.tsx",
+    ".ladle/**/*.ts",
+    ".ladle/**/*.tsx",
+    "vitest.config.ts"
+  ]
+}

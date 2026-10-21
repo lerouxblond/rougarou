@@ -81,7 +81,7 @@ Playwright 1.64.1.
   - Contenu : type dérivé des clés de `fr`, `en` avec toutes les clés présentes (valeurs non traduites admises, D-16), clés en `domaine.sous_domaine.cle`
   - Tests attendus : parité stricte des clés entre `fr` et `en` ; aucune valeur vide en `fr`
 
-- [ ] **T8 — `packages/ui` : tokens, `Button`, Ladle**
+- [x] **T8 — `packages/ui` : tokens, `Button`, Ladle**
   - Fichiers : `packages/ui/package.json`, `tsconfig.json`, `src/styles.css`, `src/Button.tsx`, `src/index.ts`, `src/Button.stories.tsx`, `.ladle/config.mjs`, `.ladle/components.tsx`
   - Contenu : `@import "../../design/tokens.css"` puis `@theme inline` pour exposer les tokens sémantiques à Tailwind ; `Button` avec les variantes `primary`/`secondary`/`ghost`/`danger` et les tailles `md`/`lg`, zone tactile au moins 44 px, anneau de focus `--color-focus` ; décorateur Ladle qui bascule `data-phase` nuit/jour
   - Tests attendus : `test/button.test.tsx` (Testing Library : rend le libellé passé, réagit au clavier, `axe` sans violation) et `test/contrast.test.ts` (exigé par `docs/06` : chaque paire texte/fond des deux thèmes atteint 4,5:1, et 3:1 pour les composants)
