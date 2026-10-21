@@ -1,0 +1,9 @@
+{
+  "name": "@rougarou/native",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "tauri": "echo \"apps/native est un squelette : la chaine Tauri arrive au jalon M8 (voir README.md).\" && exit 1"
+  }
+}

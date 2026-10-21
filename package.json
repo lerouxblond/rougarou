@@ -12,7 +12,7 @@
     "build": "turbo run build",
     "lint": "eslint . --max-warnings=0 && prettier --check .",
     "lint:fix": "eslint . --fix && prettier --write .",
-    "typecheck": "turbo run typecheck",
+    "typecheck": "tsc --noEmit && turbo run typecheck",
     "test": "turbo run test",
     "test:e2e": "playwright test",
     "check": "pnpm run lint && pnpm run typecheck && pnpm run test",
@@ -23,7 +23,9 @@
   "devDependencies": {
     "@commitlint/cli": "catalog:",
     "@commitlint/config-conventional": "catalog:",
+    "@playwright/test": "catalog:",
     "@rougarou/config": "workspace:*",
+    "@types/node": "catalog:",
     "eslint": "catalog:",
     "lefthook": "2.2.2",
     "prettier": "catalog:",

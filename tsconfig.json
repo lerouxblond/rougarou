@@ -1,0 +1,10 @@
+{
+  "extends": "@rougarou/config/tsconfig/base.json",
+  "compilerOptions": {
+    // Les rappels passes a `page.evaluate()` s'executent dans le navigateur :
+    // ils ont besoin des types du DOM.
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "types": ["node", "@playwright/test"]
+  },
+  "include": ["e2e/**/*.ts", "playwright.config.ts"]
+}

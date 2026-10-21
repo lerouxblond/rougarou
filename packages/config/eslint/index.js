@@ -78,6 +78,10 @@ export default defineConfig(
       ],
       eqeqeq: ['error', 'always', { null: 'ignore' }],
       'no-console': ['warn', { allow: ['warn', 'error'] }],
+
+      // Interpoler un nombre est sans ambiguite (un port, un compteur). Les
+      // autres types restent interdits dans un gabarit.
+      '@typescript-eslint/restrict-template-expressions': ['error', { allowNumber: true }],
     },
   },
 

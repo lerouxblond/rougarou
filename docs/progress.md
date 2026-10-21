@@ -96,12 +96,12 @@ Playwright 1.64.1.
   - Contenu : Hono sur `/api/*`, Static Assets servant `apps/web/dist` avec repli SPA, en-tête CSP strict, CORS limité aux origines PWA et `tauri://localhost` ; environnements `preview` et `production` dans `wrangler.jsonc`
   - Tests attendus : `@cloudflare/vitest-pool-workers` — `GET /api/health` renvoie 200 et un corps que le schéma `HealthResponse` de `protocol` valide ; une route `/api/` inconnue renvoie 404 JSON
 
-- [ ] **T11 — `apps/native` : squelette Tauri**
+- [x] **T11 — `apps/native` : squelette Tauri**
   - Fichiers : `apps/native/package.json`, `apps/native/README.md`
   - Contenu : les scripts `tauri dev` / `tauri android dev` attendus par `CLAUDE.md`, et un README qui note que `src-tauri/` (Cargo, capacités, plugins) est écrit en M8 — pas de chaîne Rust en CI avant ce jalon
   - Tests attendus : aucun (squelette). `pnpm --filter native tauri --help` n'est pas exigé en M0
 
-- [ ] **T12 — Playwright et budget de bundle**
+- [x] **T12 — Playwright et budget de bundle**
   - Fichiers : `playwright.config.ts`, `e2e/smoke.spec.ts`, `scripts/check-bundle-size.mjs`
   - Contenu : Chromium et WebKit mobile contre `wrangler dev`, un test de fumée (l'accueil se charge, le manifest est servi) ; le script échoue au-delà de 250 ko gzip de JS initial (`docs/08`)
   - Tests attendus : `pnpm test:e2e` passe en local ; `node scripts/check-bundle-size.mjs` sort en 0 sur le build courant
