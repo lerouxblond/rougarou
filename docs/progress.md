@@ -66,7 +66,7 @@ Playwright 1.64.1.
   - Contenu : `PROTOCOL_VERSION`, schéma Zod `HealthResponse` (le seul message existant à ce jalon), helper `assertNever`
   - Tests attendus : le schéma accepte une réponse valide et rejette un corps inconnu ; `PROTOCOL_VERSION` est un entier positif
 
-- [ ] **T5 — `packages/engine` : squelette pur**
+- [x] **T5 — `packages/engine` : squelette pur**
   - Fichiers : `packages/engine/package.json`, `tsconfig.json`, `src/index.ts`, `src/result.ts`, `src/rng.ts`, `test/rng.test.ts`
   - Contenu : types `Result`, `EngineError`, et un `Rng` à graine déterministe (le reste du moteur est M1). Aucune dépendance au réseau, au DOM ni à l'horloge
   - Tests attendus : deux `Rng` de même graine produisent la même suite ; deux graines différentes divergent
