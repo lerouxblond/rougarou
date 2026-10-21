@@ -209,6 +209,9 @@ catalogs:
     vitest:
       specifier: 4.1.12
       version: 4.1.12
+    zod:
+      specifier: 4.6.7
+      version: 4.6.7
 
 importers:
 
@@ -278,6 +281,38 @@ importers:
       prettier:
         specifier: 'catalog:'
         version: 3.9.10
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
+      vitest:
+        specifier: 'catalog:'
+        version: 4.1.12(@types/node@26.6.5)(@vitest/coverage-v8@4.1.12)(vite@8.3.4(@types/node@26.6.5)(jiti@2.7.0))
+
+  packages/engine:
+    dependencies:
+      '@rougarou/protocol':
+        specifier: workspace:*
+        version: link:../protocol
+    devDependencies:
+      '@rougarou/config':
+        specifier: workspace:*
+        version: link:../config
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
+      vitest:
+        specifier: 'catalog:'
+        version: 4.1.12(@types/node@26.6.5)(@vitest/coverage-v8@4.1.12)(vite@8.3.4(@types/node@26.6.5)(jiti@2.7.0))
+
+  packages/protocol:
+    dependencies:
+      zod:
+        specifier: 'catalog:'
+        version: 4.6.7
+    devDependencies:
+      '@rougarou/config':
+        specifier: workspace:*
+        version: link:../config
       typescript:
         specifier: 'catalog:'
         version: 6.0.3

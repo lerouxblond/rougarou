@@ -61,7 +61,7 @@ Playwright 1.64.1.
   - Contenu : `pre-commit` → Prettier + ESLint sur les fichiers modifiés ; `commit-msg` → commitlint avec les scopes de `docs/09` ; `pre-push` → `typecheck`
   - Tests attendus : `commitlint.test.ts` — `feat(engine): x` passe, `broken message` et `feat(unknown): x` échouent
 
-- [ ] **T4 — `packages/protocol` : squelette typé**
+- [x] **T4 — `packages/protocol` : squelette typé**
   - Fichiers : `packages/protocol/package.json`, `tsconfig.json`, `src/index.ts`, `src/version.ts`, `src/health.ts`, `test/health.test.ts`
   - Contenu : `PROTOCOL_VERSION`, schéma Zod `HealthResponse` (le seul message existant à ce jalon), helper `assertNever`
   - Tests attendus : le schéma accepte une réponse valide et rejette un corps inconnu ; `PROTOCOL_VERSION` est un entier positif
