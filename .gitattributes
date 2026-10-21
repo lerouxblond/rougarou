@@ -1,0 +1,17 @@
+# Normalisation : le depot est en LF, quelle que soit la plateforme.
+* text=auto eol=lf
+
+# Binaires : jamais de conversion de fins de ligne.
+*.png binary
+*.jpg binary
+*.webp binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.mp3 binary
+*.ogg binary
+*.wasm binary
+
+# Genere : exclu des diffs et des statistiques de langage.
+pnpm-lock.yaml linguist-generated=true -diff
+CHANGELOG.md linguist-generated=true
