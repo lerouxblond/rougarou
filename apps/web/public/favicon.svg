@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Rougarou">
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#F2C14E" stop-opacity="0.55" />
+      <stop offset="100%" stop-color="#F2C14E" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+  <rect width="64" height="64" fill="#070A12" />
+  <circle cx="32" cy="32" r="30" fill="url(#glow)" />
+  <circle cx="32" cy="32" r="12" fill="#ECE6D6" />
+</svg>

@@ -86,7 +86,7 @@ Playwright 1.64.1.
   - Contenu : `@import "../../design/tokens.css"` puis `@theme inline` pour exposer les tokens sémantiques à Tailwind ; `Button` avec les variantes `primary`/`secondary`/`ghost`/`danger` et les tailles `md`/`lg`, zone tactile au moins 44 px, anneau de focus `--color-focus` ; décorateur Ladle qui bascule `data-phase` nuit/jour
   - Tests attendus : `test/button.test.tsx` (Testing Library : rend le libellé passé, réagit au clavier, `axe` sans violation) et `test/contrast.test.ts` (exigé par `docs/06` : chaque paire texte/fond des deux thèmes atteint 4,5:1, et 3:1 pour les composants)
 
-- [ ] **T9 — `apps/web` : shell PWA**
+- [x] **T9 — `apps/web` : shell PWA**
   - Fichiers : `apps/web/package.json`, `vite.config.ts`, `tsconfig.json`, `index.html`, `src/main.tsx`, `src/i18n.ts`, `src/app.css`, `src/routes/__root.tsx`, `src/routes/index.tsx`, `public/icon-192.png`, `public/icon-512.png`, `public/icon-maskable-512.png`
   - Contenu : TanStack Router, i18next branché sur `@rougarou/i18n`, `tokens.css` importé, `data-phase="night"` sur `<html>` (fond de nuit hors partie), page d'accueil statique sans aucun texte en dur, manifest et service worker par `vite-plugin-pwa` (API et WS jamais mis en cache)
   - Tests attendus : `test/home.test.tsx` — l'accueil affiche le titre issu d'i18n et `axe` ne signale rien ; le build écrit `dist/manifest.webmanifest` et un service worker (`test/build-artifacts.test.ts`)

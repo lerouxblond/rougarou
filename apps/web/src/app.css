@@ -1,0 +1,13 @@
+/* Styles de l'app. Le design system et les tokens viennent de
+   `@rougarou/ui` ; on ajoute seulement les sources Tailwind propres a cette
+   app, que la feuille du paquet `ui` ne peut pas connaitre. */
+
+@import '@rougarou/ui/styles.css';
+
+@source '../src/**/*.{ts,tsx}';
+@source '../index.html';
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+}
