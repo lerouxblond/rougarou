@@ -78,7 +78,14 @@
       "no_tie": "There is no tie to break.",
       "not_tied": "That player is not among the tied players.",
       "target_is_wolf": "A wolf cannot target another wolf."
-    }
+    },
+    "not_found": "This resource cannot be found.",
+    "internal": "Something went wrong on the server.",
+    "invalid_message": "The message sent is not valid.",
+    "rate_limited": "Too many actions at once. Please wait a moment.",
+    "not_a_member": "You are not part of this game.",
+    "unauthenticated": "Sign in to continue.",
+    "conflict": "This action is no longer possible."
   },
   "roles": {
     "werewolf": {

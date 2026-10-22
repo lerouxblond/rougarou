@@ -1,3 +1,5 @@
+import type { EngineErrorCode } from '@rougarou/protocol';
+
 /**
  * Resultat d'une commande du moteur.
  *
@@ -11,22 +13,8 @@
 export type Result<TState, TEvent> =
   { ok: true; state: TState; events: TEvent[] } | { ok: false; error: EngineError };
 
-/** Codes d'erreur du moteur. Ils sont stables : le client les traduit. */
-export type EngineErrorCode =
-  | 'FORBIDDEN'
-  | 'GAME_FULL'
-  | 'INVALID_COMMAND'
-  | 'INVALID_COMPOSITION'
-  | 'INVALID_TARGET'
-  | 'NAME_TAKEN'
-  | 'NOT_YOUR_TURN'
-  | 'NOTHING_TO_UNDO'
-  | 'PENDING_ACTIONS'
-  | 'TOO_EARLY'
-  | 'UNDO_BLOCKED'
-  | 'UNKNOWN_PLAYER'
-  | 'UNSUPPORTED_OPTION'
-  | 'WRONG_PHASE';
+/** Codes d'erreur du moteur, definis dans `protocol` : ils traversent le reseau (ADR 0008). */
+export type { EngineErrorCode };
 
 /** Une erreur metier, destinee a etre renvoyee puis traduite par le client. */
 export interface EngineError {

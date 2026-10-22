@@ -116,7 +116,7 @@ type ClientMessage =
 type ServerMessage =
   | { t: 'state'; seq: number; view: PlayerView | NarratorView }
   | { t: 'ack'; id: string }
-  | { t: 'error'; id?: string; code: ErrorCode; message: string }
+  | { t: 'error'; id?: string; code: ErrorCode; messageKey: string }  // clé i18n, jamais un texte
   | { t: 'chat'; channel: ChannelId; msg: ChatMessage }
   | { t: 'private'; info: PrivateInfo }              // résultat Voyante, Renard…
   | { t: 'presence'; connected: PlayerId[] }         // au meneur seul (R-61)
@@ -124,7 +124,8 @@ type ServerMessage =
 ```
 
 - Chaque message porte un `v` (version du protocole). Si le client a une version trop ancienne, le serveur renvoie `error: 'PROTOCOL_OUTDATED'`, et l'app invite l'utilisateur à se mettre à jour.
-- Le `seq` est croissant. Si le client détecte un trou dans la séquence, il demande un `state` complet.
+- Le `seq` est la **révision** de la partie : il croît à chaque commande acceptée, `Undo` compris (le nombre d'événements, lui, diminue). Si le client détecte un trou dans la séquence, il demande un `state` complet.
+- Les schémas sont dans `packages/protocol/src/ws.ts` (WebSocket) et `rest.ts` (REST). Le chat (`t: 'chat'`) et `private` arrivent avec leurs jalons (M5, M3). Une réponse REST en erreur a la forme `{ code, messageKey }`.
 
 ## Authentification
 

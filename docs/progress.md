@@ -354,7 +354,7 @@ Quatre PR : **A** (T1–T3, règles et protocole), **B** (T4–T6, base et compt
   - Fichiers : `packages/protocol/src/{commands,views}.ts`, `packages/engine/src/{state,events,evolve,apply,actions,project,timers}.ts`, `phases/lobby.ts`, `test/{timers,lobby}.test.ts`, `test/bot.ts`, i18n
   - Tests attendus : P13 (pause → `Timeout` refusé ; reprise → échéance décalée de la durée de pause ; +30 s en marche et en pause ; refus sans minuteur ; annulable) ; la vue d'un joueur qui ne voit pas le minuteur reste identique pendant la nuit (non-fuite) ; P16 (`Alice` puis ` alice ` → `NAME_TAKEN`) ; les 1 000 parties aléatoires tirent aussi ces commandes ; couverture ≥ 90 %
 
-- [ ] **T3 — Protocole WS et REST** *(PR A)*
+- [x] **T3 — Protocole WS et REST** *(PR A)*
   - Fichiers : `packages/protocol/src/{ws,rest,errors,game-code}.ts`, `test/{ws,rest,game-code}.test.ts`, `version.ts` (passe à 2)
   - Contenu : `ClientMessage` (`cmd`, `ping` ; `chat` arrive en M5) et `ServerMessage` (`state`, `ack`, `error`, `presence`, `pong`), chacun avec `v` ; `ErrorCode` (`PROTOCOL_OUTDATED`, `RATE_LIMITED`, `INVALID_MESSAGE` et les codes du moteur) ; DTO REST (`CreateGame`, `JoinByCode`, `Ticket`, `Me`) ; code de partie à 6 caractères sans `0/O/1/I`
   - Tests attendus : chaque message valide passe ; une clé inconnue et un `v` absent sont refusés ; le code refuse les caractères ambigus

@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 import { compositionSchema, playerIdSchema } from './ids.ts';
 import { gameOptionsSchema } from './options.ts';
+import { displayNameSchema } from './rest.ts';
 
 /**
  * Qui envoie la commande.
@@ -44,7 +45,7 @@ export type Ballot = z.infer<typeof ballotSchema>;
  */
 export const commandSchema = z.discriminatedUnion('type', [
   // Salon
-  z.strictObject({ type: z.literal('JoinGame'), name: z.string().trim().min(1).max(30) }),
+  z.strictObject({ type: z.literal('JoinGame'), name: displayNameSchema }),
   z.strictObject({ type: z.literal('LeaveGame') }),
   z.strictObject({ type: z.literal('KickPlayer'), playerId: playerIdSchema }),
   z.strictObject({ type: z.literal('ReorderSeats'), order: z.array(playerIdSchema).max(24) }),

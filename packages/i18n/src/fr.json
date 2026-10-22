@@ -78,7 +78,14 @@
       "no_tie": "Il n'y a pas d'égalité à trancher.",
       "not_tied": "Ce joueur ne fait pas partie des ex æquo.",
       "target_is_wolf": "Un loup ne peut pas cibler un autre loup."
-    }
+    },
+    "not_found": "Cette ressource est introuvable.",
+    "internal": "Une erreur est survenue sur le serveur.",
+    "invalid_message": "Le message envoyé n'est pas valide.",
+    "rate_limited": "Trop d'actions d'un coup. Patientez un instant.",
+    "not_a_member": "Vous ne faites pas partie de cette partie.",
+    "unauthenticated": "Connectez-vous pour continuer.",
+    "conflict": "Cette action n'est plus possible."
   },
   "roles": {
     "werewolf": {
