@@ -136,6 +136,15 @@
         "wake": "The Witch wakes up. I show her tonight's victim: does she want to save them, or poison someone?",
         "sleep": "The Witch puts away her vials and goes back to sleep."
       }
+    },
+    "hunter": {
+      "name": "Hunter",
+      "short": "If he falls, he takes his last shot with him.",
+      "description": "A villager with his finger on the trigger. Whatever happens to him, he takes someone along.",
+      "rules": "You do not act at night. When you die, whatever the cause, you immediately pick a living player, who dies in turn. If you die at night, you shoot at dawn. Without a choice before the timer ends, you do not shoot. Your role is revealed as soon as your shot is awaited.",
+      "narrator": {
+        "shot": "With his last breath, the Hunter raises his rifle. Whom does he take with him?"
+      }
     }
   },
   "phase": {
