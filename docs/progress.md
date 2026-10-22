@@ -138,7 +138,7 @@ Trois éléments de la définition de « terminé » sortent de ce que je peux f
 | **L'URL de production affiche l'accueil** | ✅ | https://rougarou.neyteck-pro.workers.dev : l'accueil, `/api/health`, le manifest et `sw.js` répondent 200 (2026-10-22) |
 | **La PWA est installable** | ✅ (local) | Manifest, service worker, icônes dont une maskable, vérifiés par test et en e2e. À reconfirmer sur l'URL de production |
 | **La CI est verte** | ✅ | PR #1 : lint, types, tests et e2e au vert |
-| **Une PR produit une URL de preview** | ⏳ | L'authentification passe, mais `versions upload` exige que le Worker `rougarou-preview` existe déjà |
+| **Une PR produit une URL de preview** | ✅ | PR #4 : le Worker `rougarou-preview` est créé au premier passage, puis l'URL de preview est commentée sur la PR. L'accueil et `/api/health` répondent 200 |
 
 **Total des tests : 107 unitaires (7 paquets) + 18 e2e.**
 
@@ -167,7 +167,7 @@ défaut du dépôt GitHub est `master`. **Aucune exécution de CI n'a jamais eu 
   - `gh secret set CLOUDFLARE_API_TOKEN` et `gh secret set CLOUDFLARE_ACCOUNT_ID`
   - Tests attendus : `gh secret list` les affiche
 
-- [ ] **T17 — PR de vérification**
+- [x] **T17 — PR de vérification**
   - Pousser `init/jalon-01`, ouvrir une PR vers la branche par défaut
   - Tests attendus : `ci.yml` au vert, `deploy.yml` commente une URL de preview sur la PR ; après merge, l'URL de production affiche l'accueil et la PWA est installable
   - État (2026-10-22) : PR #1 mergée (squash) et production déployée. « Preview » échoue encore, car Wrangler refuse de téléverser une version d'un Worker qui n'existe pas (`rougarou-preview` n'a jamais été déployé). Release Please échoue aussi : GitHub Actions n'a pas le droit de créer de pull request dans ce dépôt
@@ -297,4 +297,6 @@ P10 → `R-14`, P11 → `R-15`, P12 → ADR 0008.
 
 **Total des tests : 184 dans le moteur (14 fichiers), plus 45 dans le protocole.**
 
-**M1 est terminé.** Il reste une action en dehors du jalon : relancer le job « Preview » de la PR #1, puisque les secrets Cloudflare existent maintenant, pour clore M0.
+**M1 est terminé.** M0 l'est aussi : production déployée (PR #1) et previews fonctionnelles (PR #4).
+
+**Choix de projection validés le 2026-10-22** (`docs/04` §Projection) : nuit uniforme, aube masquée avant « Lever le jour », causes de mort jamais publiques, et actions possibles jointes aux vues.
