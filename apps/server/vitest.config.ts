@@ -27,7 +27,10 @@ export default defineConfig(async () => {
           compatibilityDate: '2026-10-19',
           compatibilityFlags: ['nodejs_compat'],
           d1Databases: ['DB'],
-          bindings: { TEST_MIGRATIONS: migrations },
+          bindings: {
+            TEST_MIGRATIONS: migrations,
+            BETTER_AUTH_SECRET: 'test-secret-only-for-vitest-0123456789abcdef',
+          },
         },
       }),
     ],

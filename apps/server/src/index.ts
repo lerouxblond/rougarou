@@ -2,38 +2,43 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 
 import { apiError } from './api-error.ts';
+import type { AppEnv } from './app-env.ts';
+import { DEV_ORIGINS, NATIVE_ORIGINS } from './auth.ts';
 import { health } from './routes/health.ts';
+import { me } from './routes/me.ts';
+import { withAuth } from './session.ts';
+
+const app = new Hono<AppEnv>();
 
 /**
  * Origines autorisees a appeler l'API (`docs/04` §Securite).
  *
  * Le web est servi par ce meme Worker, donc sur la meme origine : il n'a pas
  * besoin de CORS. Seules les apps Tauri, qui ont leur propre origine, en ont
- * besoin.
+ * besoin, plus le serveur Vite en developpement.
  */
-const ALLOWED_ORIGINS = ['tauri://localhost', 'http://tauri.localhost'];
-
-/** En developpement, le serveur Vite tourne sur un autre port. */
-const DEV_ORIGINS = ['http://localhost:5173', 'http://127.0.0.1:5173'];
-
-const app = new Hono();
-
 app.use(
   '/api/*',
   cors({
     origin: (origin) => {
-      if (ALLOWED_ORIGINS.includes(origin)) {
+      if (NATIVE_ORIGINS.includes(origin)) {
         return origin;
       }
 
       return DEV_ORIGINS.includes(origin) ? origin : null;
     },
     credentials: true,
-    allowMethods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
+    allowMethods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
   }),
 );
 
 app.route('/api', health);
+
+app.use('/api/auth/*', withAuth);
+app.on(['GET', 'POST'], '/api/auth/*', (context) => context.var.auth.handler(context.req.raw));
+
+app.use('/api/me', withAuth);
+app.route('/api/me', me);
 
 /**
  * Une route d'API inconnue renvoie du JSON, jamais le `index.html` de la SPA :

@@ -134,7 +134,7 @@ type ServerMessage =
 - **Web (PWA)** : cookie de session `HttpOnly`, `Secure`, `SameSite=Lax`, sur le même domaine que l'API.
 - **Tauri** : plugin *bearer* de Better Auth. Le jeton est stocké dans le stockage sécurisé de l'OS (plugin Tauri `stronghold` ou keychain), jamais dans `localStorage`.
 - **WebSocket** : le client obtient d'abord un **ticket** à usage unique valable 30 s (`POST /api/games/:id/ticket`), puis ouvre `wss://…/ws/:gameId?ticket=…`. Le Worker vérifie la session à l'émission ; le ticket est émis et **consommé par le DO de la partie**, qui seul peut garantir l'usage unique : il refuse un ticket inconnu, expiré ou déjà servi. On ne met jamais le jeton de session dans l'URL.
-- **Invités** (D-04) : plugin `anonymous` de Better Auth. Un invité a une session et un identifiant comme un compte ; la conversion en compte garde cet identifiant (ADR 0009).
+- **Invités** (D-04) : plugin `anonymous` de Better Auth. Un invité a une session et un identifiant comme un compte. La conversion crée un nouveau compte, vers lequel on transfère d'abord ses lignes D1 (ADR 0009).
 - **E-mails** : Resend, derrière une interface `EmailSender`. Tant qu'aucun domaine n'est vérifié, la vérification d'e-mail et la réinitialisation par e-mail sont désactivées (ADR 0009).
 
 ## Base de données D1 (Drizzle)

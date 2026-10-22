@@ -364,7 +364,10 @@ Quatre PR : **A** (T1–T3, règles et protocole), **B** (T4–T6, base et compt
   - Contenu : tables de Better Auth, `profile`, `game`, `game_player`, `preset` (`docs/04`), index unique partiel `game(code) where status != 'ended'`
   - Tests attendus : les migrations s'appliquent sur la D1 de test ; deux parties actives ne partagent pas un code ; une partie terminée libère le sien
 
-- [ ] **T5 — Better Auth : e-mail + mot de passe, invités, profil, suppression** *(PR B)*
+- [x] **T5 — Better Auth : e-mail + mot de passe, invités, profil, suppression** *(PR B)*
+  - Mesure du 2026-10-22 : le scrypt natif de Better Auth coûte environ 108 ms de CPU par hachage (PBKDF2 à 100 000 itérations : 28 ms). **Décision** : on garde scrypt, et on vérifie l'inscription sur la preview ; si elle échoue en 1102, on passe à Workers Paid (ADR 0009). *Vérification en preview : à faire dès que la PR B est déployée.*
+  - Écart : la conversion d'un invité crée un **nouvel** identifiant (comportement du plugin `anonymous`) ; `onLinkAccount` transfère les lignes D1. L'ADR 0009 est corrigé. Les gabarits d'e-mail attendent le domaine (seuls l'interface et le client Resend sont livrés).
+  - Secrets `BETTER_AUTH_SECRET` posés sur la preview et la production ; `apps/server/.dev.vars.example` pour le local
   - Fichiers : `apps/server/src/auth.ts`, `src/email.ts` (`EmailSender`), `src/routes/me.ts`, `test/{auth,me}.test.ts`, `pnpm-workspace.yaml` (`better-auth` 1.7.12)
   - Contenu : handler `/api/auth/*`, mot de passe de 12 caractères minimum (US-01), plugin `anonymous` avec conversion vers un compte (D-04), cookie `HttpOnly; Secure; SameSite=Lax`, `GET`/`PATCH /api/me` (pseudo), `DELETE /api/me` (Q2), secret `BETTER_AUTH_SECRET`
   - Tests attendus : inscription, connexion, refus sous 12 caractères, session invité, conversion invité → compte avec le même identifiant, `PATCH /api/me` validé par Zod, suppression qui anonymise `game_player`, **mesure du CPU** du hachage

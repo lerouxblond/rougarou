@@ -12,6 +12,7 @@
   "dependencies": {
     "@rougarou/engine": "workspace:*",
     "@rougarou/protocol": "workspace:*",
+    "better-auth": "catalog:",
     "drizzle-orm": "catalog:",
     "hono": "catalog:"
   },
