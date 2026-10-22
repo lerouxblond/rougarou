@@ -25,6 +25,114 @@
     "unknown_player": "Ce joueur est introuvable.",
     "wrong_phase": "Cette action n'est pas possible dans cette phase.",
     "protocol_outdated": "Votre application est trop ancienne. Mettez-la à jour pour continuer.",
-    "network": "Connexion perdue. Nouvelle tentative…"
+    "network": "Connexion perdue. Nouvelle tentative…",
+    "game_full": "La partie est complète.",
+    "invalid_composition": "La composition ne permet pas de distribuer les rôles.",
+    "invalid_target": "Cette cible n'est pas valide.",
+    "nothing_to_undo": "Il n'y a rien à annuler.",
+    "pending_actions": "Des actions sont encore attendues. Forcez pour passer.",
+    "too_early": "Le minuteur n'est pas encore écoulé.",
+    "undo_blocked": "Impossible d'annuler : les joueurs ont déjà reçu cette information.",
+    "unsupported_option": "Cette option n'est pas encore disponible.",
+    "already_joined": "Vous êtes déjà dans cette partie.",
+    "dead_cannot_act": "Les morts ne peuvent plus agir.",
+    "nothing_to_expire": "Aucun minuteur n'est en cours.",
+    "seats_not_permutation": "Le nouvel ordre doit reprendre chaque joueur une seule fois.",
+    "target_dead": "Ce joueur est mort.",
+    "undo_needs_record": "L'annulation passe par le journal de la partie.",
+    "composition": {
+      "count_mismatch": "Il faut autant de rôles que de joueurs.",
+      "duplicate_unique": "Un rôle unique apparaît plusieurs fois.",
+      "no_wolf": "Il faut au moins un loup.",
+      "player_count": "Le nombre de joueurs n'est pas autorisé dans ce mode.",
+      "role_not_allowed": "Un rôle n'est pas autorisé dans ce mode.",
+      "role_unavailable": "Un rôle de la composition n'est pas encore disponible.",
+      "too_many_wolves": "Il faut moins de loups que d'autres joueurs."
+    },
+    "election": {
+      "candidacy_closed": "Les candidatures sont closes.",
+      "not_eligible": "Ce joueur ne peut pas être élu.",
+      "player_only": "Votez pour un joueur.",
+      "vote_closed": "Le vote n'est pas ouvert."
+    },
+    "options": {
+      "ceremony_unavailable": "La distribution un par un n'est pas encore disponible.",
+      "mode_unavailable": "Ce mode de jeu n'est pas encore disponible.",
+      "parallel_night_unavailable": "La nuit en parallèle n'est pas encore disponible.",
+      "roleplay_unavailable": "Le role play n'est pas encore disponible."
+    },
+    "vote": {
+      "closed": "Le vote est clos.",
+      "no_abstain": "L'abstention n'est pas autorisée dans cette partie.",
+      "no_spare": "Le choix « Épargner » n'est pas proposé.",
+      "no_tie": "Il n'y a pas d'égalité à trancher.",
+      "not_candidate": "Ce joueur n'est pas candidat.",
+      "not_tied": "Ce joueur ne fait pas partie des ex æquo.",
+      "self": "Vous ne pouvez pas voter contre vous-même."
+    },
+    "wolves": {
+      "already_resolved": "La meute a déjà choisi sa victime.",
+      "no_tie": "Il n'y a pas d'égalité à trancher.",
+      "not_tied": "Ce joueur ne fait pas partie des ex æquo.",
+      "target_is_wolf": "Un loup ne peut pas cibler un autre loup."
+    }
+  },
+  "roles": {
+    "werewolf": {
+      "name": "Loup-garou",
+      "description": "Chaque nuit, la meute se réunit et choisit une victime. Le jour, il se cache parmi les villageois."
+    },
+    "villager": {
+      "name": "Villageois",
+      "description": "Aucun pouvoir, seulement son flair et sa voix. Il débat et vote pour démasquer les loups."
+    }
+  },
+  "phase": {
+    "lobby": {
+      "title": "Salon"
+    },
+    "config": {
+      "title": "Préparation"
+    },
+    "deal": {
+      "title": "Distribution"
+    },
+    "presentations": {
+      "title": "Présentations"
+    },
+    "night": {
+      "title": "Nuit"
+    },
+    "dawn": {
+      "title": "Aube"
+    },
+    "mayor_election": {
+      "title": "Élection du Maire"
+    },
+    "day_debate": {
+      "title": "Débat"
+    },
+    "day_vote": {
+      "title": "Vote"
+    },
+    "execution": {
+      "title": "Exécution"
+    },
+    "ended": {
+      "title": "Fin de la partie"
+    }
+  },
+  "modes": {
+    "classic": {
+      "name": "Classique",
+      "description": "Les loups contre le village, avec les rôles et le Maire."
+    }
+  },
+  "winner": {
+    "village": "Le village l'emporte.",
+    "wolves": "Les loups l'emportent.",
+    "solo": "Un joueur l'emporte seul.",
+    "vampires": "Les vampires l'emportent.",
+    "nobody": "Personne ne gagne."
   }
 }

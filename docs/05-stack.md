@@ -6,12 +6,11 @@
 
 Les versions sont écrites **une seule fois**, dans le **catalogue pnpm** de `pnpm-workspace.yaml`. Les paquets écrivent `"eslint": "catalog:"` au lieu d'un numéro, donc une montée de version se fait à un seul endroit. `packageManager` épingle pnpm lui-même.
 
-Trois versions ne sont pas la dernière publiée, et c'est volontaire (vérifié le 2026-10-21) :
+Deux versions ne sont pas la dernière publiée, et c'est volontaire (vérifié le 2026-10-21) :
 
 | Outil | Retenue | Dernière | Pourquoi |
 |---|---|---|---|
 | TypeScript | 6.0.3 | 7.0.2 | `typescript-eslint` exige `typescript >=4.8.4 <6.1.0`. Passer à TS 7 ferait perdre tout le lint typé. |
-| Vitest | 4.1.12 | 5.0.5 | `@cloudflare/vitest-pool-workers` exige `vitest ^4.1.0`, et ce pool est indispensable pour tester le Durable Object (M2). |
 | `@types/react` | 19.3.0 | — | Suit React 19.3.1. |
 
 pnpm 12 refuse par défaut les versions publiées depuis trop peu de temps (`minimumReleaseAge`). Les paquets épinglés volontairement et plus récents que ce délai sont listés dans `minimumReleaseAgeExclude`.
@@ -37,7 +36,8 @@ pnpm 12 refuse par défaut les versions publiées depuis trop peu de temps (`min
 | Base de données | **Cloudflare D1** + **Drizzle ORM** / drizzle-kit | SQLite managé, migrations typées |
 | Auth | **Better Auth** (+ plugin bearer pour Tauri) | Auto-hébergé, adaptateur D1/Drizzle |
 | Apps natives | **Tauri 2** (Windows, macOS, Linux, Android, iOS) | Un seul code, binaires légers |
-| Tests unitaires | **Vitest** (+ `@cloudflare/vitest-pool-workers` pour le Worker et le DO) | Rapide, environnement Workers réel |
+| Tests unitaires | **Vitest** 5 (+ `@cloudflare/vitest-plugin`, ex-`vitest-pool-workers`, pour le Worker et le DO), couverture `@vitest/coverage-v8` | Rapide, environnement Workers réel |
+| Tests de propriétés | **fast-check** (moteur seulement, `docs/09`) | Parties aléatoires reproductibles par graine |
 | Tests e2e | **Playwright** (plusieurs contextes navigateur = plusieurs joueurs) | Simule une vraie table |
 | Qualité | **ESLint** (flat config, typescript-eslint), **Prettier**, **Lefthook** (hooks Git), **commitlint** | Normes vérifiées automatiquement |
 | CLI Cloudflare | **Wrangler** | Développement local et déploiement |

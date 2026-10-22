@@ -26,6 +26,11 @@ describe('createRng — determinisme (ADR 0002)', () => {
 
     expect([second.next(), second.next(), second.next()]).toEqual(drawn);
   });
+
+  it('refuse une graine non entiere : la partie ne serait plus rejouable', () => {
+    expect(() => createRng(1.5)).toThrow();
+    expect(() => createRng(Number.NaN)).toThrow();
+  });
 });
 
 describe('createRng — next', () => {

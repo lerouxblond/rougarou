@@ -1,0 +1,189 @@
+import {
+  gameOptionsSchema,
+  type Ballot,
+  type Composition,
+  type GameOptions,
+  type Phase,
+  type PlayerId,
+  type RoleId,
+  type TeamId,
+  type VoteOutcome,
+} from '@rougarou/protocol';
+
+/**
+ * Etat d'une partie.
+ *
+ * Il ne quitte jamais le serveur : seule la vue projetee en sort (`CLAUDE.md`
+ * regle 2, ADR 0008). Il est plat, indexe par identifiant de joueur, et
+ * entierement `readonly` (ADR 0007). C'est du JSON ordinaire, pour l'instantane
+ * du Durable Object et la comparaison en test.
+ */
+export interface GameState {
+  readonly gameId: string;
+  readonly phase: Phase;
+  readonly players: Readonly<Record<PlayerId, PlayerState>>;
+  /** Ordre des places autour de la table (`docs/02`, Renard et Montreur d'ours). */
+  readonly seats: readonly PlayerId[];
+  readonly options: GameOptions;
+  readonly composition: Composition;
+  /** Graine de la distribution, conservee pour le rejeu (ADR 0002). */
+  readonly seed: number | null;
+  /** Numero de la nuit en cours ou de la derniere nuit jouee. Le jour N suit la nuit N. */
+  readonly nightNumber: number;
+  readonly mayor: PlayerId | null;
+  /** Une election du Maire a deja eu lieu (`R-50`). */
+  readonly electionHeld: boolean;
+  readonly night: NightState | null;
+  readonly dawn: DawnState | null;
+  readonly election: ElectionState | null;
+  readonly vote: VoteState | null;
+  /** Effets a la mort en attente, dans l'ordre de `R-42`. */
+  readonly pending: readonly PendingEffect[];
+  /**
+   * Echeance de l'action en cours, en millisecondes (`R-14`). `null` : pas de
+   * minuteur, c'est le meneur qui avance.
+   */
+  readonly deadline: number | null;
+  readonly winner: Winner | null;
+}
+
+export interface PlayerState {
+  readonly id: PlayerId;
+  readonly name: string;
+  readonly role: RoleId | null;
+  readonly alive: boolean;
+  /** Le joueur a confirme « J'ai vu mon role » (`docs/01` §2, `DEAL`). */
+  readonly roleSeen: boolean;
+  /** Le role est connu de tous (mort avec `revealRoleOnDeath`, `R-43`). */
+  readonly roleRevealed: boolean;
+}
+
+/**
+ * Identifiant d'une sous-etape de nuit (`R-20`), declare par le role ou le
+ * mode qui la porte (`wolves` pour les loups).
+ */
+export type NightStepId = string;
+
+export interface NightState {
+  readonly number: number;
+  readonly steps: readonly NightStepId[];
+  /** Index de l'etape en cours. Egal a `steps.length` quand toutes sont passees. */
+  readonly current: number;
+  readonly stepResolved: boolean;
+  /** Vote en cours de chaque loup (`R-34`). */
+  readonly wolfVotes: Readonly<Record<PlayerId, PlayerId>>;
+  /** Ex aequo que le meneur doit departager, en mode `majority`. */
+  readonly wolfTie: readonly PlayerId[] | null;
+  /** Victime choisie par les loups : une intention, resolue a l'aube (`R-21`). */
+  readonly wolfVictim: PlayerId | null;
+}
+
+/** Cause d'une mort. */
+export type DeathCause = 'wolves' | 'vote';
+
+export interface Death {
+  readonly playerId: PlayerId;
+  readonly cause: DeathCause;
+}
+
+export interface DawnState {
+  readonly deaths: readonly Death[];
+  /** « Lever le jour » a ete joue : les morts sont publiques (`R-12`). */
+  readonly announced: boolean;
+}
+
+export interface ElectionState {
+  readonly stage: 'candidacy' | 'vote';
+  readonly candidates: readonly PlayerId[];
+  /** Joueurs pour qui l'on peut voter : les candidats, ou tous les vivants. */
+  readonly eligible: readonly PlayerId[];
+  readonly ballots: Readonly<Record<PlayerId, PlayerId>>;
+  readonly round: 1 | 2;
+}
+
+export interface VoteState {
+  readonly candidates: readonly PlayerId[];
+  /** Le choix « Epargner » est propose (`R-36`). */
+  readonly spare: boolean;
+  readonly ballots: Readonly<Record<PlayerId, Ballot>>;
+  readonly round: 1 | 2;
+  /** Ex aequo que le Maire doit departager (`R-33`, `R-38`). */
+  readonly tie: readonly PlayerId[] | null;
+  /** Le vote est clos ; l'execution suit. */
+  readonly closed: boolean;
+  /** Decompte et issue, une fois le vote clos. */
+  readonly result: {
+    readonly tally: Readonly<Record<string, number>>;
+    readonly outcome: VoteOutcome;
+  } | null;
+}
+
+/** Le Maire mort doit designer son successeur (`R-52`, `designate`). */
+export interface MayorSuccessionEffect {
+  readonly kind: 'mayorSuccession';
+  readonly from: PlayerId;
+}
+
+/** Un effet a la mort qui attend une resolution (`R-41`). Le Chasseur s'ajoute en M3. */
+export type PendingEffect = MayorSuccessionEffect;
+
+/** Issue de la partie (`docs/01` §1). */
+export type Winner = TeamId | 'nobody';
+
+/** Etat vide, avant l'evenement `GameCreated`. */
+export function emptyState(): GameState {
+  return {
+    gameId: '',
+    phase: 'LOBBY',
+    players: {},
+    seats: [],
+    options: gameOptionsSchema.parse({}),
+    composition: {},
+    seed: null,
+    nightNumber: 0,
+    mayor: null,
+    electionHeld: false,
+    night: null,
+    dawn: null,
+    election: null,
+    vote: null,
+    pending: [],
+    deadline: null,
+    winner: null,
+  };
+}
+
+/** Joueurs dans l'ordre des places. */
+export function seatedPlayers(state: GameState): PlayerState[] {
+  return state.seats.map((id) => getPlayer(state, id));
+}
+
+/** Joueurs vivants, dans l'ordre des places. */
+export function alivePlayers(state: GameState): PlayerState[] {
+  return seatedPlayers(state).filter((player) => player.alive);
+}
+
+/** Un joueur dont on sait qu'il existe. Un identifiant inconnu est un bug. */
+export function getPlayer(state: GameState, id: PlayerId): PlayerState {
+  const player = state.players[id];
+
+  if (player === undefined) {
+    throw new Error(`Joueur inconnu dans l'etat : ${id}`);
+  }
+
+  return player;
+}
+
+/** Remplace un joueur sans muter l'etat (ADR 0007). */
+export function updatePlayer(
+  state: GameState,
+  id: PlayerId,
+  patch: Partial<Omit<PlayerState, 'id'>>,
+): GameState {
+  return { ...state, players: { ...state.players, [id]: { ...getPlayer(state, id), ...patch } } };
+}
+
+/** Retire une cle d'un dictionnaire sans le muter. */
+export function omitKey<T>(record: Readonly<Record<string, T>>, key: string): Record<string, T> {
+  return Object.fromEntries(Object.entries(record).filter(([entry]) => entry !== key));
+}

@@ -135,10 +135,10 @@ Trois éléments de la définition de « terminé » sortent de ce que je peux f
 | Ladle avec un `Button` dans les deux thèmes | ✅ | `pnpm --filter @rougarou/ui run ladle:build` aboutit |
 | `ci.yml` et `deploy.yml` (preview et production) | ✅ | Écrits et validés ; la séquence de `ci.yml` passe en local |
 | ADR 0001 à 0005 relus, puis ADR 0007 | ✅ | `docs/adr/0007-mises-a-jour-immuables.md` |
-| **L'URL de production affiche l'accueil** | ⏳ | Demande les secrets Cloudflare et un premier déploiement (action humaine) |
+| **L'URL de production affiche l'accueil** | ✅ | https://rougarou.neyteck-pro.workers.dev : l'accueil, `/api/health`, le manifest et `sw.js` répondent 200 (2026-10-22) |
 | **La PWA est installable** | ✅ (local) | Manifest, service worker, icônes dont une maskable, vérifiés par test et en e2e. À reconfirmer sur l'URL de production |
-| **La CI est verte** | ⏳ | À confirmer au premier push sur GitHub |
-| **Une PR produit une URL de preview** | ⏳ | Demande les secrets Cloudflare |
+| **La CI est verte** | ✅ | PR #1 : lint, types, tests et e2e au vert |
+| **Une PR produit une URL de preview** | ✅ | PR #4 : le Worker `rougarou-preview` est créé au premier passage, puis l'URL de preview est commentée sur la PR. L'accueil et `/api/health` répondent 200 |
 
 **Total des tests : 107 unitaires (7 paquets) + 18 e2e.**
 
@@ -163,10 +163,140 @@ défaut du dépôt GitHub est `master`. **Aucune exécution de CI n'a jamais eu 
   - Option B : passer les workflows sur `master` et mettre à jour `docs/08` et `docs/09` dans le même commit.
   - Tests attendus : `gh api repos/lerouxblond/rougarou --jq .default_branch` renvoie la branche retenue
 
-- [ ] **T16 — Secrets Cloudflare** (action humaine)
+- [x] **T16 — Secrets Cloudflare** (action humaine, faite le 2026-10-22)
   - `gh secret set CLOUDFLARE_API_TOKEN` et `gh secret set CLOUDFLARE_ACCOUNT_ID`
   - Tests attendus : `gh secret list` les affiche
 
-- [ ] **T17 — PR de vérification**
+- [x] **T17 — PR de vérification**
   - Pousser `init/jalon-01`, ouvrir une PR vers la branche par défaut
   - Tests attendus : `ci.yml` au vert, `deploy.yml` commente une URL de preview sur la PR ; après merge, l'URL de production affiche l'accueil et la PWA est installable
+  - État (2026-10-22) : PR #1 mergée (squash) et production déployée. « Preview » échoue encore, car Wrangler refuse de téléverser une version d'un Worker qui n'existe pas (`rougarou-preview` n'a jamais été déployé). Release Please échoue aussi : GitHub Actions n'a pas le droit de créer de pull request dans ce dépôt
+
+---
+
+## M1 — Moteur v0 (sans interface)
+
+**But** : on peut jouer une partie Loups contre Villageois entièrement en tests.
+
+**Terminé quand** : la couverture du moteur dépasse 90 % et 1 000 parties aléatoires
+se terminent sans violer d'invariant.
+
+### Décisions bloquantes (`docs/12` §7)
+
+| ID | Décision | État |
+|---|---|---|
+| D-02 | Minuteurs par défaut | ✅ validé |
+| D-06 | Le meneur ne joue pas | ✅ validé |
+| D-07 | 5 à 24 joueurs en Classique | ✅ validé |
+| D-08 | Épargner, abstention en option, pas de vote contre soi | ✅ validé |
+
+### Précisions de règles (règle 5 de `CLAUDE.md`) — ✅ validées le 2026-10-22
+
+`docs/01` laissait des trous ou se contredisait avec `docs/12` sur les points suivants.
+Elles sont entrées dans `docs/01` en T1 : P1 → `R-37`, P2 → `R-34`, P3 → `R-12`,
+P4 → `R-11`, P5 → `R-13`, P6 → `R-44`, P7 → `R-35`, P8 → `R-38`, P9 → `R-07`,
+P10 → `R-14`, P11 → `R-15`, P12 → ADR 0008.
+
+| # | Sujet | Proposition |
+|---|---|---|
+| P1 | **Clôture des votes** : `docs/01` dit « automatique quand tous ont voté », alors que `docs/12` §1 laisse la clôture au meneur (et `R-31` permet de changer d'avis) | Le vote du village et celui du Maire ne se closent **jamais seuls** : le meneur clôt, ou le minuteur expire. Le moteur expose « tout le monde a voté » pour que le bouton du meneur le signale |
+| P2 | **Vote des loups** (`R-34`) | Unanimité : l'étape se résout dès que tous les loups vivants désignent la même cible. Majorité : dès que tous ont voté, la cible en tête l'emporte, et une égalité est tranchée par le meneur. Pas de choix « personne ». Minuteur expiré ou forçage sans accord : pas de victime |
+| P3 | **Aube en deux temps** : `docs/12` #9 montre au meneur les morts avant « Lever le jour » | À l'entrée en `DAWN`, les morts sont calculées et seul le meneur les voit. « Lever le jour » les annonce aux joueurs, puis les effets à la mort s'enchaînent. Une deuxième action du meneur passe à la suite |
+| P4 | **Annuler** (`R-11`) | Le meneur annule le dernier **groupe d'événements** (une commande). C'est refusé si ce groupe contient une révélation : distribution, annonce des morts, clôture d'un vote, élection, fin de partie. On peut annuler plusieurs fois de suite |
+| P5 | **Forcer** (`R-10`) | Valeurs par défaut : loups → pas de victime ; vote → clôture avec les bulletins déposés ; successeur du Maire → tirage ; « J'ai vu mon rôle » → ignoré. Le forçage est journalisé |
+| P6 | **Victoire et succession du Maire** (`R-05`, `R-42`) | La victoire est vérifiée une fois la file d'effets vide. Seule exception : la succession du Maire, qui ne peut tuer personne, est sautée si la partie est déjà gagnée |
+| P7 | **Élection du Maire** (`R-35`, `R-50`) | Votants = les vivants. On peut voter pour soi (la règle « pas de vote contre soi-même » de D-08 vise l'exécution). Pas d'abstention. Égalité → second vote entre ex æquo → tirage. Aucun bulletin → tirage parmi les éligibles |
+| P8 | **Égalité au vote du village** (`R-33`) | `mayor` : le Maire choisit parmi les ex æquo (30 s, puis personne n'est exécuté). `revote` : seuls les ex æquo sont candidats, sans « Épargner ». Aucun bulletin déposé → personne n'est exécuté |
+| P9 | **Composition valide en Classique** | Autant de rôles que de joueurs, 5 à 24 joueurs, au moins 1 loup, strictement moins de loups que de non-loups |
+| P10 | **Minuteurs dans un moteur sans horloge** | Le moteur range une échéance `deadline = ctx.now + durée` et accepte une commande système `Timeout` seulement si `ctx.now >= deadline`. Les alarmes du DO, Pause et +30 s arrivent en M2 |
+| P11 | **Options pas encore prises en charge** | Le schéma contient toutes les options de `docs/01` §8, mais `roleplay: true` (M5), `dealMode: 'ceremony'` (M4) et `parallelNight: true` (M5) sont refusés en M1 avec une erreur explicite |
+| P12 | **Où vivent les schémas Zod** : `docs/01` §8 place les options dans `engine/src/options.ts`, mais elles traversent le réseau dans la commande de configuration, et `protocol` ne peut pas dépendre d'`engine` | Les schémas des **options**, des **commandes** et des **vues projetées** vont dans `packages/protocol`. Les **événements** et `GameState` restent internes au moteur. Les vues sont des schémas `.strict()`, ce qui permet aux tests de non-fuite de refuser tout champ inattendu. Décision consignée dans l'ADR 0008 |
+
+### Tâches
+
+- [x] **T1 — Préciser les règles et écrire l'ADR 0008**
+  - Fichiers : `docs/01-regles-du-jeu.md` (P1 à P11), `docs/04-architecture.md` (P12), `docs/adr/0008-schemas-dans-protocol.md`
+  - Tests attendus : aucun (document)
+
+- [x] **T2 — Outillage de test du moteur**
+  - Fichiers : `pnpm-workspace.yaml` (ajout de `fast-check`), `docs/05-stack.md` (Vitest 5 et `@cloudflare/vitest-plugin`, que M0 avait adoptés sans mettre la doc à jour), `packages/engine/package.json`, `packages/engine/vitest.config.ts` (seuils de 90 % en lignes et en branches, mesurés à chaque `pnpm test`)
+  - Tests attendus : `pnpm --filter @rougarou/engine test` mesure la couverture et échoue sous 90 % ; une branche non testée du `Rng` (graine non entière) a été couverte
+
+- [x] **T3 — `protocol` : identifiants, options, commandes**
+  - Fichiers : `packages/protocol/src/{ids,options,commands}.ts`, `test/{options,commands}.test.ts`
+  - Contenu : `GameOptions` (toutes les clés de `docs/01` §8 avec leurs défauts et les minuteurs de D-02), l'union discriminée `Command` avec son enveloppe `{ actor, cmd }`
+  - Tests attendus : l'objet vide se complète avec les défauts, une clé inconnue est refusée, chaque commande valide passe et un `type` inconnu est refusé
+
+> **T4 à T8 forment un seul commit.** `evolve`, l'état et les événements couvrent toute
+> la boucle de jeu. Un commit T4 isolé aurait donc fait chuter la couverture sous le
+> seuil de 90 % imposé en T2, et `pnpm check` aurait échoué. Plutôt que d'abaisser le
+> seuil, la boucle a été écrite en entier, puis testée tâche par tâche avant un commit
+> unique. Écart au découpage relevé en cours de route : à l'expiration d'un minuteur, la
+> succession du Maire était résolue, mais le moteur passait aussi au jour à la place du
+> meneur. C'est corrigé, et `R-14` le précise désormais.
+
+- [x] **T4 — Cœur du moteur : état, événements, `evolve`, salon, configuration, distribution**
+  - Fichiers : `packages/engine/src/{state,events,evolve,apply,defaults}.ts`, `roles/{index,werewolf,villager}.ts`, `modes/{index,classic}.ts`, `phases/{lobby,config,deal}.ts`, `test/dsl.ts`
+  - Contenu : `GameState` plat et `readonly`, les événements, `apply` = valider puis émettre puis `evolve`, les registres des rôles et des modes (`RoleDefinition`, `GameModeDefinition`), une distribution déterministe par `rng`, et un DSL de test (`game().players().roles()…`)
+  - Tests attendus : rejoindre/expulser/réordonner, composition invalide refusée (P9), D-07, distribution identique pour une même graine, rôles refusés hors mode, autorisations (`FORBIDDEN`), et l'état d'entrée jamais modifié
+
+- [x] **T5 — Nuit : plan de nuit, vote des loups, minuteurs, forçage**
+  - Fichiers : `src/night/{plan,wolves}.ts`, `src/timers.ts`, `test/night/*.test.ts`
+  - Tests attendus : `R-20` (ordre calculé à partir des rôles vivants), `R-34` dans les deux modes (P2), `R-10` et P5, P10 (`Timeout` refusé avant l'échéance), `pilotMode` `assisted` / `manual`
+
+- [x] **T6 — Aube, pipeline des morts, victoire**
+  - Fichiers : `src/deaths.ts`, `src/victory.ts`, `src/phases/dawn.ts`, `test/{deaths,victory,dawn}.test.ts`
+  - Tests attendus : `R-40` à `R-43`, P3, `R-01`, `R-02` (avec et sans `wolvesWinOnParity`), `R-05`, `R-06` (« Personne ne gagne »), et les conditions de victoire venant du mode
+
+- [x] **T7 — Jour : débat, vote du village, exécution**
+  - Fichiers : `src/phases/{debate,vote,execution}.ts`, `src/votes.ts`, `test/vote/*.test.ts`
+  - Tests attendus : `R-30` à `R-33` et `R-36`, P1, P8, D-08 (pas de vote contre soi), abstention en option, et non-votants ignorés
+
+- [x] **T8 — Le Maire**
+  - Fichiers : `src/phases/mayor-election.ts`, `src/mayor.ts`, `test/mayor/*.test.ts`
+  - Tests attendus : `R-50` à `R-52` (`designate` et `reelect`, y compris une mort à l'exécution suivie d'un `tieBreak` → `revote`), P6, P7, double voix (`R-32`). `R-53` reste sans objet tant que l'Idiot n'existe pas (M6) : le point d'accroche est prévu, mais pas de test
+
+- [x] **T9 — Rejeu, instantanés, `Undo`**
+  - Fichiers : `src/replay.ts`, `src/undo.ts`, `test/{replay,undo}.test.ts`
+  - Tests attendus : `events.reduce(evolve)` redonne l'état, un instantané est pris tous les 50 événements, et P4 (annulation acceptée ou refusée, plusieurs fois de suite)
+
+- [x] **T10 — `projectView` en liste blanche, et non-fuite**
+  - Fichiers : `packages/protocol/src/views.ts`, `packages/engine/src/project.ts`, `test/leaks/generic.test.ts`
+  - Tests attendus : chaque vue est validée par le schéma `.strict()`. Sur des parties simulées, à chaque événement et pour chaque joueur, aucun rôle d'autrui ne fuit, sauf les loups entre eux, `revealRoleOnDeath` et `deadSeeRoles`. Aucune cible de nuit et aucun bulletin secret ne fuit non plus. `availableActions` est cohérent avec ce que `apply` accepte
+
+- [x] **T11 — Textes i18n du moteur**
+  - Fichiers : `packages/i18n/src/{fr,en}.json`, `packages/engine/test/i18n-keys.test.ts`
+  - Tests attendus : toutes les `messageKey` du moteur et tous les noms de rôles, de phases et de modes existent en `fr`
+
+- [x] **T12 — Tests de propriétés**
+  - Fichiers : `packages/engine/test/properties/random-games.test.ts`
+  - Tests attendus : 1 000 parties aléatoires (5 à 24 joueurs, toutes options, actions et forçages au hasard) se terminent. Invariants : aucun mort n'agit ni ne vote, il y a au plus un Maire et il est vivant, le rejeu égale l'état, le décompte des camps est cohérent, et la victoire est conforme à `R-01`/`R-02`
+
+- [x] **T13 — Vérification de la définition de « terminé » et rapport**
+  - Fichiers : `docs/progress.md`
+  - Tests attendus : `pnpm check` au vert, couverture du moteur ≥ 90 % (lignes et branches)
+  - Écart relevé pendant la vérification : la roadmap demande la **retouche de projection** dans l'architecture des modes, et elle manquait. Elle a été ajoutée (`GameModeDefinition.project`), sans mode qui s'en serve avant M7.
+
+### Vérification de la définition de « terminé »
+
+| Point | État | Preuve |
+|---|---|---|
+| **Couverture du moteur > 90 %** | ✅ | 95,4 % des lignes, 92,1 % des branches, 99,5 % des fonctions. Le seuil est appliqué à chaque `pnpm test` |
+| **1 000 parties aléatoires sans violer d'invariant** | ✅ | `test/properties/random-games.test.ts`, de 5 à 24 joueurs, toutes options, environ 14 s. Un bogue volontaire a été injecté et détecté |
+| `GameState`, commandes, événements, `apply`, `evolve`, rejeu, `Undo`, `Rng` à graine | ✅ | `src/{state,events,evolve,apply,record}.ts`. Le rejeu est vérifié à chaque partie aléatoire |
+| Machine d'états (`docs/01` §2) | ✅ sauf `PRESENTATIONS` | `PRESENTATIONS` appartient au role play (M5) et est refusé par `R-15` |
+| Options (schéma Zod) | ✅ | `packages/protocol/src/options.ts` (ADR 0008) |
+| Votes `R-30` à `R-35` (et `R-36` à `R-38`) | ✅ | `test/vote.test.ts`, `test/mayor.test.ts` |
+| Maire `R-50` à `R-52`, `designate` et `reelect` | ✅ | `test/mayor.test.ts`. `R-53` attend l'Idiot du village (M6) |
+| Pipeline des morts `R-40` à `R-43` (et `R-44`) | ✅ | `test/dawn.test.ts`, `test/mayor.test.ts` |
+| Victoire `R-01` à `R-06` | ✅ pour `R-01`, `R-02`, `R-05` et `R-06` | `R-03` (amoureux, M3) et `R-04` (rôles solo, M6) se brancheront sur `WinCondition` et sa priorité |
+| Rôles `werewolf` et `villager` en plugins, avec registre | ✅ | `src/roles/`. L'étape de nuit des loups appartient au plugin du rôle |
+| Registre des modes avec `classic` : étapes de nuit, victoire, retouche de projection | ✅ | `src/modes/` |
+| `projectView` en liste blanche et test de non-fuite générique | ✅ | `src/project.ts`, `test/leaks/generic.test.ts`. Deux fuites volontaires ont été détectées |
+| DSL de test et tests de propriétés fast-check | ✅ | `test/dsl.ts`, `test/bot.ts`, `test/properties/` |
+
+**Total des tests : 184 dans le moteur (14 fichiers), plus 45 dans le protocole.**
+
+**M1 est terminé.** M0 l'est aussi : production déployée (PR #1) et previews fonctionnelles (PR #4).
+
+**Choix de projection validés le 2026-10-22** (`docs/04` §Projection) : nuit uniforme, aube masquée avant « Lever le jour », causes de mort jamais publiques, et actions possibles jointes aux vues.

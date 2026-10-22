@@ -1,0 +1,87 @@
+import { describe, expect, it } from 'vitest';
+
+import { gameOptionsSchema, resolveFakeWake } from '../src/index.ts';
+
+describe('gameOptionsSchema (docs/01 §8)', () => {
+  it('complete un objet vide avec toutes les valeurs par defaut', () => {
+    const options = gameOptionsSchema.parse({});
+
+    expect(options).toMatchObject({
+      playMode: 'inPerson',
+      gameMode: 'classic',
+      mayor: true,
+      dealMode: 'simultaneous',
+      pilotMode: 'assisted',
+      roleplay: false,
+      mayorSuccession: 'designate',
+      revealRoleOnDeath: true,
+      deadSeeRoles: true,
+      voteVisibility: 'public',
+      allowAbstain: false,
+      allowSpare: true,
+      tieBreak: 'mayor',
+      wolfVoteMode: 'unanimous',
+      wolvesWinOnParity: false,
+      seerMode: 'role',
+      witchSelfSave: 'firstNightOnly',
+      parallelNight: false,
+    });
+  });
+
+  it('applique les minuteurs de D-02 : seulement sur les actions', () => {
+    const { timers } = gameOptionsSchema.parse({});
+
+    expect(timers).toEqual({
+      roleReveal: null,
+      characterSheet: null,
+      presentation: null,
+      nightAction: 45,
+      wolfVote: 90,
+      hunterShot: 30,
+      mayorSuccessor: 30,
+      tieBreak: 30,
+      mayorCandidacy: 60,
+      mayorVote: 90,
+      debate: null,
+      dayVote: 60,
+    });
+  });
+
+  it('garde les minuteurs par defaut quand un seul est modifie', () => {
+    const { timers } = gameOptionsSchema.parse({ timers: { dayVote: 120 } });
+
+    expect(timers.dayVote).toBe(120);
+    expect(timers.wolfVote).toBe(90);
+  });
+
+  it('accepte de desactiver un minuteur avec null', () => {
+    expect(gameOptionsSchema.parse({ timers: { wolfVote: null } }).timers.wolfVote).toBeNull();
+  });
+
+  it('refuse une cle inconnue (CLAUDE.md regle 4)', () => {
+    expect(gameOptionsSchema.safeParse({ cheat: true }).success).toBe(false);
+    expect(gameOptionsSchema.safeParse({ timers: { cheat: 5 } }).success).toBe(false);
+  });
+
+  it('refuse une valeur hors de l enumeration', () => {
+    expect(gameOptionsSchema.safeParse({ tieBreak: 'coinFlip' }).success).toBe(false);
+  });
+
+  it('refuse un minuteur non entier ou trop court', () => {
+    expect(gameOptionsSchema.safeParse({ timers: { dayVote: 1.5 } }).success).toBe(false);
+    expect(gameOptionsSchema.safeParse({ timers: { dayVote: 1 } }).success).toBe(false);
+  });
+});
+
+describe('resolveFakeWake (R-20)', () => {
+  it('vaut true en presentiel et false a distance quand elle est absente', () => {
+    expect(resolveFakeWake(gameOptionsSchema.parse({ playMode: 'inPerson' }))).toBe(true);
+    expect(resolveFakeWake(gameOptionsSchema.parse({ playMode: 'remote' }))).toBe(false);
+  });
+
+  it('respecte une valeur explicite', () => {
+    const options = gameOptionsSchema.parse({ playMode: 'inPerson', fakeWakeForDeadRoles: false });
+
+    expect(resolveFakeWake(options)).toBe(false);
+  });
+});
