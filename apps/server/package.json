@@ -12,12 +12,15 @@
   "dependencies": {
     "@rougarou/engine": "workspace:*",
     "@rougarou/protocol": "workspace:*",
+    "better-auth": "catalog:",
+    "drizzle-orm": "catalog:",
     "hono": "catalog:"
   },
   "devDependencies": {
     "@cloudflare/vitest-plugin": "catalog:",
     "@cloudflare/workers-types": "catalog:",
     "@rougarou/config": "workspace:*",
+    "drizzle-kit": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:",
     "wrangler": "catalog:"

@@ -43,8 +43,8 @@ jobs:
       - run: pnpm run build
 
       # Les migrations D1 s'appliquent AVANT le deploiement du Worker et
-      # doivent rester retrocompatibles (docs/08). La base arrive au jalon M2,
-      # donc l'etape attend qu'un repertoire de migrations existe.
+      # doivent rester retrocompatibles (docs/08). `--env` est necessaire : les
+      # bases sont declarees par environnement dans wrangler.jsonc.
       - name: Migrations D1
         if: ${{ hashFiles('apps/server/migrations/*.sql') != '' }}
         uses: cloudflare/wrangler-action@v4
@@ -54,7 +54,7 @@ jobs:
           workingDirectory: apps/server
           command: >-
             d1 migrations apply
-            ${{ github.event_name == 'pull_request' && 'rougarou-db-preview' || 'rougarou-db' }}
+            ${{ github.event_name == 'pull_request' && 'rougarou-db-preview --env preview' || 'rougarou-db --env production' }}
             --remote
 
       # `versions upload` exige que le Worker de preview existe deja. Au tout

@@ -359,20 +359,24 @@ Quatre PR : **A** (T1–T3, règles et protocole), **B** (T4–T6, base et compt
   - Contenu : `ClientMessage` (`cmd`, `ping` ; `chat` arrive en M5) et `ServerMessage` (`state`, `ack`, `error`, `presence`, `pong`), chacun avec `v` ; `ErrorCode` (`PROTOCOL_OUTDATED`, `RATE_LIMITED`, `INVALID_MESSAGE` et les codes du moteur) ; DTO REST (`CreateGame`, `JoinByCode`, `Ticket`, `Me`) ; code de partie à 6 caractères sans `0/O/1/I`
   - Tests attendus : chaque message valide passe ; une clé inconnue et un `v` absent sont refusés ; le code refuse les caractères ambigus
 
-- [ ] **T4 — D1, Drizzle et migrations** *(PR B)*
+- [x] **T4 — D1, Drizzle et migrations** *(PR B)* — bases `rougarou-db` et `rougarou-db-preview` créées le 2026-10-22 (région `weur`)
   - Fichiers : `apps/server/src/db/schema.ts`, `apps/server/drizzle.config.ts`, `apps/server/migrations/0000_*.sql` (générée), `wrangler.jsonc` (D1 par environnement), `vitest.config.ts`, `pnpm-workspace.yaml` (`drizzle-orm` 0.45.4, `drizzle-kit` 0.31.11)
   - Contenu : tables de Better Auth, `profile`, `game`, `game_player`, `preset` (`docs/04`), index unique partiel `game(code) where status != 'ended'`
   - Tests attendus : les migrations s'appliquent sur la D1 de test ; deux parties actives ne partagent pas un code ; une partie terminée libère le sien
 
-- [ ] **T5 — Better Auth : e-mail + mot de passe, invités, profil, suppression** *(PR B)*
+- [x] **T5 — Better Auth : e-mail + mot de passe, invités, profil, suppression** *(PR B)*
+  - Mesure du 2026-10-22 : le scrypt natif de Better Auth coûte environ 108 ms de CPU par hachage (PBKDF2 à 100 000 itérations : 28 ms). **Décision** : on garde scrypt, et on vérifie l'inscription sur la preview ; si elle échoue en 1102, on passe à Workers Paid (ADR 0009). *Vérification en preview : à faire dès que la PR B est déployée.*
+  - Écart : la conversion d'un invité crée un **nouvel** identifiant (comportement du plugin `anonymous`) ; `onLinkAccount` transfère les lignes D1. L'ADR 0009 est corrigé. Les gabarits d'e-mail attendent le domaine (seuls l'interface et le client Resend sont livrés).
+  - Secrets `BETTER_AUTH_SECRET` posés sur la preview et la production ; `apps/server/.dev.vars.example` pour le local
   - Fichiers : `apps/server/src/auth.ts`, `src/email.ts` (`EmailSender`), `src/routes/me.ts`, `test/{auth,me}.test.ts`, `pnpm-workspace.yaml` (`better-auth` 1.7.12)
   - Contenu : handler `/api/auth/*`, mot de passe de 12 caractères minimum (US-01), plugin `anonymous` avec conversion vers un compte (D-04), cookie `HttpOnly; Secure; SameSite=Lax`, `GET`/`PATCH /api/me` (pseudo), `DELETE /api/me` (Q2), secret `BETTER_AUTH_SECRET`
   - Tests attendus : inscription, connexion, refus sous 12 caractères, session invité, conversion invité → compte avec le même identifiant, `PATCH /api/me` validé par Zod, suppression qui anonymise `game_player`, **mesure du CPU** du hachage
 
-- [ ] **T6 — REST des parties** *(PR B)*
+- [x] **T6 — REST des parties** *(PR B)*
   - Fichiers : `apps/server/src/routes/games.ts`, `src/ulid.ts`, `test/games.test.ts`
-  - Contenu : `POST /api/games` (ULID, code unique avec nouvelle tentative sur collision, DO initialisé), `POST /api/games/join` (code → `gameId` ; refusé après la distribution, sauf pour un membre), `POST /api/games/:id/ticket`
-  - Tests attendus : sans session → 401 ; code introuvable → 404 ; partie distribuée → 409 pour un nouveau venu et 200 pour un membre ; corps invalide → 400
+  - Contenu : `POST /api/games` (ULID, code unique avec nouvelle tentative sur collision), `POST /api/games/join` (code actif → `gameId`)
+  - Écart au plan : le ticket (`POST /api/games/:id/ticket`) passe en T8, puisque c'est le DO qui l'émet (P15) ; le DO est donc initialisé au premier ticket, et non à la création. « Rejoindre après la distribution » n'est pas refusé par la route, qui doit laisser revenir un membre après un rechargement : c'est le moteur qui refuse un nouveau venu (`WRONG_PHASE`)
+  - Tests : sans session → 401 ; code inconnu ou partie terminée → 404 ; partie en cours trouvable ; corps invalide → 400 ; ULID triable ; alphabet du code
 
 - [ ] **T7 — `GameRoom` : journal SQLite, commandes, diffusion** *(PR C)*
   - Fichiers : `apps/server/src/room/{game-room,storage,broadcast}.ts`, `wrangler.jsonc` (classe et migration du DO), `test/room.test.ts`
