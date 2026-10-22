@@ -36,6 +36,7 @@ Les migrations D1 s'appliquent **avant** le déploiement du Worker, et elles doi
 - Utilise `cloudflare/wrangler-action`.
 - Étapes : `wrangler d1 migrations apply <db> --remote`, puis `wrangler deploy` (ou `versions upload` pour une preview).
 - Le Worker de preview (`rougarou-preview`) est créé automatiquement par `deploy --env preview` au premier passage, car `versions upload` exige qu'il existe déjà.
+- `versions upload` ne sait pas non plus appliquer une **migration de Durable Object** (nouvelle classe, renommage). Si le téléversement échoue, le workflow lance `deploy --env preview` pour appliquer la migration, puis retente. En production, `wrangler deploy` les applique de lui-même.
 - Secrets nécessaires : `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`.
 - Secrets du Worker (définis une fois par `wrangler secret put`, pas dans GitHub) : `BETTER_AUTH_SECRET`, `GOOGLE_CLIENT_ID`/`SECRET`, clé du fournisseur d'e-mail.
 
