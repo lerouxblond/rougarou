@@ -416,7 +416,25 @@ Quatre PR : **A** (T1–T3, règles et protocole), **B** (T4–T6, base et compt
   - Résultat en local (2026-10-22) : la partie à six navigateurs va jusqu'à la victoire du village en 9 s, chaque vue de joueur est contrôlée contre la fuite de rôle à chaque tour, et chaque joueur (puis le meneur) recharge en pleine nuit et retrouve exactement sa vue. 19 tests e2e passent ; les deux scénarios à six navigateurs ne tournent que sur Chromium
   - Bogue trouvé : la session invité et la déconnexion partaient sans corps JSON, et Better Auth répond alors 415. Corrigé dans `apps/web/src/api.ts`
 
-- [ ] **T13 — Déploiement, vérification et rapport**
+- [x] **T13 — Déploiement, vérification et rapport**
   - Fait le 2026-10-22 : bases D1 créées, `BETTER_AUTH_SECRET` posé sur la preview et la production, `deploy.yml` applique la migration du Durable Object avant un téléversement de preview (`versions upload` ne le sait pas, `docs/08` mis à jour)
-  - **Preview de la PR #8** (`rougarou-preview.neyteck-pro.workers.dev`) : les 11 tests e2e Chromium passent, dont la partie à six navigateurs jusqu'à la victoire (25 s) et la reconnexion en pleine nuit (29 s). Aucune erreur 1102 sur une douzaine de sessions
-  - **Reste à faire** : merger les PR #5 à #8 dans `main` (déploiement de production), puis `E2E_BASE_URL=https://rougarou.neyteck-pro.workers.dev pnpm exec playwright test --project=chromium`
+  - PR #5 à #8 mergées en squash dans `main`, l'une après l'autre (chaque branche rebasée sur `main`)
+  - **Production** (`rougarou.neyteck-pro.workers.dev`, commit `8aed39b`) : les 11 tests e2e Chromium passent, dont la partie à six navigateurs jusqu'à la victoire (37 s) et la reconnexion en pleine nuit (39 s)
+
+### Vérification de la définition de « terminé »
+
+| Point | État | Preuve |
+|---|---|---|
+| **6 navigateurs (1 meneur, 5 joueurs) jouent une partie Loups contre Villageois en production** | ✅ | `E2E_BASE_URL=https://rougarou.neyteck-pro.workers.dev`, `e2e/m2-full-game.spec.ts` : six contextes de navigateur, de la création par le meneur à la victoire du village, avec un contrôle de non-fuite de rôle à chaque tour |
+| **Recharger une page en pleine nuit restaure l'état** | ✅ | `e2e/m2-reconnect.spec.ts` en production : chaque joueur, puis le meneur, recharge et retrouve exactement sa vue |
+| D1 + Drizzle + migrations, Better Auth, profil | ✅ | `apps/server/src/db/`, `migrations/0000_init.sql`, e-mail + mot de passe et invités (D-04), `GET`/`PATCH`/`DELETE /api/me` (D-21). Google : prévu, non branché |
+| REST : créer, rejoindre par code, ticket WS | ✅ | `POST /api/games`, `POST /api/games/join`, `GET /api/games/:id`, `POST /api/games/:id/ticket` |
+| `GameRoom` : hibernation, journal SQLite, vues projetées, alarmes, reconnexion | ✅ | `apps/server/src/room/`, 55 tests serveur dans le runtime Workers |
+| Client : store Zustand, indicateur de connexion | ✅ | `apps/web/src/game/`, reconnexion à délai croissant |
+| Écrans bruts : salon, distribution, vue de débogage | ✅ | `apps/web/src/routes/Game.tsx` et `src/game/` |
+
+**Total des tests : 202 dans le moteur, 82 dans le protocole, 55 dans le serveur, 43 dans le web, 50 dans `ui`, plus 19 e2e (11 sur Chromium contre la production).**
+
+**M2 est terminé.**
+
+**Points ouverts** : (1) les e-mails attendent un domaine (D-17, ADR 0009) ; (2) le coût CPU de scrypt est à surveiller dans le tableau de bord Cloudflare (aucune erreur 1102 constatée) ; (3) GitHub a deux fois signalé un run de CI terminé alors que son job e2e tournait encore, et une fois renvoyé une erreur interne à release-please : il faut vérifier les jobs eux-mêmes avant de merger.
