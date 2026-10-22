@@ -25,6 +25,15 @@ export const nightActionSchema = z.discriminatedUnion('kind', [
   z.strictObject({ kind: z.literal('wolfVote'), target: playerIdSchema }),
   /** La Voyante sonde un joueur (`docs/02`). */
   z.strictObject({ kind: z.literal('seerProbe'), target: playerIdSchema }),
+  /**
+   * La Sorciere repond en une fois (`docs/02`) : potion de vie sur la victime
+   * des loups, potion de mort sur `kill`. Ne rien faire : `false` et `null`.
+   */
+  z.strictObject({
+    kind: z.literal('witchPotions'),
+    save: z.boolean(),
+    kill: playerIdSchema.nullable(),
+  }),
 ]);
 
 export type NightAction = z.infer<typeof nightActionSchema>;

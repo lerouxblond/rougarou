@@ -112,6 +112,14 @@ const nightActionDescriptorSchema = z.discriminatedUnion('kind', [
     kind: z.literal('seerProbe'),
     targets: playerIdList,
   }),
+  z.strictObject({
+    type: z.literal('SubmitNightAction'),
+    kind: z.literal('witchPotions'),
+    /** La potion de vie peut sauver la victime des loups. */
+    canSave: z.boolean(),
+    /** Cibles de la potion de mort, vide si elle est bue. */
+    killTargets: playerIdList,
+  }),
 ]);
 
 /**
@@ -175,6 +183,9 @@ const selfSchema = z.strictObject({
   knowledge: z.array(knowledgeSchema),
 });
 
+/** Les potions qui restent a une Sorciere. */
+const potionsSchema = z.strictObject({ life: z.boolean(), death: z.boolean() });
+
 /**
  * L'etape de nuit, vue seulement par ceux qui y agissent ou la regardent.
  * Chaque etape a sa forme.
@@ -188,6 +199,13 @@ const playerNightSchema = z.discriminatedUnion('step', [
   }),
   /** La Voyante : son resultat entre dans ses infos. */
   z.strictObject({ step: z.literal('seer'), resolved: z.boolean() }),
+  /** La Sorciere : la victime des loups (ou personne) et ses potions restantes. */
+  z.strictObject({
+    step: z.literal('witch'),
+    resolved: z.boolean(),
+    victim: playerIdSchema.nullable(),
+    potions: potionsSchema,
+  }),
 ]);
 
 const playerElectionSchema = z.strictObject({
@@ -259,6 +277,8 @@ const narratorNightSchema = z.strictObject({
   wolfVotes: z.record(playerIdSchema, playerIdSchema),
   wolfTie: playerIdList.nullable(),
   wolfVictim: playerIdSchema.nullable(),
+  /** Le choix de la Sorciere cette nuit, une fois fait. */
+  witch: z.strictObject({ save: z.boolean(), kill: playerIdSchema.nullable() }).nullable(),
 });
 
 const deathSchema = z.strictObject({
@@ -277,6 +297,8 @@ export const narratorViewSchema = z.strictObject({
   deadline: z.int().nullable(),
   pausedRemaining: z.int().min(0).nullable(),
   night: narratorNightSchema.nullable(),
+  /** Potions restantes de chaque Sorciere. */
+  potions: z.record(playerIdSchema, potionsSchema),
   dawn: z.strictObject({ deaths: z.array(deathSchema), announced: z.boolean() }).nullable(),
   election: playerElectionSchema.nullable(),
   vote: playerVoteSchema.nullable(),

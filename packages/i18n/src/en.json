@@ -92,6 +92,12 @@
     "seer": {
       "already_probed": "You have already probed someone tonight.",
       "self": "You cannot probe yourself."
+    },
+    "witch": {
+      "already_chosen": "You have already made your choice tonight.",
+      "cannot_save": "The healing potion cannot save anyone tonight.",
+      "no_death_potion": "You have already used the poison.",
+      "self_poison": "You cannot poison yourself."
     }
   },
   "roles": {
@@ -119,6 +125,16 @@
       "narrator": {
         "wake": "The Seer wakes up and points at the player whose secret she wants to learn.",
         "sleep": "The Seer has seen what she wanted to see. She goes back to sleep."
+      }
+    },
+    "witch": {
+      "name": "Witch",
+      "short": "One potion to save, one potion to kill.",
+      "description": "She knows the night's victim and keeps two potions: one gives life back, the other takes it. Each works only once.",
+      "rules": "Each night, after the wolves, you see their victim (or nobody). You may save them with your healing potion, poison another player with your poison, use both, or do nothing. Each potion works once per game. Whether you may save yourself depends on the options.",
+      "narrator": {
+        "wake": "The Witch wakes up. I show her tonight's victim: does she want to save them, or poison someone?",
+        "sleep": "The Witch puts away her vials and goes back to sleep."
       }
     }
   },
@@ -251,6 +267,11 @@
     "undo": "Undo last action",
     "spare": "Spare: execute nobody",
     "abstain": "Abstain",
-    "hunter_shoot": "Shoot"
+    "hunter_shoot": "Shoot",
+    "seer_probe": "Probe a player",
+    "witch_potions": "Your potions",
+    "witch_save": "Save the victim with the healing potion",
+    "witch_kill": "Poison",
+    "witch_kill_none": "Nobody"
   }
 }

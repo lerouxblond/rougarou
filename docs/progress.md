@@ -493,7 +493,7 @@ Trois PR : **A** (T1–T2, règles et points d'accroche), **B** (T3–T7, les r�
   - Fichiers : `src/roles/seer.ts`, `test/roles/seer.test.ts`, `test/leaks/seer.test.ts`, i18n (`roles.seer.{name,short,rules,narrator.wake,narrator.sleep}`), `packages/ui/icons/icon-role-seer.svg`, `apps/web/public/assets/CREDITS.md`
   - Tests attendus : P18 (cible valide, soi-même et mort refusés, une seule fois, `seerMode` rôle et camp, minuteur → rien, camp effectif via `teamOf`) ; non-fuite : le résultat n'est visible que d'elle et du meneur, et la vue des autres reste identique toute la nuit
 
-- [ ] **T4 — Sorcière** *(PR B)*
+- [x] **T4 — Sorcière** *(PR B)*
   - Fichiers : `src/roles/witch.ts`, `test/roles/witch.test.ts`, `test/leaks/witch.test.ts`, i18n, icône, crédits
   - Tests attendus : P19 (vie sans victime refusée, potion épuisée refusée, deux potions la même nuit, `witchSelfSave` × 3, potion de vie consommée, potion de mort tue à l'aube, réveil sans potion) ; non-fuite : la victime n'est vue que d'elle (et des loups), la cause `witch` jamais par un joueur
 

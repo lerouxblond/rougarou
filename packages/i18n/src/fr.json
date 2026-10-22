@@ -92,6 +92,12 @@
     "seer": {
       "already_probed": "Vous avez déjà sondé un joueur cette nuit.",
       "self": "Vous ne pouvez pas vous sonder vous-même."
+    },
+    "witch": {
+      "already_chosen": "Vous avez déjà fait votre choix cette nuit.",
+      "cannot_save": "La potion de vie ne peut sauver personne cette nuit.",
+      "no_death_potion": "Vous avez déjà utilisé la potion de mort.",
+      "self_poison": "Vous ne pouvez pas vous empoisonner vous-même."
     }
   },
   "roles": {
@@ -119,6 +125,16 @@
       "narrator": {
         "wake": "La Voyante se réveille et désigne le joueur dont elle veut connaître le secret.",
         "sleep": "La Voyante a vu ce qu'elle voulait voir. Elle se rendort."
+      }
+    },
+    "witch": {
+      "name": "Sorcière",
+      "short": "Une potion pour sauver, une potion pour tuer.",
+      "description": "Elle connaît la victime de la nuit et garde deux potions : l'une rend la vie, l'autre l'ôte. Chacune ne sert qu'une fois.",
+      "rules": "Chaque nuit, après les loups, vous voyez leur victime (ou personne). Vous pouvez la sauver avec votre potion de vie, empoisonner un autre joueur avec votre potion de mort, utiliser les deux, ou ne rien faire. Chaque potion ne sert qu'une fois dans la partie. Vous sauver vous-même dépend des options.",
+      "narrator": {
+        "wake": "La Sorcière se réveille. Je lui montre la victime de la nuit : veut-elle la sauver, ou empoisonner quelqu'un ?",
+        "sleep": "La Sorcière range ses fioles et se rendort."
       }
     }
   },
@@ -251,6 +267,11 @@
     "undo": "Annuler la dernière action",
     "spare": "Épargner : n'exécuter personne",
     "abstain": "S'abstenir",
-    "hunter_shoot": "Tirer"
+    "hunter_shoot": "Tirer",
+    "seer_probe": "Sonder un joueur",
+    "witch_potions": "Vos potions",
+    "witch_save": "Sauver la victime avec la potion de vie",
+    "witch_kill": "Potion de mort",
+    "witch_kill_none": "Personne"
   }
 }

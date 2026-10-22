@@ -38,6 +38,8 @@ export interface GameState {
   readonly dawn: DawnState | null;
   readonly election: ElectionState | null;
   readonly vote: VoteState | null;
+  /** Potions restantes de chaque Sorciere (`docs/02`). Absente : les deux. */
+  readonly potions: Readonly<Record<PlayerId, Potions>>;
   /** Effets a la mort en attente, dans l'ordre de `R-42`. */
   readonly pending: readonly PendingEffect[];
   /**
@@ -84,6 +86,20 @@ export interface NightState {
   readonly wolfTie: readonly PlayerId[] | null;
   /** Victime choisie par les loups : une intention, resolue a l'aube (`R-21`). */
   readonly wolfVictim: PlayerId | null;
+  /** Le choix de la Sorciere cette nuit, resolu a l'aube (`R-40`). */
+  readonly witch: WitchChoice | null;
+}
+
+/** Les potions d'une Sorciere : `true` tant qu'elle ne l'a pas bue. */
+export interface Potions {
+  readonly life: boolean;
+  readonly death: boolean;
+}
+
+/** Une Sorciere sauve la victime des loups (`save`) et/ou empoisonne `kill`. */
+export interface WitchChoice {
+  readonly save: boolean;
+  readonly kill: PlayerId | null;
 }
 
 /** Cause d'une mort, connue du seul meneur (`docs/04` §Projection). */
@@ -161,6 +177,7 @@ export function emptyState(): GameState {
     dawn: null,
     election: null,
     vote: null,
+    potions: {},
     pending: [],
     deadline: null,
     pausedRemaining: null,

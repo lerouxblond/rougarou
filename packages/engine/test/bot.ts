@@ -8,7 +8,7 @@ import type {
 } from '@rougarou/protocol';
 
 import { availableActions, createRng, type Rng, type Viewer } from '../src/index.ts';
-import { NARRATOR, player, setup, SYSTEM, type GameDriver } from './dsl.ts';
+import { NARRATOR, player, setup, SYSTEM, type GameDriver, type NightActionInput } from './dsl.ts';
 
 /** Un coup joue par le robot. */
 export interface Move {
@@ -27,6 +27,33 @@ function mostCommon(values: readonly string[]): string | undefined {
   return [...counts.entries()].sort((left, right) => right[1] - left[1])[0]?.[0];
 }
 
+/** Une action de nuit : chaque role joue un peu au hasard, avec quelques reflexes. */
+function nightAction(
+  game: GameDriver,
+  rng: Rng,
+  descriptor: Extract<ActionDescriptor, { type: 'SubmitNightAction' }>,
+): NightActionInput {
+  switch (descriptor.kind) {
+    case 'wolfVote': {
+      const pack = mostCommon(Object.values(game.state.night?.wolfVotes ?? {}));
+      const target = pack !== undefined && rng.next() < 0.8 ? pack : rng.pick(descriptor.targets);
+
+      return { kind: 'wolfVote', target };
+    }
+    case 'seerProbe':
+      return { kind: 'seerProbe', target: rng.pick(descriptor.targets) };
+    case 'witchPotions': {
+      const save = descriptor.canSave && rng.next() < 0.4;
+      const kill =
+        descriptor.killTargets.length > 0 && rng.next() < 0.2
+          ? rng.pick(descriptor.killTargets)
+          : null;
+
+      return { kind: 'witchPotions', save, kill };
+    }
+  }
+}
+
 /**
  * Traduit une action proposee en commande, avec un peu de strategie pour que
  * les parties avancent : les loups suivent souvent la meute, et les
@@ -41,12 +68,8 @@ function toCommand(game: GameDriver, rng: Rng, descriptor: ActionDescriptor): Co
     case 'ResumeTimer':
     case 'ExtendTimer':
       return { type: descriptor.type };
-    case 'SubmitNightAction': {
-      const pack = mostCommon(Object.values(game.state.night?.wolfVotes ?? {}));
-      const target = pack !== undefined && rng.next() < 0.8 ? pack : rng.pick(descriptor.targets);
-
-      return { type: 'SubmitNightAction', action: { kind: 'wolfVote', target } };
-    }
+    case 'SubmitNightAction':
+      return { type: 'SubmitNightAction', action: nightAction(game, rng, descriptor) };
     case 'CastVote': {
       const ballots = Object.values(game.state.vote?.ballots ?? {}).flatMap((ballot) =>
         ballot.kind === 'player' ? [ballot.playerId] : [],
