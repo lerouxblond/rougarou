@@ -7,6 +7,7 @@ import { DEV_ORIGINS, NATIVE_ORIGINS } from './auth.ts';
 import { games } from './routes/games.ts';
 import { health } from './routes/health.ts';
 import { me } from './routes/me.ts';
+import { ticket, ws } from './routes/room.ts';
 import { withAuth } from './session.ts';
 
 const app = new Hono<AppEnv>();
@@ -44,6 +45,9 @@ app.route('/api/me', me);
 app.use('/api/games/*', withAuth);
 app.use('/api/games', withAuth);
 app.route('/api/games', games);
+app.route('/api/games', ticket);
+
+app.route('/ws', ws);
 
 /**
  * Une route d'API inconnue renvoie du JSON, jamais le `index.html` de la SPA :
@@ -59,3 +63,5 @@ app.onError((error, context) => {
 });
 
 export default app;
+
+export { GameRoom } from './room/game-room.ts';

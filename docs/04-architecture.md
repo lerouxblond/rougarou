@@ -90,7 +90,7 @@ function checkVictory(state: GameState): Victory | null;
 ## Durable Object `GameRoom`
 
 - Il est identifié par `idFromName(gameId)`, et le `gameId` est un ULID.
-- Il stocke dans le SQLite du DO les tables `events(seq, grp, type, payload, at)`, `snapshot(seq, state)` et `members(userId, kind: 'narrator'|'player')`. `grp` numérote la commande qui a produit l'événement : `Undo` supprime les lignes du dernier groupe (`R-11`). Au réveil, le DO recharge le dernier instantané et rejoue les événements qui le suivent.
+- Il stocke dans le SQLite du DO les tables `events(seq, grp, type, payload, at)`, `snapshot(seq, state)`, `members(user_id, kind: 'narrator'|'player')`, `ticket(ticket, user_id, expires_at)` et `meta` (identifiant, révision, date de purge). Le code est dans `apps/server/src/room/`. `grp` numérote la commande qui a produit l'événement : `Undo` supprime les lignes du dernier groupe (`R-11`). Au réveil, le DO recharge le dernier instantané et rejoue les événements qui le suivent.
 - Le **meneur** est l'utilisateur qui a créé la partie. Un utilisateur qui ouvre la WebSocket sans être membre ne peut envoyer que `JoinGame`, qui fait de lui un joueur.
 - L'**état de connexion** (`R-61`) n'est pas un fait de jeu : il vit dans le DO, jamais dans `GameState` ni dans le journal, sinon `Undo` l'annulerait. Le DO l'envoie au meneur seul, par un message `presence`.
 - Il utilise l'**API WebSocket Hibernation** (`ctx.acceptWebSocket`, `webSocketMessage`, `webSocketClose`) : les sockets restent ouverts pendant que le DO hiberne, ce qui le garde dans la formule gratuite.
@@ -101,7 +101,7 @@ function checkVictory(state: GameState): Victory | null;
   3. On applique `engine.apply`. En cas d'erreur, on envoie `error` à l'émetteur seul.
   4. On ajoute les événements au journal.
   5. Pour **chaque** socket, on calcule `projectView` et on envoie un `state` (complet) ou un `patch` (diff JSON, optimisation au jalon M8).
-- À `ENDED`, on écrit un résumé dans D1 (`games`, `game_players`) et on garde le DO 7 jours (pour l'écran de fin et « Rejouer »), puis on le purge avec `deleteAll()`.
+- À la distribution, la partie passe en `playing` dans D1. À `ENDED`, on écrit un résumé dans D1 (`game`, `game_player`) et on garde le DO 7 jours (pour l'écran de fin et « Rejouer »), puis on le purge avec `deleteAll()`. Un DO purgé garde seulement une marque, pour qu'aucun ticket ne fasse renaître une partie vide sous le même identifiant.
 
 ## Protocole (`packages/protocol`)
 

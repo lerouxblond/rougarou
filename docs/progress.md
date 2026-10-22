@@ -365,7 +365,7 @@ Quatre PR : **A** (T1–T3, règles et protocole), **B** (T4–T6, base et compt
   - Tests attendus : les migrations s'appliquent sur la D1 de test ; deux parties actives ne partagent pas un code ; une partie terminée libère le sien
 
 - [x] **T5 — Better Auth : e-mail + mot de passe, invités, profil, suppression** *(PR B)*
-  - Mesure du 2026-10-22 : le scrypt natif de Better Auth coûte environ 108 ms de CPU par hachage (PBKDF2 à 100 000 itérations : 28 ms). **Décision** : on garde scrypt, et on vérifie l'inscription sur la preview ; si elle échoue en 1102, on passe à Workers Paid (ADR 0009). *Vérification en preview : à faire dès que la PR B est déployée.*
+  - Mesure du 2026-10-22 : le scrypt natif de Better Auth coûte environ 108 ms de CPU par hachage (PBKDF2 à 100 000 itérations : 28 ms). **Décision** : on garde scrypt, et on vérifie l'inscription sur la preview ; si elle échoue en 1102, on passe à Workers Paid (ADR 0009). **Vérifié le 2026-10-22 sur la preview de la PR #6** : trois inscriptions et une connexion répondent 200, sans erreur 1102 (comptes de test supprimés ensuite). L'échantillon est petit : à surveiller dans le tableau de bord (« Exceeded CPU Time Limits »).
   - Écart : la conversion d'un invité crée un **nouvel** identifiant (comportement du plugin `anonymous`) ; `onLinkAccount` transfère les lignes D1. L'ADR 0009 est corrigé. Les gabarits d'e-mail attendent le domaine (seuls l'interface et le client Resend sont livrés).
   - Secrets `BETTER_AUTH_SECRET` posés sur la preview et la production ; `apps/server/.dev.vars.example` pour le local
   - Fichiers : `apps/server/src/auth.ts`, `src/email.ts` (`EmailSender`), `src/routes/me.ts`, `test/{auth,me}.test.ts`, `pnpm-workspace.yaml` (`better-auth` 1.7.12)
@@ -378,20 +378,28 @@ Quatre PR : **A** (T1–T3, règles et protocole), **B** (T4–T6, base et compt
   - Écart au plan : le ticket (`POST /api/games/:id/ticket`) passe en T8, puisque c'est le DO qui l'émet (P15) ; le DO est donc initialisé au premier ticket, et non à la création. « Rejoindre après la distribution » n'est pas refusé par la route, qui doit laisser revenir un membre après un rechargement : c'est le moteur qui refuse un nouveau venu (`WRONG_PHASE`)
   - Tests : sans session → 401 ; code inconnu ou partie terminée → 404 ; partie en cours trouvable ; corps invalide → 400 ; ULID triable ; alphabet du code
 
-- [ ] **T7 — `GameRoom` : journal SQLite, commandes, diffusion** *(PR C)*
+- [x] **T7 — `GameRoom` : journal SQLite, commandes, diffusion** *(PR C)*
   - Fichiers : `apps/server/src/room/{game-room,storage,broadcast}.ts`, `wrangler.jsonc` (classe et migration du DO), `test/room.test.ts`
   - Contenu : tables `events(seq, grp, type, payload, at)`, `snapshot`, `members` ; chargement = dernier instantané + rejeu ; `applyToRecord` avec `now` et une graine tirée de `crypto` ; `Undo` retire les lignes du dernier groupe ; `projectView` pour chaque socket après chaque commande ; l'erreur ne part qu'à l'émetteur ; logs JSON `{ gameId, seq, cmd }` sans donnée personnelle
   - Tests attendus : une commande refusée ne touche pas le journal ; une nouvelle instance du DO retrouve l'état exact ; `Undo` survit au rechargement ; chaque socket reçoit **sa** vue validée par le schéma strict, et un joueur ne reçoit jamais la vue du meneur
 
-- [ ] **T8 — WebSocket : tickets, hibernation, autorisations, débit** *(PR C)*
+- [x] **T8 — WebSocket : tickets, hibernation, autorisations, débit** *(PR C)*
   - Fichiers : `apps/server/src/room/{tickets,sockets,rate-limit}.ts`, `src/routes/ws.ts`, `test/ws.test.ts`
   - Contenu : P15 ; API Hibernation (`acceptWebSocket`, pièce jointe `{ userId, kind }`) ; `PROTOCOL_OUTDATED` ; 10 commandes par seconde et par socket ; `presence` au meneur (P14) ; état complet à chaque (re)connexion
   - Tests attendus : ticket réutilisé, expiré ou d'une autre partie → refus ; message invalide → `error` sans effet ; 11ᵉ commande dans la seconde → `RATE_LIMITED` ; commande de meneur envoyée par un joueur → `FORBIDDEN` ; une reconnexion reçoit la vue courante ; `presence` ne part qu'au meneur
 
-- [ ] **T9 — Minuteurs par alarme, fin de partie, purge** *(PR C)*
+- [x] **T9 — Minuteurs par alarme, fin de partie, purge** *(PR C)*
   - Fichiers : `apps/server/src/room/{alarms,summary}.ts`, `test/alarms.test.ts`
   - Contenu : une seule alarme pour l'échéance du moteur et la purge à J+7 ; à l'expiration, `Timeout` avec l'acteur `system` ; à `ENDED`, résumé dans D1 (`game.status`, `winner`, `game_player`) ; à J+7, `deleteAll()` ; pause et +30 s replanifient l'alarme
   - Tests attendus : l'alarme applique `Timeout` à l'échéance et rien avant ; pause → alarme retirée ; fin de partie → lignes D1 écrites une seule fois ; purge → stockage vide
+
+> **T7 à T9 forment un seul commit**, comme T4–T8 en M1 : la salle, ses sockets et son alarme
+> partagent le même objet, et chacun ne se teste qu'à travers une vraie WebSocket. Écarts relevés :
+> la limite de débit compte aussi `JoinGame` (normal, mais le test attend la fin de la fenêtre) ;
+> `webSocketClose` ne peut pas renvoyer les codes réservés (1005, 1006) ; un DO purgé gardait des
+> sockets qui relisaient un journal effacé, et un ticket l'aurait fait renaître vide. Les deux sont
+> corrigés et testés. La PR C dépasse 400 lignes, surtout en tests : la découper aurait livré un
+> Durable Object qu'on ne peut pas tester.
 
 - [ ] **T10 — Client : store Zustand, socket, indicateur de connexion** *(PR D)*
   - Fichiers : `apps/web/src/game/{socket,store,useGameView,useSendCommand}.ts`, `src/components/ConnectionIndicator.tsx`, `test/socket.test.ts`, `pnpm-workspace.yaml` (`zustand` 5.0.16, `@tanstack/react-query` 5.104.5)
