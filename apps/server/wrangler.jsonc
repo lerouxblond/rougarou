@@ -34,6 +34,13 @@
     }
   ],
 
+  // Un Durable Object par partie (docs/04). Comme D1, le binding est redeclare
+  // dans chaque environnement ; la migration de classe, elle, est commune.
+  "durable_objects": {
+    "bindings": [{ "name": "GAME_ROOM", "class_name": "GameRoom" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["GameRoom"] }],
+
   "observability": {
     // Logs structures du Worker (docs/04 §Observabilite).
     "enabled": true
@@ -42,6 +49,9 @@
   "env": {
     "preview": {
       "name": "rougarou-preview",
+      "durable_objects": {
+        "bindings": [{ "name": "GAME_ROOM", "class_name": "GameRoom" }]
+      },
       "d1_databases": [
         {
           "binding": "DB",
@@ -53,6 +63,9 @@
     },
     "production": {
       "name": "rougarou",
+      "durable_objects": {
+        "bindings": [{ "name": "GAME_ROOM", "class_name": "GameRoom" }]
+      },
       "d1_databases": [
         {
           "binding": "DB",
