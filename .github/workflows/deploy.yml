@@ -57,6 +57,29 @@ jobs:
             ${{ github.event_name == 'pull_request' && 'rougarou-db-preview' || 'rougarou-db' }}
             --remote
 
+      # `versions upload` exige que le Worker de preview existe deja. Au tout
+      # premier passage (ou sur un nouveau compte Cloudflare), on le cree une
+      # fois avec `deploy`, puis chaque PR televerse sa propre version.
+      - name: Le Worker de preview existe-t-il ?
+        id: preview-exists
+        if: ${{ github.event_name == 'pull_request' }}
+        continue-on-error: true
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: apps/server
+          command: deployments list --env preview
+
+      - name: Creation du Worker de preview
+        if: ${{ github.event_name == 'pull_request' && steps.preview-exists.outcome == 'failure' }}
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: apps/server
+          command: deploy --env preview
+
       - name: Deploiement de preview
         id: preview
         if: ${{ github.event_name == 'pull_request' }}

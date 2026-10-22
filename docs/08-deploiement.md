@@ -35,11 +35,13 @@ Les migrations D1 s'appliquent **avant** le déploiement du Worker, et elles doi
 ### `deploy.yml` : sur un push sur `main` (après le passage de `ci`), et en preview sur une PR
 - Utilise `cloudflare/wrangler-action`.
 - Étapes : `wrangler d1 migrations apply <db> --remote`, puis `wrangler deploy` (ou `versions upload` pour une preview).
+- Le Worker de preview (`rougarou-preview`) est créé automatiquement par `deploy --env preview` au premier passage, car `versions upload` exige qu'il existe déjà.
 - Secrets nécessaires : `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`.
 - Secrets du Worker (définis une fois par `wrangler secret put`, pas dans GitHub) : `BETTER_AUTH_SECRET`, `GOOGLE_CLIENT_ID`/`SECRET`, clé du fournisseur d'e-mail.
 
 ### `release-please.yml` : sur un push sur `main`
 - Maintient une PR de release (version semver et `CHANGELOG.md`) à partir des Conventional Commits.
+- Avant la V1, les versions restent en `0.x` (`bump-minor-pre-major`, première version `0.1.0`) : la `v1.0.0-rc.1` arrive en M8 et la `v1.0.0` en M9 (`docs/10`).
 - Au merge de cette PR, le tag `vX.Y.Z` est créé, ce qui déclenche `release.yml`.
 
 ### `release.yml` : sur un tag `v*`
