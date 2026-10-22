@@ -268,7 +268,7 @@ P10 → `R-14`, P11 → `R-15`, P12 → ADR 0008.
   - Fichiers : `packages/i18n/src/{fr,en}.json`, `packages/engine/test/i18n-keys.test.ts`
   - Tests attendus : toutes les `messageKey` du moteur et tous les noms de rôles, de phases et de modes existent en `fr`
 
-- [ ] **T12 — Tests de propriétés**
+- [x] **T12 — Tests de propriétés**
   - Fichiers : `packages/engine/test/properties/random-games.test.ts`
   - Tests attendus : 1 000 parties aléatoires (5 à 24 joueurs, toutes options, actions et forçages au hasard) se terminent. Invariants : aucun mort n'agit ni ne vote, il y a au plus un Maire et il est vivant, le rejeu égale l'état, le décompte des camps est cohérent, et la victoire est conforme à `R-01`/`R-02`
 
