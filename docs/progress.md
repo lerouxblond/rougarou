@@ -501,7 +501,7 @@ Trois PR : **A** (T1–T2, règles et points d'accroche), **B** (T3–T7, les r�
   - Fichiers : `src/roles/hunter.ts`, `test/roles/hunter.test.ts`, `test/leaks/hunter.test.ts`, i18n, icône, crédits
   - Tests attendus : P20 (tir à l'aube après une mort de nuit, tir après exécution, minuteur et forçage → pas de tir, Chasseur Maire : tir puis succession, tir sur le dernier loup → victoire du village, révélation avec `revealRoleOnDeath: false`)
 
-- [ ] **T6 — Cupidon, amoureux, `R-03`** *(PR B)*
+- [x] **T6 — Cupidon, amoureux, `R-03`** *(PR B)*
   - Fichiers : `src/roles/cupid.ts`, `src/lovers.ts`, `src/modes/classic.ts` (condition `lovers`), `test/roles/cupid.test.ts`, `test/leaks/lovers.test.ts`, i18n, icône, crédits
   - Tests attendus : P22, P23, P24, **cas limite 1** (couple loup + villageois, victoire `lovers` à deux survivants, priorité `R-06`), **cas limite 3** (le Chasseur meurt de chagrin et tire), chagrin en chaîne avec la succession du Maire ; non-fuite : seuls les amoureux (et le meneur) connaissent le couple, et Cupidon ne voit pas leurs rôles
 

@@ -34,6 +34,13 @@ export const nightActionSchema = z.discriminatedUnion('kind', [
     save: z.boolean(),
     kill: playerIdSchema.nullable(),
   }),
+  /** Cupidon designe deux amoureux distincts, lui compris (`docs/02`). */
+  z.strictObject({
+    kind: z.literal('cupidLink'),
+    lovers: z.tuple([playerIdSchema, playerIdSchema]),
+  }),
+  /** Un amoureux confirme avoir decouvert l'autre. */
+  z.strictObject({ kind: z.literal('loversConfirm') }),
 ]);
 
 export type NightAction = z.infer<typeof nightActionSchema>;

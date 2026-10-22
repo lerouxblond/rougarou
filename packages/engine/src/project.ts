@@ -236,6 +236,7 @@ function narratorView(state: GameState): NarratorView {
             tally: vote.result?.tally ?? null,
             outcome: vote.result?.outcome ?? null,
           },
+    lovers: state.lovers === null ? null : [state.lovers[0], state.lovers[1]],
     potions: Object.fromEntries(
       Object.entries(state.potions).map(([id, potions]) => [id, { ...potions }]),
     ),

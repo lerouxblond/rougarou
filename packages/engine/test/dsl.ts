@@ -61,6 +61,8 @@ export interface GameDriver {
   seerProbe(seer: PlayerId, target: PlayerId): GameDriver;
   witch(witch: PlayerId, choice?: { save?: boolean; kill?: PlayerId | null }): GameDriver;
   shoot(hunter: PlayerId, target: PlayerId): GameDriver;
+  link(cupid: PlayerId, first: PlayerId, second: PlayerId): GameDriver;
+  confirmLove(lover: PlayerId): GameDriver;
   vote(voter: PlayerId, target: Choice): GameDriver;
   votes(ballots: Readonly<Record<PlayerId, Choice>>): GameDriver;
 }
@@ -175,6 +177,9 @@ export function newGame(seed = 1, gameId = 'game-1'): GameDriver {
     witch: (witch, { save = false, kill = null } = {}) =>
       driver.night(witch, { kind: 'witchPotions', save, kill }),
     shoot: (hunter, target) => driver.as(hunter, { type: 'HunterShoot', playerId: target }),
+    link: (cupid, first, second) =>
+      driver.night(cupid, { kind: 'cupidLink', lovers: [first, second] }),
+    confirmLove: (lover) => driver.night(lover, { kind: 'loversConfirm' }),
     vote: (voter, target) => driver.as(voter, { type: 'CastVote', ballot: toBallot(target) }),
     votes(ballots) {
       for (const [voter, target] of Object.entries(ballots)) {

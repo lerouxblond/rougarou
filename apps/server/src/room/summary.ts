@@ -1,8 +1,18 @@
 import { teamOf, type GameState } from '@rougarou/engine';
+import type { TeamId } from '@rougarou/protocol';
 import { eq } from 'drizzle-orm';
 
 import type { Database } from '../auth.ts';
 import * as schema from '../db/schema.ts';
+
+/** Le joueur a-t-il gagne ? Le couple mixte gagne a deux, chacun hors de son camp (`R-03`). */
+function wonGame(state: GameState, id: string, team: TeamId | null): boolean {
+  if (state.winner === 'lovers') {
+    return state.lovers?.includes(id) === true;
+  }
+
+  return team !== null && team === state.winner;
+}
 
 /** La partie est distribuee : son code ne sert plus qu'a revenir (US-11). */
 export async function markPlaying(db: Database, gameId: string): Promise<void> {
@@ -33,7 +43,7 @@ export async function writeSummary(db: Database, state: GameState, now: number):
         finalRole: player.role,
         team,
         aliveAtEnd: player.alive,
-        won: team !== null && team === state.winner,
+        won: wonGame(state, id, team),
       },
     ];
   });

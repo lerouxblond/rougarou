@@ -98,6 +98,13 @@
       "cannot_save": "La potion de vie ne peut sauver personne cette nuit.",
       "no_death_potion": "Vous avez déjà utilisé la potion de mort.",
       "self_poison": "Vous ne pouvez pas vous empoisonner vous-même."
+    },
+    "cupid": {
+      "already_linked": "Le couple est déjà formé.",
+      "same_player": "Choisissez deux joueurs différents."
+    },
+    "lovers": {
+      "already_confirmed": "Vous avez déjà confirmé."
     }
   },
   "roles": {
@@ -144,6 +151,18 @@
       "rules": "Vous n'agissez pas la nuit. Quand vous mourez, quelle qu'en soit la cause, vous désignez aussitôt un joueur vivant, qui meurt à son tour. Si vous mourez la nuit, vous tirez à l'aube. Sans choix avant la fin du minuteur, vous ne tirez pas. Votre rôle est révélé dès que votre tir est attendu.",
       "narrator": {
         "shot": "Le Chasseur, dans un dernier souffle, épaule son fusil. Qui emporte-t-il avec lui ?"
+      }
+    },
+    "cupid": {
+      "name": "Cupidon",
+      "short": "La première nuit, il lie deux cœurs pour la vie… et pour la mort.",
+      "description": "D'une flèche, il unit deux joueurs. Si l'un meurt, l'autre le suit de chagrin.",
+      "rules": "La première nuit seulement, désignez deux joueurs vivants (vous pouvez vous choisir) : ils deviennent amoureux et découvrent le rôle l'un de l'autre. Si l'un meurt, l'autre meurt de chagrin. Un couple formé d'un loup et d'un non-loup gagne s'il est le dernier en vie. Vous, vous jouez ensuite avec le village.",
+      "narrator": {
+        "wake": "Cupidon se réveille et décoche sa flèche : il désigne deux amoureux.",
+        "sleep": "Cupidon se rendort.",
+        "lovers_wake": "Je touche l'épaule des deux amoureux. Ouvrez les yeux et découvrez-vous.",
+        "lovers_sleep": "Les amoureux se rendorment, le cœur battant."
       }
     }
   },
@@ -281,6 +300,10 @@
     "witch_potions": "Vos potions",
     "witch_save": "Sauver la victime avec la potion de vie",
     "witch_kill": "Potion de mort",
-    "witch_kill_none": "Personne"
+    "witch_kill_none": "Personne",
+    "cupid_link": "Former le couple",
+    "cupid_first": "Premier amoureux",
+    "cupid_second": "Second amoureux",
+    "lovers_confirm": "J'ai découvert mon amoureux"
   }
 }

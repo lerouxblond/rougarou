@@ -9,7 +9,7 @@ import type {
   VoteOutcome,
 } from '@rougarou/protocol';
 
-import type { Death, NightStepId, PendingEffect, Winner } from './state.ts';
+import type { Couple, Death, NightStepId, PendingEffect, Winner } from './state.ts';
 
 /**
  * Les evenements : des faits, au participe passe (`docs/09`).
@@ -53,6 +53,8 @@ export type GameEvent =
   | { readonly type: 'WolvesResolved'; readonly victim: PlayerId | null }
   // Une etape de nuit autre que celle des loups est terminee.
   | { readonly type: 'NightStepResolved' }
+  | { readonly type: 'LoversLinked'; readonly cupid: PlayerId; readonly lovers: Couple }
+  | { readonly type: 'LoverConfirmed'; readonly playerId: PlayerId }
   | {
       readonly type: 'WitchActed';
       readonly witch: PlayerId;

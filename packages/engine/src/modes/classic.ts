@@ -1,5 +1,6 @@
 import type { Composition, RoleId } from '@rougarou/protocol';
 
+import { mixedLoversWin } from '../lovers.ts';
 import { findRole, teamOf } from '../roles/index.ts';
 import { alivePlayers, type GameState } from '../state.ts';
 import type { GameModeDefinition, ValidationIssue, WinCondition } from './types.ts';
@@ -41,6 +42,13 @@ const nobodyAlive: WinCondition = {
   id: 'nobody',
   priority: 100,
   check: (state) => (alivePlayers(state).length === 0 ? 'nobody' : null),
+};
+
+/** `R-03` : le couple mixte, seul en vie. Au-dessus des loups et du village (`R-06`). */
+const loversWin: WinCondition = {
+  id: 'lovers',
+  priority: 30,
+  check: mixedLoversWin,
 };
 
 /** `R-02` : tous les non-loups sont morts, ou parite avec `wolvesWinOnParity`. */
@@ -116,5 +124,5 @@ export const classic: GameModeDefinition = {
   },
 
   nightSteps: [],
-  winConditions: [nobodyAlive, wolvesWin, villageWins],
+  winConditions: [nobodyAlive, loversWin, wolvesWin, villageWins],
 };

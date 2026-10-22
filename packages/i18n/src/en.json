@@ -98,6 +98,13 @@
       "cannot_save": "The healing potion cannot save anyone tonight.",
       "no_death_potion": "You have already used the poison.",
       "self_poison": "You cannot poison yourself."
+    },
+    "cupid": {
+      "already_linked": "The couple is already formed.",
+      "same_player": "Pick two different players."
+    },
+    "lovers": {
+      "already_confirmed": "You have already confirmed."
     }
   },
   "roles": {
@@ -144,6 +151,18 @@
       "rules": "You do not act at night. When you die, whatever the cause, you immediately pick a living player, who dies in turn. If you die at night, you shoot at dawn. Without a choice before the timer ends, you do not shoot. Your role is revealed as soon as your shot is awaited.",
       "narrator": {
         "shot": "With his last breath, the Hunter raises his rifle. Whom does he take with him?"
+      }
+    },
+    "cupid": {
+      "name": "Cupid",
+      "short": "On the first night, he binds two hearts for life… and death.",
+      "description": "With one arrow, he joins two players. If one dies, the other follows out of grief.",
+      "rules": "On the first night only, pick two living players (you may pick yourself): they become lovers and learn each other's role. If one dies, the other dies of grief. A couple made of a wolf and a non-wolf wins if they are the last ones alive. Afterwards, you play with the village.",
+      "narrator": {
+        "wake": "Cupid wakes up and shoots his arrow: he points at two lovers.",
+        "sleep": "Cupid goes back to sleep.",
+        "lovers_wake": "I touch the shoulders of the two lovers. Open your eyes and meet each other.",
+        "lovers_sleep": "The lovers go back to sleep, hearts pounding."
       }
     }
   },
@@ -281,6 +300,10 @@
     "witch_potions": "Your potions",
     "witch_save": "Save the victim with the healing potion",
     "witch_kill": "Poison",
-    "witch_kill_none": "Nobody"
+    "witch_kill_none": "Nobody",
+    "cupid_link": "Form the couple",
+    "cupid_first": "First lover",
+    "cupid_second": "Second lover",
+    "lovers_confirm": "I have met my lover"
   }
 }

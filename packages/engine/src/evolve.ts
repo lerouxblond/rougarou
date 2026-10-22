@@ -95,6 +95,7 @@ export function evolve(state: GameState, event: GameEvent): GameState {
           wolfTie: null,
           wolfVictim: null,
           witch: null,
+          loversConfirmed: [],
         },
       };
 
@@ -124,6 +125,15 @@ export function evolve(state: GameState, event: GameEvent): GameState {
 
     case 'NightStepResolved':
       return withNight(state, (night) => ({ ...night, stepResolved: true }));
+
+    case 'LoversLinked':
+      return { ...state, lovers: event.lovers };
+
+    case 'LoverConfirmed':
+      return withNight(state, (night) => ({
+        ...night,
+        loversConfirmed: [...night.loversConfirmed, event.playerId],
+      }));
 
     case 'WitchActed': {
       const left = state.potions[event.witch] ?? { life: true, death: true };
