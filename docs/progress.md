@@ -401,7 +401,7 @@ Quatre PR : **A** (T1–T3, règles et protocole), **B** (T4–T6, base et compt
 > corrigés et testés. La PR C dépasse 400 lignes, surtout en tests : la découper aurait livré un
 > Durable Object qu'on ne peut pas tester.
 
-- [ ] **T10 — Client : store Zustand, socket, indicateur de connexion** *(PR D)*
+- [x] **T10 — Client : store Zustand, socket, indicateur de connexion** *(PR D)*
   - Fichiers : `apps/web/src/game/{socket,store,useGameView,useSendCommand}.ts`, `src/components/ConnectionIndicator.tsx`, `test/socket.test.ts`, `pnpm-workspace.yaml` (`zustand` 5.0.16, `@tanstack/react-query` 5.104.5)
   - Contenu : chaque `ServerMessage` validé par Zod ; la dernière vue fait foi ; reconnexion à délai croissant (US-90) ; un trou de `seq` déclenche une resynchronisation ; `ack` et `error` corrélés par `id`
   - Tests attendus : message invalide ignoré ; reconnexion après coupure avec des délais croissants ; l'indicateur s'annonce par `aria-live`

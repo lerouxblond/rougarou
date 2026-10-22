@@ -14,11 +14,13 @@
     "@rougarou/i18n": "workspace:*",
     "@rougarou/protocol": "workspace:*",
     "@rougarou/ui": "workspace:*",
+    "@tanstack/react-query": "catalog:",
     "@tanstack/react-router": "catalog:",
     "i18next": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "react-i18next": "catalog:"
+    "react-i18next": "catalog:",
+    "zustand": "catalog:"
   },
   "devDependencies": {
     "@rougarou/config": "workspace:*",

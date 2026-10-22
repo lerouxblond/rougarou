@@ -144,5 +144,11 @@
     "solo": "A lone player wins.",
     "vampires": "The vampires win.",
     "nobody": "Nobody wins."
+  },
+  "connection": {
+    "connecting": "Connecting…",
+    "open": "Connected",
+    "reconnecting": "Connection lost. Retrying…",
+    "closed": "Disconnected"
   }
 }

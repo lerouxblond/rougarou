@@ -144,5 +144,11 @@
     "solo": "Un joueur l'emporte seul.",
     "vampires": "Les vampires l'emportent.",
     "nobody": "Personne ne gagne."
+  },
+  "connection": {
+    "connecting": "Connexion…",
+    "open": "Connecté",
+    "reconnecting": "Connexion perdue. Nouvelle tentative…",
+    "closed": "Déconnecté"
   }
 }
