@@ -22,9 +22,10 @@ const built = existsSync(MANIFEST);
 const describeBuilt = built ? describe : describe.skip;
 
 describeBuilt('artefacts de build de la PWA', () => {
-  const manifest: unknown = JSON.parse(readFileSync(MANIFEST, 'utf8'));
-
+  // Lecture paresseuse : Vitest execute le corps d'un `describe.skip` pendant
+  // la collecte, donc une lecture ici casserait le cas « pas encore de build ».
   function field(name: string): unknown {
+    const manifest: unknown = JSON.parse(readFileSync(MANIFEST, 'utf8'));
     return (manifest as Record<string, unknown>)[name];
   }
 
