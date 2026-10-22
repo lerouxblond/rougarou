@@ -107,6 +107,11 @@ const nightActionDescriptorSchema = z.discriminatedUnion('kind', [
     kind: z.literal('wolfVote'),
     targets: playerIdList,
   }),
+  z.strictObject({
+    type: z.literal('SubmitNightAction'),
+    kind: z.literal('seerProbe'),
+    targets: playerIdList,
+  }),
 ]);
 
 /**
@@ -181,6 +186,8 @@ const playerNightSchema = z.discriminatedUnion('step', [
     /** Votes de la meute, visibles des seuls loups (`docs/12` #7). */
     wolfVotes: z.record(playerIdSchema, playerIdSchema),
   }),
+  /** La Voyante : son resultat entre dans ses infos. */
+  z.strictObject({ step: z.literal('seer'), resolved: z.boolean() }),
 ]);
 
 const playerElectionSchema = z.strictObject({

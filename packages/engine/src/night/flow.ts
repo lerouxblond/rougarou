@@ -184,6 +184,11 @@ export function submitNightAction(tx: Tx, actor: Actor, action: NightAction): En
   const observer = step.actors(tx.state).includes(player.id)
     ? null
     : observerSpecOf(tx.state, player.id);
+
+  if (observer === null && !step.actors(tx.state).includes(player.id)) {
+    return engineError('NOT_YOUR_TURN');
+  }
+
   const error =
     observer === null ? step.submit(tx, player.id, action) : observer.submit(tx, player.id, action);
 

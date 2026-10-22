@@ -85,16 +85,41 @@
     "rate_limited": "Too many actions at once. Please wait a moment.",
     "not_a_member": "You are not part of this game.",
     "unauthenticated": "Sign in to continue.",
-    "conflict": "This action is no longer possible."
+    "conflict": "This action is no longer possible.",
+    "night": {
+      "wrong_action": "This action does not match the current step."
+    },
+    "seer": {
+      "already_probed": "You have already probed someone tonight.",
+      "self": "You cannot probe yourself."
+    }
   },
   "roles": {
     "werewolf": {
       "name": "Werewolf",
-      "description": "Each night, the pack gathers and picks a victim. By day, it hides among the villagers."
+      "description": "Each night, the pack gathers and picks a victim. By day, it hides among the villagers.",
+      "short": "Each night, the pack picks a victim.",
+      "rules": "At night, you wake up with the other wolves and vote together for a victim among the non-wolves. By day, hide among the villagers. You win when only wolves are left.",
+      "narrator": {
+        "wake": "The werewolves wake up, recognise each other and choose their victim.",
+        "sleep": "The werewolves, sated, go back to sleep."
+      }
     },
     "villager": {
       "name": "Villager",
-      "description": "No power, only instinct and a voice. Debates and votes to unmask the wolves."
+      "description": "No power, only instinct and a voice. Debates and votes to unmask the wolves.",
+      "short": "No power, but a voice.",
+      "rules": "You have no night power. By day, watch, debate and vote to eliminate the wolves. You win with the village when every wolf is dead."
+    },
+    "seer": {
+      "name": "Seer",
+      "short": "Each night, she uncovers one player's secret.",
+      "description": "Each night, she probes a player and learns their role. She must guide the village without giving herself away.",
+      "rules": "Each night, pick a living player other than yourself: their role (or only their team, depending on the game options) is added to your notes at once. Only once per night.",
+      "narrator": {
+        "wake": "The Seer wakes up and points at the player whose secret she wants to learn.",
+        "sleep": "The Seer has seen what she wanted to see. She goes back to sleep."
+      }
     }
   },
   "phase": {

@@ -23,6 +23,8 @@ export type Actor = z.infer<typeof actorSchema>;
 export const nightActionSchema = z.discriminatedUnion('kind', [
   /** Vote d'un loup pour la victime de la nuit (`R-34`). */
   z.strictObject({ kind: z.literal('wolfVote'), target: playerIdSchema }),
+  /** La Voyante sonde un joueur (`docs/02`). */
+  z.strictObject({ kind: z.literal('seerProbe'), target: playerIdSchema }),
 ]);
 
 export type NightAction = z.infer<typeof nightActionSchema>;

@@ -202,3 +202,10 @@ export function updatePlayer(
 export function omitKey<T>(record: Readonly<Record<string, T>>, key: string): Record<string, T> {
   return Object.fromEntries(Object.entries(record).filter(([entry]) => entry !== key));
 }
+
+/** Les vivants qui portent ce role, dans l'ordre des places. */
+export function livingWithRole(state: GameState, role: RoleId): PlayerId[] {
+  return alivePlayers(state)
+    .filter((player) => player.role === role)
+    .map((player) => player.id);
+}

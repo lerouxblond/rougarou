@@ -83,7 +83,7 @@ describe('Composition (R-07)', () => {
     [
       'un role pas encore implemente',
       FIVE,
-      { werewolf: 1, seer: 1, villager: 3 },
+      { werewolf: 1, guardian: 1, villager: 3 },
       'errors.composition.role_unavailable',
     ],
   ])('refuse %s', (_label, names, composition, messageKey) => {

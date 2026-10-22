@@ -489,7 +489,7 @@ Trois PR : **A** (T1–T2, règles et points d'accroche), **B** (T3–T7, les r�
   - Contenu : aucun changement de comportement pour les loups et les villageois ; la file d'effets accepte plusieurs genres d'effets (P24)
   - Tests attendus : les 202 tests existants passent ; ordre de la file `R-42` ; couverture ≥ 90 %
 
-- [ ] **T3 — Voyante** *(PR B)*
+- [x] **T3 — Voyante** *(PR B)*
   - Fichiers : `src/roles/seer.ts`, `test/roles/seer.test.ts`, `test/leaks/seer.test.ts`, i18n (`roles.seer.{name,short,rules,narrator.wake,narrator.sleep}`), `packages/ui/icons/icon-role-seer.svg`, `apps/web/public/assets/CREDITS.md`
   - Tests attendus : P18 (cible valide, soi-même et mort refusés, une seule fois, `seerMode` rôle et camp, minuteur → rien, camp effectif via `teamOf`) ; non-fuite : le résultat n'est visible que d'elle et du meneur, et la vue des autres reste identique toute la nuit
 

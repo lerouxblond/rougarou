@@ -81,6 +81,10 @@ const wolvesStep: NightStepSpec = {
       throw new Error('Vote des loups hors de la nuit.');
     }
 
+    if (action.kind !== 'wolfVote') {
+      return engineError('INVALID_COMMAND', 'errors.night.wrong_action');
+    }
+
     if (!livingWolves(tx.state).includes(actor)) {
       return engineError('NOT_YOUR_TURN');
     }
