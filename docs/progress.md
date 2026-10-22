@@ -135,10 +135,10 @@ Trois éléments de la définition de « terminé » sortent de ce que je peux f
 | Ladle avec un `Button` dans les deux thèmes | ✅ | `pnpm --filter @rougarou/ui run ladle:build` aboutit |
 | `ci.yml` et `deploy.yml` (preview et production) | ✅ | Écrits et validés ; la séquence de `ci.yml` passe en local |
 | ADR 0001 à 0005 relus, puis ADR 0007 | ✅ | `docs/adr/0007-mises-a-jour-immuables.md` |
-| **L'URL de production affiche l'accueil** | ⏳ | Demande les secrets Cloudflare et un premier déploiement (action humaine) |
+| **L'URL de production affiche l'accueil** | ✅ | https://rougarou.neyteck-pro.workers.dev : l'accueil, `/api/health`, le manifest et `sw.js` répondent 200 (2026-10-22) |
 | **La PWA est installable** | ✅ (local) | Manifest, service worker, icônes dont une maskable, vérifiés par test et en e2e. À reconfirmer sur l'URL de production |
-| **La CI est verte** | ⏳ | À confirmer au premier push sur GitHub |
-| **Une PR produit une URL de preview** | ⏳ | Demande les secrets Cloudflare |
+| **La CI est verte** | ✅ | PR #1 : lint, types, tests et e2e au vert |
+| **Une PR produit une URL de preview** | ⏳ | L'authentification passe, mais `versions upload` exige que le Worker `rougarou-preview` existe déjà |
 
 **Total des tests : 107 unitaires (7 paquets) + 18 e2e.**
 
@@ -163,14 +163,14 @@ défaut du dépôt GitHub est `master`. **Aucune exécution de CI n'a jamais eu 
   - Option B : passer les workflows sur `master` et mettre à jour `docs/08` et `docs/09` dans le même commit.
   - Tests attendus : `gh api repos/lerouxblond/rougarou --jq .default_branch` renvoie la branche retenue
 
-- [ ] **T16 — Secrets Cloudflare** (action humaine)
+- [x] **T16 — Secrets Cloudflare** (action humaine, faite le 2026-10-22)
   - `gh secret set CLOUDFLARE_API_TOKEN` et `gh secret set CLOUDFLARE_ACCOUNT_ID`
   - Tests attendus : `gh secret list` les affiche
 
 - [ ] **T17 — PR de vérification**
   - Pousser `init/jalon-01`, ouvrir une PR vers la branche par défaut
   - Tests attendus : `ci.yml` au vert, `deploy.yml` commente une URL de preview sur la PR ; après merge, l'URL de production affiche l'accueil et la PWA est installable
-  - État (2026-10-22) : PR #1 ouverte. « Lint, types et tests » est au vert. « Preview » échoue faute de `CLOUDFLARE_API_TOKEN` (T16)
+  - État (2026-10-22) : PR #1 mergée (squash) et production déployée. « Preview » échoue encore, car Wrangler refuse de téléverser une version d'un Worker qui n'existe pas (`rougarou-preview` n'a jamais été déployé). Release Please échoue aussi : GitHub Actions n'a pas le droit de créer de pull request dans ce dépôt
 
 ---
 
