@@ -365,7 +365,7 @@ Quatre PR : **A** (T1–T3, règles et protocole), **B** (T4–T6, base et compt
   - Tests attendus : les migrations s'appliquent sur la D1 de test ; deux parties actives ne partagent pas un code ; une partie terminée libère le sien
 
 - [x] **T5 — Better Auth : e-mail + mot de passe, invités, profil, suppression** *(PR B)*
-  - Mesure du 2026-10-22 : le scrypt natif de Better Auth coûte environ 108 ms de CPU par hachage (PBKDF2 à 100 000 itérations : 28 ms). **Décision** : on garde scrypt, et on vérifie l'inscription sur la preview ; si elle échoue en 1102, on passe à Workers Paid (ADR 0009). *Vérification en preview : à faire dès que la PR B est déployée.*
+  - Mesure du 2026-10-22 : le scrypt natif de Better Auth coûte environ 108 ms de CPU par hachage (PBKDF2 à 100 000 itérations : 28 ms). **Décision** : on garde scrypt, et on vérifie l'inscription sur la preview ; si elle échoue en 1102, on passe à Workers Paid (ADR 0009). **Vérifié le 2026-10-22 sur la preview de la PR #6** : trois inscriptions et une connexion répondent 200, sans erreur 1102 (comptes de test supprimés ensuite). L'échantillon est petit : à surveiller dans le tableau de bord (« Exceeded CPU Time Limits »).
   - Écart : la conversion d'un invité crée un **nouvel** identifiant (comportement du plugin `anonymous`) ; `onLinkAccount` transfère les lignes D1. L'ADR 0009 est corrigé. Les gabarits d'e-mail attendent le domaine (seuls l'interface et le client Resend sont livrés).
   - Secrets `BETTER_AUTH_SECRET` posés sur la preview et la production ; `apps/server/.dev.vars.example` pour le local
   - Fichiers : `apps/server/src/auth.ts`, `src/email.ts` (`EmailSender`), `src/routes/me.ts`, `test/{auth,me}.test.ts`, `pnpm-workspace.yaml` (`better-auth` 1.7.12)
