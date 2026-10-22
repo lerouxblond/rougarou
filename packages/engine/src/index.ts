@@ -2,6 +2,7 @@ export { availableActions, type Viewer } from './actions.ts';
 export { apply, compositionIssues, createGame, type ApplyResult } from './apply.ts';
 export { REVEALING_EVENTS, type GameEvent, type GameEventType } from './events.ts';
 export { evolve } from './evolve.ts';
+export { nightPlan } from './night/flow.ts';
 export {
   applyToRecord,
   createRecord,
@@ -26,3 +27,4 @@ export {
   type Winner,
 } from './state.ts';
 export { type Context } from './tx.ts';
+export { checkVictory } from './victory.ts';

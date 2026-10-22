@@ -1,6 +1,7 @@
 import type { NarratorView, PlayerId, PlayerView } from '@rougarou/protocol';
 
 import { availableActions, type Viewer } from './actions.ts';
+import { getMode } from './modes/index.ts';
 import { currentStep } from './night/flow.ts';
 import { everyoneVoted } from './phases/day.ts';
 import { getRole, teamOf } from './roles/index.ts';
@@ -14,7 +15,14 @@ import { getPlayer, type GameState, type PlayerState } from './state.ts';
  * explicitement ajoute ici ne quitte jamais le serveur (liste blanche).
  */
 export function projectView(state: GameState, viewer: Viewer): PlayerView | NarratorView {
-  return viewer.kind === 'narrator' ? narratorView(state) : playerView(state, viewer.playerId);
+  if (viewer.kind === 'narrator') {
+    return narratorView(state);
+  }
+
+  const view = playerView(state, viewer.playerId);
+  const { project } = getMode(state.options.gameMode);
+
+  return project === undefined ? view : project(view, state);
 }
 
 /** Le lecteur peut-il connaitre le role de `target` ? */

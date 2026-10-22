@@ -1,4 +1,4 @@
-import type { Composition, ModeId, RoleId, TeamId } from '@rougarou/protocol';
+import type { Composition, ModeId, PlayerView, RoleId, TeamId } from '@rougarou/protocol';
 
 import type { NightStepSpec } from '../night/types.ts';
 import type { GameState, Winner } from '../state.ts';
@@ -8,7 +8,7 @@ import type { GameState, Winner } from '../state.ts';
  *
  * La boucle de phases, les votes, le Maire et le pipeline des morts restent
  * communs : un mode ne fait qu'ajouter des etapes de nuit, des conditions de
- * victoire et, plus tard, une retouche de la projection (`project`, M7).
+ * victoire et une retouche de la projection.
  */
 export interface GameModeDefinition {
   readonly id: ModeId;
@@ -24,6 +24,12 @@ export interface GameModeDefinition {
   /** Etapes de nuit ajoutees par le mode, en plus de celles des roles. */
   readonly nightSteps: readonly NightStepSpec[];
   readonly winConditions: readonly WinCondition[];
+  /**
+   * Retouche la vue d'un joueur apres la projection commune. Un mode deguise
+   * s'en sert pour se montrer sous les traits de `disguiseAs` (`W-30`, M7).
+   * La vue du meneur n'est jamais retouchee.
+   */
+  readonly project?: (view: PlayerView, state: GameState) => PlayerView;
 }
 
 /** Un probleme de composition, a traduire cote client. */
