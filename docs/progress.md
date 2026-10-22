@@ -406,10 +406,10 @@ Quatre PR : **A** (T1–T3, règles et protocole), **B** (T4–T6, base et compt
   - Contenu : chaque `ServerMessage` validé par Zod ; la dernière vue fait foi ; reconnexion à délai croissant (US-90) ; un trou de `seq` déclenche une resynchronisation ; `ack` et `error` corrélés par `id`
   - Tests attendus : message invalide ignoré ; reconnexion après coupure avec des délais croissants ; l'indicateur s'annonce par `aria-live`
 
-- [ ] **T11 — Écrans bruts : auth, accueil, salon, configuration, distribution, débogage** *(PR D)*
-  - Fichiers : `apps/web/src/routes/{Login,Signup,Home,Join,Game}.tsx`, `src/game/screens/{Lobby,Config,Deal,DebugView}.tsx`, `src/api.ts`, i18n
-  - Contenu : connexion, inscription, « Jouer en invité » ; créer ou rejoindre par code et `/join/:code`, avec retour au salon après connexion (US-11) ; salon (code, liste, connexion vue par le meneur, monter/descendre, expulser) ; configuration brute (compteurs loups/villageois, options) ; carte à maintenir pour révéler et « J'ai vu mon rôle » ; vue de débogage : la vue projetée et un bouton par entrée de `availableActions`, de quoi jouer toute la partie
-  - Tests attendus : Testing Library + axe sur chaque écran ; aucun texte en dur (test existant) ; un bouton par action reçue, aucun quand la vue n'en porte pas
+- [x] **T11 — Écrans bruts : auth, accueil, salon, configuration, distribution, débogage** *(PR D)*
+  - Fichiers : `apps/web/src/routes/{Home,Join,Game}.tsx`, `src/components/{AuthGate,Field}.tsx`, `src/game/{ActionPanel,Lobby,Config,RoleCard}.tsx`, `src/{api,session,form}.ts`, i18n ; côté serveur `GET /api/games/:id` ; côté `ui`, `Button` accepte `type="submit"`
+  - Écarts au plan : (1) pas de routes `/auth/login` et `/auth/signup` séparées : une porte `AuthGate` affiche connexion, inscription et invité **à la place** de la page demandée, ce qui ramène directement au salon après connexion (US-11) sans paramètre de redirection ; (2) `GET /api/games/:id` ajouté, car le code de la partie vit dans D1 et pas dans la vue projetée ; (3) le détecteur de texte en dur prenait les génériques TypeScript pour du JSX : son motif est affiné et testé dans les deux sens
+  - Tests : accueil sans session et connecté, axe sur chaque écran, un contrôle par action reçue et aucun sans action, salon (connexion, déplacement, expulsion), carte maintenue pour révéler, à la souris et au clavier
 
 - [ ] **T12 — E2E : 1 meneur + 5 joueurs, reconnexion de nuit** *(PR D)*
   - Fichiers : `e2e/m2-full-game.spec.ts`, `e2e/m2-reconnect.spec.ts`, `e2e/fixtures/table.ts`, `playwright.config.ts` (`BASE_URL` pour viser la preview ou la production)

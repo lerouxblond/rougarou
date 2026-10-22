@@ -74,6 +74,26 @@ describe('POST /api/games/join (US-11)', () => {
   });
 });
 
+describe('GET /api/games/:id', () => {
+  it('donne le code, et dit au meneur qu il mene', async () => {
+    const narrator = await signUp('Meneur');
+    const { gameId, code } = await createGame(narrator);
+    const player = await signInGuest();
+
+    expect(await (await call(`/api/games/${gameId}`, { cookie: narrator })).json()).toEqual({
+      gameId,
+      code,
+      narrator: true,
+    });
+    expect(await (await call(`/api/games/${gameId}`, { cookie: player })).json()).toMatchObject({
+      narrator: false,
+    });
+    expect((await call('/api/games/01JA0000000000000000000099', { cookie: player })).status).toBe(
+      404,
+    );
+  });
+});
+
 describe('Identifiants', () => {
   it('un ULID respecte le schema et se trie dans l ordre de creation', () => {
     const first = ulid(1_761_000_000_000);

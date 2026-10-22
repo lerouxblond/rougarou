@@ -4,6 +4,11 @@ export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
 export type ButtonSize = 'md' | 'lg';
 
 export interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'type'> {
+  /**
+   * `button` par defaut, pour qu'un bouton pose dans un formulaire ne
+   * l'envoie jamais par accident ; `submit` pour le bouton d'envoi.
+   */
+  type?: 'button' | 'submit';
   /** Variante visuelle (`docs/06`). */
   variant?: ButtonVariant;
   /** `lg` par defaut sur mobile pour les actions de jeu (`docs/06`). */
@@ -42,6 +47,7 @@ const SIZE_CLASSES: Record<ButtonSize, string> = {
 };
 
 export function Button({
+  type = 'button',
   variant = 'primary',
   size = 'lg',
   loading = false,
@@ -56,7 +62,7 @@ export function Button({
 
   return (
     <button
-      type="button"
+      type={type}
       className={classes}
       disabled={disabled || loading}
       aria-busy={loading}

@@ -1,5 +1,7 @@
 import {
   createGameResponseSchema,
+  gameIdSchema,
+  gameSummaryResponseSchema,
   GAME_CODE_ALPHABET,
   GAME_CODE_LENGTH,
   joinGameRequestSchema,
@@ -51,6 +53,27 @@ export const games = new Hono<AppEnv>()
     }
 
     return context.json(apiError('CONFLICT'), 503);
+  })
+  .get('/:id', async (context) => {
+    const gameId = gameIdSchema.safeParse(context.req.param('id'));
+    const found = gameId.success
+      ? await database(context.env).query.game.findFirst({
+          columns: { id: true, code: true, narratorId: true },
+          where: eq(schema.game.id, gameId.data),
+        })
+      : undefined;
+
+    if (found === undefined) {
+      return context.json(apiError('NOT_FOUND'), 404);
+    }
+
+    return context.json(
+      gameSummaryResponseSchema.parse({
+        gameId: found.id,
+        code: found.code,
+        narrator: found.narratorId === context.var.user.id,
+      }),
+    );
   })
   /**
    * Resout un code actif. Une partie deja distribuee reste trouvable, pour

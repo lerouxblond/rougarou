@@ -28,12 +28,14 @@ const FILES = components(SRC);
  * Texte visible ecrit directement entre deux balises JSX.
  *
  * On ignore ce qui est entre accolades (`{t('…')}`), qui est du code, et les
- * fragments d'une seule lettre ou de ponctuation.
+ * fragments d'une seule lettre ou de ponctuation. Un `>` de fleche (`=>`) et
+ * un segment qui porte de la syntaxe (`;`, `(`, `)`, `=`, `|`, `[`) viennent
+ * des generiques TypeScript (`useState<…>`, `Promise<…>`), pas du JSX.
  */
 function hardCodedText(source: string): string[] {
-  return (source.match(/>[^<>{}]*[A-Za-zÀ-ÿ]{3,}[^<>{}]*</g) ?? []).map((match) =>
-    match.slice(1, -1).trim(),
-  );
+  return (source.match(/(?<!=)>[^<>{}]*[A-Za-zÀ-ÿ]{3,}[^<>{}]*</g) ?? [])
+    .map((match) => match.slice(1, -1).trim())
+    .filter((text) => !/[;()=|[]/.test(text));
 }
 
 describe('aucun texte en dur (CLAUDE.md regle 6)', () => {
@@ -48,5 +50,15 @@ describe('aucun texte en dur (CLAUDE.md regle 6)', () => {
   it('detecte un libelle ecrit en dur quand il y en a un', () => {
     expect(hardCodedText('<button>Créer une partie</button>')).toEqual(['Créer une partie']);
     expect(hardCodedText("<button>{t('home.create_game')}</button>")).toEqual([]);
+    expect(hardCodedText("<p>Le joueur n'a pas vu son rôle</p>")).toEqual([
+      "Le joueur n'a pas vu son rôle",
+    ]);
+  });
+
+  it('ignore les generiques TypeScript', () => {
+    expect(hardCodedText("const [mode, setMode] = useState<Mode>('login');")).toEqual([]);
+    expect(
+      hardCodedText('async function run(action: () => Promise<void>): Promise<void> {}'),
+    ).toEqual([]);
   });
 });

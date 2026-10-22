@@ -1,11 +1,13 @@
 import {
   apiErrorSchema,
   createGameResponseSchema,
+  gameSummaryResponseSchema,
   joinGameResponseSchema,
   meResponseSchema,
   ticketResponseSchema,
   type ApiError,
   type CreateGameResponse,
+  type GameSummaryResponse,
   type JoinGameResponse,
   type MeResponse,
 } from '@rougarou/protocol';
@@ -97,6 +99,8 @@ export const api = {
   },
   createGame: (): Promise<CreateGameResponse> =>
     json('/api/games', createGameResponseSchema, { method: 'POST' }),
+  game: (gameId: string): Promise<GameSummaryResponse> =>
+    json(`/api/games/${gameId}`, gameSummaryResponseSchema),
   joinGame: (code: string): Promise<JoinGameResponse> =>
     json('/api/games/join', joinGameResponseSchema, {
       method: 'POST',

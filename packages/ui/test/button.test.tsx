@@ -33,6 +33,29 @@ describe('Button', () => {
     expect(button).toHaveProperty('type', 'button');
   });
 
+  it('envoie son formulaire seulement quand on le demande', () => {
+    const onSubmit = vi.fn((event: Event) => {
+      event.preventDefault();
+    });
+
+    render(
+      <form
+        onSubmit={(event) => {
+          onSubmit(event.nativeEvent);
+        }}
+      >
+        <Button>Annuler</Button>
+        <Button type="submit">Envoyer</Button>
+      </form>,
+    );
+
+    screen.getByRole('button', { name: 'Annuler' }).click();
+    expect(onSubmit).not.toHaveBeenCalled();
+
+    screen.getByRole('button', { name: 'Envoyer' }).click();
+    expect(onSubmit).toHaveBeenCalledOnce();
+  });
+
   it('affiche le libelle qu on lui passe : aucun texte en dur (CLAUDE.md regle 6)', () => {
     render(<Button>Rejoindre une partie</Button>);
 
