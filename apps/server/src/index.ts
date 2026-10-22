@@ -4,6 +4,7 @@ import { cors } from 'hono/cors';
 import { apiError } from './api-error.ts';
 import type { AppEnv } from './app-env.ts';
 import { DEV_ORIGINS, NATIVE_ORIGINS } from './auth.ts';
+import { games } from './routes/games.ts';
 import { health } from './routes/health.ts';
 import { me } from './routes/me.ts';
 import { withAuth } from './session.ts';
@@ -39,6 +40,10 @@ app.on(['GET', 'POST'], '/api/auth/*', (context) => context.var.auth.handler(con
 
 app.use('/api/me', withAuth);
 app.route('/api/me', me);
+
+app.use('/api/games/*', withAuth);
+app.use('/api/games', withAuth);
+app.route('/api/games', games);
 
 /**
  * Une route d'API inconnue renvoie du JSON, jamais le `index.html` de la SPA :

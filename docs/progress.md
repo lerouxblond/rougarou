@@ -372,10 +372,11 @@ Quatre PR : **A** (T1–T3, règles et protocole), **B** (T4–T6, base et compt
   - Contenu : handler `/api/auth/*`, mot de passe de 12 caractères minimum (US-01), plugin `anonymous` avec conversion vers un compte (D-04), cookie `HttpOnly; Secure; SameSite=Lax`, `GET`/`PATCH /api/me` (pseudo), `DELETE /api/me` (Q2), secret `BETTER_AUTH_SECRET`
   - Tests attendus : inscription, connexion, refus sous 12 caractères, session invité, conversion invité → compte avec le même identifiant, `PATCH /api/me` validé par Zod, suppression qui anonymise `game_player`, **mesure du CPU** du hachage
 
-- [ ] **T6 — REST des parties** *(PR B)*
+- [x] **T6 — REST des parties** *(PR B)*
   - Fichiers : `apps/server/src/routes/games.ts`, `src/ulid.ts`, `test/games.test.ts`
-  - Contenu : `POST /api/games` (ULID, code unique avec nouvelle tentative sur collision, DO initialisé), `POST /api/games/join` (code → `gameId` ; refusé après la distribution, sauf pour un membre), `POST /api/games/:id/ticket`
-  - Tests attendus : sans session → 401 ; code introuvable → 404 ; partie distribuée → 409 pour un nouveau venu et 200 pour un membre ; corps invalide → 400
+  - Contenu : `POST /api/games` (ULID, code unique avec nouvelle tentative sur collision), `POST /api/games/join` (code actif → `gameId`)
+  - Écart au plan : le ticket (`POST /api/games/:id/ticket`) passe en T8, puisque c'est le DO qui l'émet (P15) ; le DO est donc initialisé au premier ticket, et non à la création. « Rejoindre après la distribution » n'est pas refusé par la route, qui doit laisser revenir un membre après un rechargement : c'est le moteur qui refuse un nouveau venu (`WRONG_PHASE`)
+  - Tests : sans session → 401 ; code inconnu ou partie terminée → 404 ; partie en cours trouvable ; corps invalide → 400 ; ULID triable ; alphabet du code
 
 - [ ] **T7 — `GameRoom` : journal SQLite, commandes, diffusion** *(PR C)*
   - Fichiers : `apps/server/src/room/{game-room,storage,broadcast}.ts`, `wrangler.jsonc` (classe et migration du DO), `test/room.test.ts`
