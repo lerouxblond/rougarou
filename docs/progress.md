@@ -417,5 +417,6 @@ Quatre PR : **A** (T1–T3, règles et protocole), **B** (T4–T6, base et compt
   - Bogue trouvé : la session invité et la déconnexion partaient sans corps JSON, et Better Auth répond alors 415. Corrigé dans `apps/web/src/api.ts`
 
 - [ ] **T13 — Déploiement, vérification et rapport**
-  - Actions : créer les bases `rougarou-db` et `rougarou-db-preview`, `wrangler secret put BETTER_AUTH_SECRET` sur les deux environnements, merger, puis lancer les e2e de T12 **contre l'URL de production**
-  - Tests attendus : `pnpm check` au vert ; e2e au vert en local, sur la preview et en production ; vérification point par point de la définition de « terminé »
+  - Fait le 2026-10-22 : bases D1 créées, `BETTER_AUTH_SECRET` posé sur la preview et la production, `deploy.yml` applique la migration du Durable Object avant un téléversement de preview (`versions upload` ne le sait pas, `docs/08` mis à jour)
+  - **Preview de la PR #8** (`rougarou-preview.neyteck-pro.workers.dev`) : les 11 tests e2e Chromium passent, dont la partie à six navigateurs jusqu'à la victoire (25 s) et la reconnexion en pleine nuit (29 s). Aucune erreur 1102 sur une douzaine de sessions
+  - **Reste à faire** : merger les PR #5 à #8 dans `main` (déploiement de production), puis `E2E_BASE_URL=https://rougarou.neyteck-pro.workers.dev pnpm exec playwright test --project=chromium`
