@@ -56,9 +56,15 @@ export interface GameDriver {
   replay(event: GameEvent): GameDriver;
   // Raccourcis de jeu
   wolfVote(wolf: PlayerId, target: PlayerId): GameDriver;
+  /** Envoie une action de nuit pour `actor`. */
+  night(actor: PlayerId, action: NightActionInput): GameDriver;
+  seerProbe(seer: PlayerId, target: PlayerId): GameDriver;
   vote(voter: PlayerId, target: Choice): GameDriver;
   votes(ballots: Readonly<Record<PlayerId, Choice>>): GameDriver;
 }
+
+/** Une action de nuit, telle que le client l'envoie. */
+export type NightActionInput = Extract<CommandInput, { type: 'SubmitNightAction' }>['action'];
 
 /** Un choix de bulletin : un identifiant de joueur, `'spare'` ou `'abstain'`. */
 export type Choice = string;
@@ -162,6 +168,8 @@ export function newGame(seed = 1, gameId = 'game-1'): GameDriver {
 
     wolfVote: (wolf, target) =>
       driver.as(wolf, { type: 'SubmitNightAction', action: { kind: 'wolfVote', target } }),
+    night: (actor, action) => driver.as(actor, { type: 'SubmitNightAction', action }),
+    seerProbe: (seer, target) => driver.night(seer, { kind: 'seerProbe', target }),
     vote: (voter, target) => driver.as(voter, { type: 'CastVote', ballot: toBallot(target) }),
     votes(ballots) {
       for (const [voter, target] of Object.entries(ballots)) {
@@ -278,4 +286,32 @@ export function firstNight(game: GameDriver, victim: string): GameDriver {
   }
 
   return game;
+}
+
+/**
+ * Depuis n'importe quel moment du jour (ou l'aube), le meneur avance, en
+ * forcant si besoin, jusqu'a la nuit suivante. Personne n'est elu ni execute
+ * autrement que par les valeurs par defaut.
+ */
+export function toNextNight(game: GameDriver): GameDriver {
+  const start = game.state.nightNumber;
+
+  for (let step = 0; step < 20; step += 1) {
+    if (game.state.phase === 'ENDED') {
+      return game;
+    }
+
+    if (game.state.phase === 'NIGHT' && game.state.nightNumber > start) {
+      return game;
+    }
+
+    const blocked =
+      game.state.pending.length > 0 ||
+      game.state.vote?.tie != null ||
+      (game.state.phase === 'NIGHT' && game.state.night?.stepResolved !== true);
+
+    game.advance(blocked);
+  }
+
+  throw new Error(`Nuit suivante introuvable depuis ${game.state.phase}`);
 }
