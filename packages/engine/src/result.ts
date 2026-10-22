@@ -13,7 +13,19 @@ export type Result<TState, TEvent> =
 
 /** Codes d'erreur du moteur. Ils sont stables : le client les traduit. */
 export type EngineErrorCode =
-  'FORBIDDEN' | 'INVALID_COMMAND' | 'NOT_YOUR_TURN' | 'UNKNOWN_PLAYER' | 'WRONG_PHASE';
+  | 'FORBIDDEN'
+  | 'GAME_FULL'
+  | 'INVALID_COMMAND'
+  | 'INVALID_COMPOSITION'
+  | 'INVALID_TARGET'
+  | 'NOT_YOUR_TURN'
+  | 'NOTHING_TO_UNDO'
+  | 'PENDING_ACTIONS'
+  | 'TOO_EARLY'
+  | 'UNDO_BLOCKED'
+  | 'UNKNOWN_PLAYER'
+  | 'UNSUPPORTED_OPTION'
+  | 'WRONG_PHASE';
 
 /** Une erreur metier, destinee a etre renvoyee puis traduite par le client. */
 export interface EngineError {

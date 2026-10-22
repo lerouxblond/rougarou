@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
-import { commandEnvelopeSchema, commandSchema, compositionSchema } from '../src/index.ts';
+import {
+  commandEnvelopeSchema,
+  commandSchema,
+  compositionSchema,
+  playerIdSchema,
+} from '../src/index.ts';
 
 describe('commandSchema', () => {
   it.each([
@@ -76,6 +81,13 @@ describe('commandEnvelopeSchema', () => {
     const envelope = { actor: { kind: 'player' }, cmd: { type: 'Undo' } };
 
     expect(commandEnvelopeSchema.safeParse(envelope).success).toBe(false);
+  });
+});
+
+describe('playerIdSchema', () => {
+  it('refuse le prefixe @, reserve aux choix qui ne sont pas des joueurs', () => {
+    expect(playerIdSchema.safeParse('@spare').success).toBe(false);
+    expect(playerIdSchema.safeParse('alice@example').success).toBe(true);
   });
 });
 

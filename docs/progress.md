@@ -227,24 +227,32 @@ P10 → `R-14`, P11 → `R-15`, P12 → ADR 0008.
   - Contenu : `GameOptions` (toutes les clés de `docs/01` §8 avec leurs défauts et les minuteurs de D-02), l'union discriminée `Command` avec son enveloppe `{ actor, cmd }`
   - Tests attendus : l'objet vide se complète avec les défauts, une clé inconnue est refusée, chaque commande valide passe et un `type` inconnu est refusé
 
-- [ ] **T4 — Cœur du moteur : état, événements, `evolve`, salon, configuration, distribution**
+> **T4 à T8 forment un seul commit.** `evolve`, l'état et les événements couvrent toute
+> la boucle de jeu. Un commit T4 isolé aurait donc fait chuter la couverture sous le
+> seuil de 90 % imposé en T2, et `pnpm check` aurait échoué. Plutôt que d'abaisser le
+> seuil, la boucle a été écrite en entier, puis testée tâche par tâche avant un commit
+> unique. Écart au découpage relevé en cours de route : à l'expiration d'un minuteur, la
+> succession du Maire était résolue, mais le moteur passait aussi au jour à la place du
+> meneur. C'est corrigé, et `R-14` le précise désormais.
+
+- [x] **T4 — Cœur du moteur : état, événements, `evolve`, salon, configuration, distribution**
   - Fichiers : `packages/engine/src/{state,events,evolve,apply,defaults}.ts`, `roles/{index,werewolf,villager}.ts`, `modes/{index,classic}.ts`, `phases/{lobby,config,deal}.ts`, `test/dsl.ts`
   - Contenu : `GameState` plat et `readonly`, les événements, `apply` = valider puis émettre puis `evolve`, les registres des rôles et des modes (`RoleDefinition`, `GameModeDefinition`), une distribution déterministe par `rng`, et un DSL de test (`game().players().roles()…`)
   - Tests attendus : rejoindre/expulser/réordonner, composition invalide refusée (P9), D-07, distribution identique pour une même graine, rôles refusés hors mode, autorisations (`FORBIDDEN`), et l'état d'entrée jamais modifié
 
-- [ ] **T5 — Nuit : plan de nuit, vote des loups, minuteurs, forçage**
+- [x] **T5 — Nuit : plan de nuit, vote des loups, minuteurs, forçage**
   - Fichiers : `src/night/{plan,wolves}.ts`, `src/timers.ts`, `test/night/*.test.ts`
   - Tests attendus : `R-20` (ordre calculé à partir des rôles vivants), `R-34` dans les deux modes (P2), `R-10` et P5, P10 (`Timeout` refusé avant l'échéance), `pilotMode` `assisted` / `manual`
 
-- [ ] **T6 — Aube, pipeline des morts, victoire**
+- [x] **T6 — Aube, pipeline des morts, victoire**
   - Fichiers : `src/deaths.ts`, `src/victory.ts`, `src/phases/dawn.ts`, `test/{deaths,victory,dawn}.test.ts`
   - Tests attendus : `R-40` à `R-43`, P3, `R-01`, `R-02` (avec et sans `wolvesWinOnParity`), `R-05`, `R-06` (« Personne ne gagne »), et les conditions de victoire venant du mode
 
-- [ ] **T7 — Jour : débat, vote du village, exécution**
+- [x] **T7 — Jour : débat, vote du village, exécution**
   - Fichiers : `src/phases/{debate,vote,execution}.ts`, `src/votes.ts`, `test/vote/*.test.ts`
   - Tests attendus : `R-30` à `R-33` et `R-36`, P1, P8, D-08 (pas de vote contre soi), abstention en option, et non-votants ignorés
 
-- [ ] **T8 — Le Maire**
+- [x] **T8 — Le Maire**
   - Fichiers : `src/phases/mayor-election.ts`, `src/mayor.ts`, `test/mayor/*.test.ts`
   - Tests attendus : `R-50` à `R-52` (`designate` et `reelect`, y compris une mort à l'exécution suivie d'un `tieBreak` → `revote`), P6, P7, double voix (`R-32`). `R-53` reste sans objet tant que l'Idiot n'existe pas (M6) : le point d'accroche est prévu, mais pas de test
 

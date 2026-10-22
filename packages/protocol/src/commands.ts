@@ -72,6 +72,9 @@ export const commandSchema = z.discriminatedUnion('type', [
 
 export type Command = z.infer<typeof commandSchema>;
 
+/** Une commande avant validation : les champs qui ont un defaut sont facultatifs. */
+export type CommandInput = z.input<typeof commandSchema>;
+
 /** Le type d'une commande. */
 export type CommandType = Command['type'];
 

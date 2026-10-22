@@ -4,9 +4,10 @@ import { z } from 'zod';
  * Identifiant d'un joueur dans une partie.
  *
  * C'est l'identifiant de l'utilisateur (compte ou invite, D-04). Le moteur ne
- * l'interprete pas : il ne sert qu'a designer un joueur.
+ * l'interprete pas : il ne sert qu'a designer un joueur. Le prefixe `@` est
+ * reserve aux choix qui ne sont pas des joueurs (« Epargner » dans un decompte).
  */
-export const playerIdSchema = z.string().min(1).max(64);
+export const playerIdSchema = z.string().min(1).max(64).regex(/^[^@]/);
 
 export type PlayerId = z.infer<typeof playerIdSchema>;
 

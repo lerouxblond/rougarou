@@ -9,6 +9,7 @@ export {
   type Ballot,
   type Command,
   type CommandEnvelope,
+  type CommandInput,
   type CommandType,
   type NightAction,
 } from './commands.ts';
