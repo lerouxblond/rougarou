@@ -8,11 +8,11 @@ Ce document est la **spécification exécutable** du moteur. Chaque règle a un 
 |---|---|
 | **Village** | `R-01` Tous les joueurs du camp Loups sont morts, et aucune condition solo n'est remplie. |
 | **Loups** | `R-02` Tous les joueurs qui ne sont pas loups sont morts. Avec l'option `wolvesWinOnParity`, il suffit que le nombre de loups vivants soit ≥ au nombre des autres vivants. |
-| **Amoureux mixtes** | `R-03` Si les deux amoureux sont de camps différents, ils forment un camp à part et gagnent s'ils sont les deux seuls survivants. |
+| **Amoureux mixtes** | `R-03` Si l'un des amoureux est un loup et l'autre non, le couple ajoute le vainqueur `lovers`. Ce n'est pas un camp : chacun garde le sien pour le reste, et le loup amoureux vote toujours avec la meute. Le couple gagne quand les deux amoureux sont les deux seuls vivants. |
 | **Solo** | `R-04` Chaque rôle solo définit sa propre condition (Loup blanc, Joueur de flûte, Ange : voir `docs/02`). |
 
 - `R-05` On vérifie la victoire **après chaque résolution de morts** (aube, exécution, morts en chaîne), jamais en cours de résolution.
-- `R-06` Si plusieurs conditions sont remplies au même moment, la priorité est : conditions solo > amoureux > loups > village. Si tout le monde est mort, la partie est déclarée « Personne ne gagne ».
+- `R-06` Si plusieurs conditions sont remplies au même moment, la priorité est : conditions solo > amoureux (`lovers`) > loups > village. Si tout le monde est mort, la partie est déclarée « Personne ne gagne ».
 - `R-07` **Composition valide en Classique** : autant de rôles que de joueurs (plus les cartes en trop du Voleur), de 5 à 24 joueurs (D-07), au moins un loup, et strictement moins de loups que de non-loups. Chaque mode peut durcir ces règles (`validateComposition`, `docs/11`).
 
 ## 2. Machine d'états d'une partie
@@ -92,12 +92,21 @@ Le **mode de jeu** (`docs/11-modes-de-jeu.md`) peut ajouter des sous-étapes de 
 
 - `R-40` À l'aube, on calcule les morts **dans cet ordre** :
   1. La cible des loups, sauf si elle est protégée par le Salvateur, sauvée par la potion de vie, ou si c'est l'Ancien (sa première vie).
-  2. La cible de la potion de mort de la Sorcière (non bloquée par le Salvateur).
+  2. La cible de la potion de mort de la Sorcière (non bloquée par le Salvateur), cause `witch`. Si c'est aussi la victime des loups, elle ne meurt qu'une fois, de la cause `wolves`.
   3. Les autres morts de nuit (Loup blanc, etc.).
+
+  Chaque étape de nuit déclare ses morts de l'aube, et le moteur les calcule dans l'ordre de nuit, ce qui donne l'ordre ci-dessus. Les causes (`wolves`, `witch`, `vote`, `hunter`, `grief`) ne sont connues que du meneur (`docs/04` §Projection).
 - `R-41` **Morts en chaîne** : à chaque mort, on applique les effets « à la mort » (le Chasseur tire, l'amoureux meurt de chagrin, l'Enfant sauvage se transforme, le Maire désigne son successeur…). On répète jusqu'à ce qu'il n'y ait plus de nouveaux effets, puis on vérifie la victoire (`R-05`).
-- `R-42` L'ordre des effets à la mort est : chagrin des amoureux → Chasseur → succession du Maire.
+- `R-42` L'ordre des effets à la mort est : chagrin des amoureux → Chasseur → succession du Maire. Pour une même vague de morts (l'aube, l'exécution, un tir) :
+  1. on tue d'abord tous les chagrins, de proche en proche (cause `grief`) ;
+  2. puis on met en file les tirs de Chasseur de tous les morts de la vague, dans l'ordre des morts ;
+  3. puis les successions du Maire.
+
+  Une mort causée par un effet de la file (le tir du Chasseur) forme une nouvelle vague, dont les effets s'ajoutent **à la fin** de la file.
 - `R-43` Option `revealRoleOnDeath` (par défaut : `true`) : le rôle d'un joueur est révélé à tous quand il meurt. Si elle vaut `false`, seul le meneur le voit.
 - `R-44` La victoire (`R-05`) est vérifiée quand la file des effets à la mort est **vide**. Seule exception : la succession du Maire, qui ne peut tuer personne, est sautée si la partie est déjà gagnée.
+- `R-45` **Le Chasseur se dévoile en tirant.** La file des effets est publique : dès que son tir est attendu, son rôle est révélé à tous, même avec `revealRoleOnDeath: false`.
+- `R-46` **Valeurs par défaut des effets** (`R-13`) : à la fin du minuteur, seul l'effet en tête de file prend sa valeur par défaut (pas de tir, successeur tiré au sort), puis le suivant lance son propre minuteur. Un forçage du meneur résout toute la file de cette façon.
 
 ## 6. Le Maire (option `mayor`, activée par défaut)
 
@@ -137,10 +146,11 @@ Le Maire est un **titre** (badge), pas un rôle. Il se cumule avec n'importe que
 | `wolfVoteMode` | `unanimous` \| `majority` | `unanimous` | R-34 |
 | `wolvesWinOnParity` | bool | `false` | R-02 |
 | `seerMode` | `role` \| `team` | `role` | Voyante |
+| `littleGirlRisk` | `{ base, increase }`, en points de % : `base` de 0 à 50, `increase` de 0 à 25 (probabilité plafonnée à 75 %) | `{ base: 10, increase: 10 }` | Petite fille |
 | `witchSelfSave` | `never` \| `firstNightOnly` \| `always` | `firstNightOnly` | Sorcière |
 | `fakeWakeForDeadRoles` | bool | `true` en présentiel | R-20 |
 | `parallelNight` | bool | `false` | R-22 |
-| `timers` | objet (secondes par phase, `null` = pas de minuteur) | voir `packages/protocol/src/options.ts` (D-02) | `R-14` |
+| `timers` | objet (secondes par phase, `null` = pas de minuteur) | voir `packages/protocol/src/options.ts` (D-02). Voyante, Sorcière, Cupidon et amoureux : `nightAction` ; tir du Chasseur : `hunterShot` | `R-14` |
 
 ## 9. Modificateur « Role play » (option `roleplay`)
 

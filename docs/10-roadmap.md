@@ -41,7 +41,7 @@ Chaque jalon est livrable et déployé. Ne commence pas un jalon tant que la dé
 ## M3 — Rôles classiques
 - `seer`, `witch`, `hunter`, `cupid`, `little-girl`, plus les amoureux (`R-03`).
 - Ordre de nuit calculé, actions immédiates, informations privées.
-- Les cas limites 1, 2, 3, 9 de `docs/02` sont testés.
+- Les cas limites 1 et 3 de `docs/02` sont testés. Les cas 2 et 9 reposent sur le Salvateur et l'Infect père des loups : M3 pose leurs points d'accroche (potion de vie consommée dès qu'elle est bue, camp effectif lu par la Voyante), et leurs tests passent en M6.
 - Cartes de rôle en fallback SVG.
 
 **Terminé quand** : chaque rôle a ses tests, son test de non-fuite et ses textes i18n, et une partie e2e à 8 joueurs utilise tous les rôles classiques.
@@ -78,7 +78,7 @@ Chaque jalon est livrable et déployé. Ne commence pas un jalon tant que la dé
 
 ## M6 — Rôles d'extension
 - Tous les rôles `extension` de `docs/02`, dans cet ordre : Salvateur, Ancien, Idiot du village, Bouc émissaire, Corbeau, Renard, Montreur d'ours, Chevalier, Enfant sauvage, Chien-loup, Deux sœurs / Trois frères, Infect père des loups, Grand méchant loup, Loup blanc, Joueur de flûte, Ange, Servante dévouée, Voleur.
-- Tous les cas limites de `docs/02`.
+- Tous les cas limites de `docs/02`, dont les cas 2 et 9 reportés de M3.
 
 **Terminé quand** : chaque rôle est testé, et les tests de propriétés tournent avec toutes les compositions possibles.
 

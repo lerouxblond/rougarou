@@ -40,7 +40,7 @@ Les **illustrations de cartes** (768×1024) restent possibles plus tard. En V1, 
 
 Il faut une illustration par rôle (27 au total, Vampire originel compris), une illustration par **mode de jeu** (`mode-<id>.webp`, pour les cartes de choix de mode et la révélation de fin « C'était une Nuit blanche ») et une pour le **dos de carte** (`card-back.webp` : sceau de cire avec une tête de loup stylisée et le motif lunaire).
 
-**Fallback en attendant les illustrations** : on génère des cartes en SVG à partir de l'icône du rôle, centrée sur un fond texturé, avec le nom en Cinzel. Le jalon M3 peut être livré avec ces fallbacks.
+**Fallback en attendant les illustrations** : on génère des cartes en SVG à partir de l'icône du rôle, centrée sur un fond texturé, avec le nom en Cormorant Garamond (la police d'affichage de `design/tokens.css`). Le jalon M3 peut être livré avec ces fallbacks.
 
 ### Icônes maison (SVG, grille 24 px, trait 1,75 px)
 
@@ -56,7 +56,7 @@ Il faut une illustration par rôle (27 au total, Vampire originel compris), une 
 - `bg-day-village` : silhouette de village sur parchemin.
 - `texture-parchment`, `texture-noise` : tuiles de 512 px à superposer avec une faible opacité.
 - `fog-layer` : PNG transparent animé en CSS pour l'écran de nuit uniforme.
-- Logo : mot-symbole « Rougarou » en Cinzel plus un monogramme (loup hurlant dans un croissant de lune). Exports : favicon, icônes PWA (192, 512, maskable), icônes Tauri (générées par `tauri icon` depuis un PNG 1024).
+- Logo : mot-symbole « Rougarou » en Cormorant Garamond plus un monogramme (loup hurlant dans un croissant de lune). Exports : favicon, icônes PWA (192, 512, maskable), icônes Tauri (générées par `tauri icon` depuis un PNG 1024).
 
 ### Sons
 

@@ -480,7 +480,7 @@ en M3, cartes SVG de repli), écrans soignés (M4 ; en M3, contrôles bruts comm
 Trois PR : **A** (T1–T2, règles et points d'accroche), **B** (T3–T7, les rôles),
 **C** (T8–T10, client, cartes, e2e), puis T11.
 
-- [ ] **T1 — Docs, règles, ADR 0010** *(PR A)*
+- [x] **T1 — Docs, règles, ADR 0010** *(PR A)*
   - Fichiers : `docs/01-regles-du-jeu.md` (`R-03` et `R-42` précisés par P23 et P24, `R-45` révélation du Chasseur, option `littleGirlRisk` au §8 : `{ base: 10, increase: 10 }`, plafond 75 %), `docs/02-roles.md` (fiches précisées par P18 à P22 ; la fiche de la Petite fille est réécrite selon P21 revue), `docs/04-architecture.md` (P17, points d'accroche des rôles), `docs/10-roadmap.md` (P25), `docs/12-deroulement-partie.md` (D-11 réécrite, puis → ✅ ; la ligne #7 du §2 est mise à jour), `docs/07-assets.md` (la police d'affichage est Cormorant Garamond dans `tokens.css`, pas Cinzel), `docs/adr/0010-infos-privees-dans-la-vue.md`
   - Tests attendus : aucun (document)
 
