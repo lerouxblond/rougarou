@@ -411,9 +411,10 @@ Quatre PR : **A** (T1–T3, règles et protocole), **B** (T4–T6, base et compt
   - Écarts au plan : (1) pas de routes `/auth/login` et `/auth/signup` séparées : une porte `AuthGate` affiche connexion, inscription et invité **à la place** de la page demandée, ce qui ramène directement au salon après connexion (US-11) sans paramètre de redirection ; (2) `GET /api/games/:id` ajouté, car le code de la partie vit dans D1 et pas dans la vue projetée ; (3) le détecteur de texte en dur prenait les génériques TypeScript pour du JSX : son motif est affiné et testé dans les deux sens
   - Tests : accueil sans session et connecté, axe sur chaque écran, un contrôle par action reçue et aucun sans action, salon (connexion, déplacement, expulsion), carte maintenue pour révéler, à la souris et au clavier
 
-- [ ] **T12 — E2E : 1 meneur + 5 joueurs, reconnexion de nuit** *(PR D)*
-  - Fichiers : `e2e/m2-full-game.spec.ts`, `e2e/m2-reconnect.spec.ts`, `e2e/fixtures/table.ts`, `playwright.config.ts` (`BASE_URL` pour viser la preview ou la production)
-  - Tests attendus : 6 contextes jouent jusqu'à la victoire ; un joueur recharge en pleine nuit et retrouve exactement sa vue ; aucun joueur n'a le rôle d'un autre dans son DOM
+- [x] **T12 — E2E : 1 meneur + 5 joueurs, reconnexion de nuit** *(PR D)*
+  - Fichiers : `e2e/fixtures/table.ts`, `e2e/m2-full-game.spec.ts`, `e2e/m2-reconnect.spec.ts`, `e2e/smoke.spec.ts` (l'accueil sans session montre maintenant la connexion), `playwright.config.ts` (`E2E_BASE_URL` pour viser un déploiement ; en local, migrations D1 puis `wrangler dev` avec un secret propre aux tests)
+  - Résultat en local (2026-10-22) : la partie à six navigateurs va jusqu'à la victoire du village en 9 s, chaque vue de joueur est contrôlée contre la fuite de rôle à chaque tour, et chaque joueur (puis le meneur) recharge en pleine nuit et retrouve exactement sa vue. 19 tests e2e passent ; les deux scénarios à six navigateurs ne tournent que sur Chromium
+  - Bogue trouvé : la session invité et la déconnexion partaient sans corps JSON, et Better Auth répond alors 415. Corrigé dans `apps/web/src/api.ts`
 
 - [ ] **T13 — Déploiement, vérification et rapport**
   - Actions : créer les bases `rougarou-db` et `rougarou-db-preview`, `wrangler secret put BETTER_AUTH_SECRET` sur les deux environnements, merger, puis lancer les e2e de T12 **contre l'URL de production**

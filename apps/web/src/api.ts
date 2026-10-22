@@ -91,11 +91,12 @@ export const api = {
   },
   /** Session invite (D-04), puis le pseudo choisi. */
   async signInGuest(displayName: string): Promise<void> {
-    await request('/api/auth/sign-in/anonymous', { method: 'POST' });
+    // Better Auth exige un corps JSON, meme vide (sinon 415).
+    await request('/api/auth/sign-in/anonymous', { method: 'POST', body: '{}' });
     await api.rename(displayName);
   },
   async signOut(): Promise<void> {
-    await request('/api/auth/sign-out', { method: 'POST' });
+    await request('/api/auth/sign-out', { method: 'POST', body: '{}' });
   },
   createGame: (): Promise<CreateGameResponse> =>
     json('/api/games', createGameResponseSchema, { method: 'POST' }),
