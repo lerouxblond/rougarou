@@ -94,6 +94,7 @@ export function evolve(state: GameState, event: GameEvent): GameState {
           wolfVotes: {},
           wolfTie: null,
           wolfVictim: null,
+          witch: null,
         },
       };
 
@@ -123,6 +124,24 @@ export function evolve(state: GameState, event: GameEvent): GameState {
 
     case 'NightStepResolved':
       return withNight(state, (night) => ({ ...night, stepResolved: true }));
+
+    case 'WitchActed': {
+      const left = state.potions[event.witch] ?? { life: true, death: true };
+
+      return withNight(
+        {
+          ...state,
+          potions: {
+            ...state.potions,
+            [event.witch]: {
+              life: left.life && !event.save,
+              death: left.death && event.kill === null,
+            },
+          },
+        },
+        (night) => ({ ...night, witch: { save: event.save, kill: event.kill } }),
+      );
+    }
 
     case 'NightEnded':
       return { ...state, dawn: { deaths: [...event.deaths], announced: false } };

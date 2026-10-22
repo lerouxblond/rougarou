@@ -80,6 +80,11 @@ function ActionControl({
 
   switch (action.type) {
     case 'SubmitNightAction':
+      return action.kind === 'witchPotions' ? (
+        <WitchControl action={action} names={names} />
+      ) : (
+        <TargetControl action={action} names={names} />
+      );
     case 'CastVote':
     case 'BreakTie':
     case 'DesignateSuccessor':
@@ -162,19 +167,22 @@ function SimpleButton({
   );
 }
 
-type TargetAction = Extract<
-  ActionDescriptor,
-  {
-    type:
-      | 'SubmitNightAction'
-      | 'CastVote'
-      | 'BreakTie'
-      | 'DesignateSuccessor'
-      | 'HunterShoot'
-      | 'ResolveWolfTie'
-      | 'KickPlayer';
-  }
->;
+/** Les actions qui se reglent en choisissant un joueur dans une liste. */
+type TargetAction = Extract<ActionDescriptor, { targets: readonly string[] }>;
+
+/** Libelle de chaque action de nuit ; `Record` exhaustif, comme `LABELS`. */
+const NIGHT_LABELS: Record<
+  Extract<ActionDescriptor, { type: 'SubmitNightAction' }>['kind'],
+  string
+> = {
+  wolfVote: 'actions.submit_night_action',
+  seerProbe: 'actions.seer_probe',
+  witchPotions: 'actions.witch_potions',
+};
+
+function labelOf(action: TargetAction): string {
+  return action.type === 'SubmitNightAction' ? NIGHT_LABELS[action.kind] : LABELS[action.type];
+}
 
 function TargetControl({
   action,
@@ -206,7 +214,7 @@ function TargetControl({
       }}
     >
       <label htmlFor={id} className="text-sm text-text">
-        {t(LABELS[action.type])}
+        {t(labelOf(action))}
       </label>
       <select
         id={id}
@@ -233,7 +241,7 @@ function TargetControl({
 function toCommand(action: TargetAction, choice: string): CommandInput {
   switch (action.type) {
     case 'SubmitNightAction':
-      return { type: 'SubmitNightAction', action: { kind: 'wolfVote', target: choice } };
+      return { type: 'SubmitNightAction', action: { kind: action.kind, target: choice } };
     case 'CastVote':
       return {
         type: 'CastVote',
@@ -252,4 +260,76 @@ function toCommand(action: TargetAction, choice: string): CommandInput {
     case 'KickPlayer':
       return { type: action.type, playerId: choice };
   }
+}
+
+type WitchAction = Extract<ActionDescriptor, { kind: 'witchPotions' }>;
+
+/** Les deux potions en une seule reponse (`docs/02`) : « ne rien faire » est un choix comme un autre. */
+function WitchControl({
+  action,
+  names,
+}: {
+  readonly action: WitchAction;
+  readonly names: ReadonlyMap<string, string>;
+}) {
+  const { t } = useTranslation();
+  const saveId = useId();
+  const killId = useId();
+  const { send, busy, error } = useSendCommand();
+  const [save, setSave] = useState(false);
+  const [kill, setKill] = useState('');
+
+  return (
+    <form
+      className="flex flex-col gap-2"
+      onSubmit={(event) => {
+        event.preventDefault();
+        void send({
+          type: 'SubmitNightAction',
+          action: { kind: 'witchPotions', save, kill: kill === '' ? null : kill },
+        });
+      }}
+    >
+      <p className="text-sm text-text">{t(NIGHT_LABELS.witchPotions)}</p>
+      {action.canSave ? (
+        <label htmlFor={saveId} className="flex min-h-11 items-center gap-2 text-text">
+          <input
+            id={saveId}
+            type="checkbox"
+            checked={save}
+            onChange={(event) => {
+              setSave(event.target.checked);
+            }}
+          />
+          {t('actions.witch_save')}
+        </label>
+      ) : null}
+      {action.killTargets.length > 0 ? (
+        <>
+          <label htmlFor={killId} className="text-sm text-text">
+            {t('actions.witch_kill')}
+          </label>
+          <select
+            id={killId}
+            value={kill}
+            onChange={(event) => {
+              setKill(event.target.value);
+            }}
+            className="min-h-11 rounded-card border border-border bg-surface px-3 text-text"
+          >
+            <option value="">{t('actions.witch_kill_none')}</option>
+            {action.killTargets.map((target) => (
+              <option key={target} value={target}>
+                {names.get(target) ?? target}
+              </option>
+            ))}
+          </select>
+        </>
+      ) : null}
+      <Button type="submit" disabled={busy}>
+        {t('common.confirm')}
+      </Button>
+      <FormError message={error === null ? null : t(error)} />
+    </form>
+  );
 }

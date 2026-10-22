@@ -53,6 +53,12 @@ export type GameEvent =
   | { readonly type: 'WolvesResolved'; readonly victim: PlayerId | null }
   // Une etape de nuit autre que celle des loups est terminee.
   | { readonly type: 'NightStepResolved' }
+  | {
+      readonly type: 'WitchActed';
+      readonly witch: PlayerId;
+      readonly save: boolean;
+      readonly kill: PlayerId | null;
+    }
   | { readonly type: 'NightEnded'; readonly deaths: readonly Death[] }
   // Morts
   | { readonly type: 'DeathsAnnounced' }

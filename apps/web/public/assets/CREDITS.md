@@ -6,3 +6,4 @@ Licences acceptées : production originale du projet, CC0, CC-BY (avec attributi
 | Fichier | Source | Auteur | Licence |
 |---|---|---|---|
 | `packages/ui/icons/icon-role-seer.svg` | Dessin original (SVG écrit à la main) | Projet Rougarou | Production originale |
+| `packages/ui/icons/icon-role-witch.svg` | Dessin original (SVG écrit à la main) | Projet Rougarou | Production originale |

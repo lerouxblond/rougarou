@@ -131,6 +131,7 @@ describe('Vue du meneur', () => {
       deadline: null,
       pausedRemaining: null,
       night: null,
+      potions: {},
       dawn: {
         deaths: ['wolves', 'witch', 'hunter', 'grief', 'vote'].map((cause) => ({
           playerId: 'p1',

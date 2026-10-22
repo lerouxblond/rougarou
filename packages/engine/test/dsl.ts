@@ -59,6 +59,7 @@ export interface GameDriver {
   /** Envoie une action de nuit pour `actor`. */
   night(actor: PlayerId, action: NightActionInput): GameDriver;
   seerProbe(seer: PlayerId, target: PlayerId): GameDriver;
+  witch(witch: PlayerId, choice?: { save?: boolean; kill?: PlayerId | null }): GameDriver;
   vote(voter: PlayerId, target: Choice): GameDriver;
   votes(ballots: Readonly<Record<PlayerId, Choice>>): GameDriver;
 }
@@ -170,6 +171,8 @@ export function newGame(seed = 1, gameId = 'game-1'): GameDriver {
       driver.as(wolf, { type: 'SubmitNightAction', action: { kind: 'wolfVote', target } }),
     night: (actor, action) => driver.as(actor, { type: 'SubmitNightAction', action }),
     seerProbe: (seer, target) => driver.night(seer, { kind: 'seerProbe', target }),
+    witch: (witch, { save = false, kill = null } = {}) =>
+      driver.night(witch, { kind: 'witchPotions', save, kill }),
     vote: (voter, target) => driver.as(voter, { type: 'CastVote', ballot: toBallot(target) }),
     votes(ballots) {
       for (const [voter, target] of Object.entries(ballots)) {
