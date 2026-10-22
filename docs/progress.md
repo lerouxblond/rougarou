@@ -300,3 +300,109 @@ P10 → `R-14`, P11 → `R-15`, P12 → ADR 0008.
 **M1 est terminé.** M0 l'est aussi : production déployée (PR #1) et previews fonctionnelles (PR #4).
 
 **Choix de projection validés le 2026-10-22** (`docs/04` §Projection) : nuit uniforme, aube masquée avant « Lever le jour », causes de mort jamais publiques, et actions possibles jointes aux vues.
+
+---
+
+## M2 — Comptes et temps réel
+
+**But** : de vrais utilisateurs se connectent à une vraie partie (UI minimale).
+
+**Terminé quand** : 6 navigateurs (1 meneur et 5 joueurs) jouent une partie Loups contre
+Villageois en production, et le rechargement d'une page en pleine nuit restaure l'état.
+
+### Décisions bloquantes (`docs/12` §7)
+
+| ID | Décision | État |
+|---|---|---|
+| D-01 | Pilotage `assisted` par défaut | ✅ validé |
+| D-04 | Compte invité (pseudo seul) + compte complet, conversion en fin de partie | ✅ validé |
+| D-18 | Fournisseur d'e-mails : Resend, inactif tant qu'aucun domaine n'est vérifié (Q1) | ✅ validé le 2026-10-22 |
+| D-21 | Données personnelles : pseudo, e-mail, historique, suppression en libre-service, aucun traqueur (Q2) | ✅ validé le 2026-10-22 |
+
+### Questions et précisions de règles (règle 5 de `CLAUDE.md`) — ✅ validées le 2026-10-22
+
+| # | Sujet | Proposition |
+|---|---|---|
+| Q1 | **E-mail (D-18)**. Constat du 2026-10-22 : l'envoi par Cloudflare (Email Sending) exige la formule Workers payante ; Resend (gratuit : 100/jour, 3 000/mois) et Brevo exigent un **domaine vérifié**, or D-17 reporte le domaine à M8 | **Resend**, consigné dans l'ADR 0009, derrière une interface `EmailSender`. Tant qu'aucun domaine n'est vérifié, la vérification d'e-mail et la réinitialisation par e-mail sont **désactivées par configuration** ; les invités (D-04) couvrent les amis de passage |
+| Q2 | **Données personnelles (D-21)** | Validée telle quelle. En M2 : `DELETE /api/me` (Better Auth `deleteUser`), qui supprime le compte et anonymise ses lignes `game_player` (`user_id` → `null`, le pseudo de la partie reste) |
+| P13 | **Pause et +30 s** (annoncés pour M2 par P10, absents de `docs/01`) | Commandes meneur `PauseTimer`, `ResumeTimer`, `ExtendTimer`. Pause : l'état range `remaining = deadline − now` et `deadline = null`, donc `Timeout` est refusé. Reprise : `deadline = now + remaining`. +30 s : `deadline += 30 000` (ou `remaining` en pause). Refusées sans minuteur. Elles ne révèlent rien et sont annulables (`R-11`). Ceux qui voyaient le minuteur voient la nouvelle échéance, ou `paused: true`. Nouvelle règle `R-16` |
+| P14 | **État de connexion** (`R-61`, US-12) : ce n'est pas un fait de jeu ; un événement le mettrait dans le journal et sous `Undo` | La connexion vit dans le DO, hors moteur. Le meneur reçoit `{ t: 'presence', connected: PlayerId[] }` ; les joueurs ne le reçoivent pas en M2. Ni `GameState` ni `projectView` ne changent |
+| P15 | **Ticket WS** : `docs/04` le fait vérifier par le Worker, mais l'usage unique exige un état partagé | Le ticket est **émis et consommé par le DO** de la partie (RPC `issueTicket(userId)`, 30 s, effacé au premier usage). Le Worker vérifie la session à l'émission et transfère l'upgrade ; le DO refuse un ticket inconnu, expiré ou déjà servi. `docs/04` mis à jour |
+| P16 | **Meneur et pseudo** | Le meneur est celui qui crée la partie (`game.narrator_id`, et `members` dans le DO). Tout autre utilisateur qui ouvre la WS est `player` s'il a rejoint ; sinon il ne peut envoyer que `JoinGame`. Le pseudo de `JoinGame` est prérempli par le profil et modifiable. Il doit être **unique dans la partie** (US-01), sans tenir compte de la casse ni des espaces : le moteur ne le vérifie pas encore → erreur `NAME_TAKEN` |
+
+**Point à surveiller (coût 0 €)** : la formule gratuite des Workers accorde 10 ms de CPU par
+requête, et le hachage scrypt de Better Auth la dépasse probablement à l'inscription et à la
+connexion. T5 mesure ; si ça coince, on passe à PBKDF2 de WebCrypto (natif) ; si ça ne suffit
+pas, la décision te remonte (formule payante à 5 $ par mois).
+
+**Hors M2** (reporté pour tenir la règle des PR de 400 lignes) : QR du code (M4, avec le
+design system), avatar et galerie (M4, assets), glisser-déposer des places (M4 ; en M2 :
+boutons monter/descendre), connexion Google (variable d'environnement prévue, non testée),
+plugin bearer pour Tauri (M8), affichage de l'historique (M5 ; en M2 on **écrit** le résumé
+dans D1 sans l'afficher).
+
+### Tâches
+
+Quatre PR : **A** (T1–T3, règles et protocole), **B** (T4–T6, base et comptes),
+**C** (T7–T9, `GameRoom`), **D** (T10–T12, client et e2e), puis T13.
+
+- [x] **T1 — Docs, règles et ADR** *(PR A)*
+  - Fichiers : `docs/01-regles-du-jeu.md` (`R-16` pour P13, `R-63` pour P16), `docs/04-architecture.md` (P14, P15, colonne `grp` de la table `events`, alarme multiplexée), `docs/12-deroulement-partie.md` (D-18 et D-21 → ✅), `docs/adr/0009-email-et-comptes-invites.md` (Resend inactif sans domaine, plugin `anonymous` de Better Auth pour D-04). Les versions des nouvelles dépendances entrent dans `docs/05` avec la tâche qui les ajoute
+  - Tests attendus : aucun (document)
+
+- [ ] **T2 — Moteur : Pause, reprise, +30 s, unicité du pseudo** *(PR A)*
+  - Fichiers : `packages/protocol/src/{commands,views}.ts`, `packages/engine/src/{state,events,evolve,apply,actions,project,timers}.ts`, `phases/lobby.ts`, `test/{timers,lobby}.test.ts`, `test/bot.ts`, i18n
+  - Tests attendus : P13 (pause → `Timeout` refusé ; reprise → échéance décalée de la durée de pause ; +30 s en marche et en pause ; refus sans minuteur ; annulable) ; la vue d'un joueur qui ne voit pas le minuteur reste identique pendant la nuit (non-fuite) ; P16 (`Alice` puis ` alice ` → `NAME_TAKEN`) ; les 1 000 parties aléatoires tirent aussi ces commandes ; couverture ≥ 90 %
+
+- [ ] **T3 — Protocole WS et REST** *(PR A)*
+  - Fichiers : `packages/protocol/src/{ws,rest,errors,game-code}.ts`, `test/{ws,rest,game-code}.test.ts`, `version.ts` (passe à 2)
+  - Contenu : `ClientMessage` (`cmd`, `ping` ; `chat` arrive en M5) et `ServerMessage` (`state`, `ack`, `error`, `presence`, `pong`), chacun avec `v` ; `ErrorCode` (`PROTOCOL_OUTDATED`, `RATE_LIMITED`, `INVALID_MESSAGE` et les codes du moteur) ; DTO REST (`CreateGame`, `JoinByCode`, `Ticket`, `Me`) ; code de partie à 6 caractères sans `0/O/1/I`
+  - Tests attendus : chaque message valide passe ; une clé inconnue et un `v` absent sont refusés ; le code refuse les caractères ambigus
+
+- [ ] **T4 — D1, Drizzle et migrations** *(PR B)*
+  - Fichiers : `apps/server/src/db/schema.ts`, `apps/server/drizzle.config.ts`, `apps/server/migrations/0000_*.sql` (générée), `wrangler.jsonc` (D1 par environnement), `vitest.config.ts`, `pnpm-workspace.yaml` (`drizzle-orm` 0.45.4, `drizzle-kit` 0.31.11)
+  - Contenu : tables de Better Auth, `profile`, `game`, `game_player`, `preset` (`docs/04`), index unique partiel `game(code) where status != 'ended'`
+  - Tests attendus : les migrations s'appliquent sur la D1 de test ; deux parties actives ne partagent pas un code ; une partie terminée libère le sien
+
+- [ ] **T5 — Better Auth : e-mail + mot de passe, invités, profil, suppression** *(PR B)*
+  - Fichiers : `apps/server/src/auth.ts`, `src/email.ts` (`EmailSender`), `src/routes/me.ts`, `test/{auth,me}.test.ts`, `pnpm-workspace.yaml` (`better-auth` 1.7.12)
+  - Contenu : handler `/api/auth/*`, mot de passe de 12 caractères minimum (US-01), plugin `anonymous` avec conversion vers un compte (D-04), cookie `HttpOnly; Secure; SameSite=Lax`, `GET`/`PATCH /api/me` (pseudo), `DELETE /api/me` (Q2), secret `BETTER_AUTH_SECRET`
+  - Tests attendus : inscription, connexion, refus sous 12 caractères, session invité, conversion invité → compte avec le même identifiant, `PATCH /api/me` validé par Zod, suppression qui anonymise `game_player`, **mesure du CPU** du hachage
+
+- [ ] **T6 — REST des parties** *(PR B)*
+  - Fichiers : `apps/server/src/routes/games.ts`, `src/ulid.ts`, `test/games.test.ts`
+  - Contenu : `POST /api/games` (ULID, code unique avec nouvelle tentative sur collision, DO initialisé), `POST /api/games/join` (code → `gameId` ; refusé après la distribution, sauf pour un membre), `POST /api/games/:id/ticket`
+  - Tests attendus : sans session → 401 ; code introuvable → 404 ; partie distribuée → 409 pour un nouveau venu et 200 pour un membre ; corps invalide → 400
+
+- [ ] **T7 — `GameRoom` : journal SQLite, commandes, diffusion** *(PR C)*
+  - Fichiers : `apps/server/src/room/{game-room,storage,broadcast}.ts`, `wrangler.jsonc` (classe et migration du DO), `test/room.test.ts`
+  - Contenu : tables `events(seq, grp, type, payload, at)`, `snapshot`, `members` ; chargement = dernier instantané + rejeu ; `applyToRecord` avec `now` et une graine tirée de `crypto` ; `Undo` retire les lignes du dernier groupe ; `projectView` pour chaque socket après chaque commande ; l'erreur ne part qu'à l'émetteur ; logs JSON `{ gameId, seq, cmd }` sans donnée personnelle
+  - Tests attendus : une commande refusée ne touche pas le journal ; une nouvelle instance du DO retrouve l'état exact ; `Undo` survit au rechargement ; chaque socket reçoit **sa** vue validée par le schéma strict, et un joueur ne reçoit jamais la vue du meneur
+
+- [ ] **T8 — WebSocket : tickets, hibernation, autorisations, débit** *(PR C)*
+  - Fichiers : `apps/server/src/room/{tickets,sockets,rate-limit}.ts`, `src/routes/ws.ts`, `test/ws.test.ts`
+  - Contenu : P15 ; API Hibernation (`acceptWebSocket`, pièce jointe `{ userId, kind }`) ; `PROTOCOL_OUTDATED` ; 10 commandes par seconde et par socket ; `presence` au meneur (P14) ; état complet à chaque (re)connexion
+  - Tests attendus : ticket réutilisé, expiré ou d'une autre partie → refus ; message invalide → `error` sans effet ; 11ᵉ commande dans la seconde → `RATE_LIMITED` ; commande de meneur envoyée par un joueur → `FORBIDDEN` ; une reconnexion reçoit la vue courante ; `presence` ne part qu'au meneur
+
+- [ ] **T9 — Minuteurs par alarme, fin de partie, purge** *(PR C)*
+  - Fichiers : `apps/server/src/room/{alarms,summary}.ts`, `test/alarms.test.ts`
+  - Contenu : une seule alarme pour l'échéance du moteur et la purge à J+7 ; à l'expiration, `Timeout` avec l'acteur `system` ; à `ENDED`, résumé dans D1 (`game.status`, `winner`, `game_player`) ; à J+7, `deleteAll()` ; pause et +30 s replanifient l'alarme
+  - Tests attendus : l'alarme applique `Timeout` à l'échéance et rien avant ; pause → alarme retirée ; fin de partie → lignes D1 écrites une seule fois ; purge → stockage vide
+
+- [ ] **T10 — Client : store Zustand, socket, indicateur de connexion** *(PR D)*
+  - Fichiers : `apps/web/src/game/{socket,store,useGameView,useSendCommand}.ts`, `src/components/ConnectionIndicator.tsx`, `test/socket.test.ts`, `pnpm-workspace.yaml` (`zustand` 5.0.16, `@tanstack/react-query` 5.104.5)
+  - Contenu : chaque `ServerMessage` validé par Zod ; la dernière vue fait foi ; reconnexion à délai croissant (US-90) ; un trou de `seq` déclenche une resynchronisation ; `ack` et `error` corrélés par `id`
+  - Tests attendus : message invalide ignoré ; reconnexion après coupure avec des délais croissants ; l'indicateur s'annonce par `aria-live`
+
+- [ ] **T11 — Écrans bruts : auth, accueil, salon, configuration, distribution, débogage** *(PR D)*
+  - Fichiers : `apps/web/src/routes/{Login,Signup,Home,Join,Game}.tsx`, `src/game/screens/{Lobby,Config,Deal,DebugView}.tsx`, `src/api.ts`, i18n
+  - Contenu : connexion, inscription, « Jouer en invité » ; créer ou rejoindre par code et `/join/:code`, avec retour au salon après connexion (US-11) ; salon (code, liste, connexion vue par le meneur, monter/descendre, expulser) ; configuration brute (compteurs loups/villageois, options) ; carte à maintenir pour révéler et « J'ai vu mon rôle » ; vue de débogage : la vue projetée et un bouton par entrée de `availableActions`, de quoi jouer toute la partie
+  - Tests attendus : Testing Library + axe sur chaque écran ; aucun texte en dur (test existant) ; un bouton par action reçue, aucun quand la vue n'en porte pas
+
+- [ ] **T12 — E2E : 1 meneur + 5 joueurs, reconnexion de nuit** *(PR D)*
+  - Fichiers : `e2e/m2-full-game.spec.ts`, `e2e/m2-reconnect.spec.ts`, `e2e/fixtures/table.ts`, `playwright.config.ts` (`BASE_URL` pour viser la preview ou la production)
+  - Tests attendus : 6 contextes jouent jusqu'à la victoire ; un joueur recharge en pleine nuit et retrouve exactement sa vue ; aucun joueur n'a le rôle d'un autre dans son DOM
+
+- [ ] **T13 — Déploiement, vérification et rapport**
+  - Actions : créer les bases `rougarou-db` et `rougarou-db-preview`, `wrangler secret put BETTER_AUTH_SECRET` sur les deux environnements, merger, puis lancer les e2e de T12 **contre l'URL de production**
+  - Tests attendus : `pnpm check` au vert ; e2e au vert en local, sur la preview et en production ; vérification point par point de la définition de « terminé »

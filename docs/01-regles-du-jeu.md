@@ -58,6 +58,7 @@ Le **mode de jeu** (`docs/11-modes-de-jeu.md`) peut ajouter des sous-étapes de 
 - `R-13` **Valeurs par défaut d'un forçage** (`R-10`) : vote des loups → pas de victime ; vote du village ou du Maire → clôture avec les bulletins déjà déposés ; successeur du Maire → tirage au sort parmi les vivants ; égalité tranchée par le Maire → personne n'est exécuté ; « J'ai vu mon rôle » → ignoré. Chaque forçage produit un événement journalisé.
 - `R-14` **Minuteurs.** Le moteur n'a pas d'horloge : il range une échéance (`deadline = now + durée`, `now` étant injecté) sur l'étape en cours, et accepte la commande système `Timeout` seulement si `now ≥ deadline`. L'expiration applique les mêmes valeurs par défaut qu'un forçage (`R-13`), mais ne fait jamais avancer une phase dont la sortie appartient au meneur : à l'aube et à l'exécution, elle résout l'effet en attente (successeur du Maire) et le meneur passe ensuite à la suite. En pilotage `manual`, une étape de nuit expirée attend aussi le meneur. Le Durable Object programme l'alarme à partir de cette échéance (`docs/04`).
 - `R-15` Une option prévue par le schéma mais pas encore prise en charge par le moteur est **refusée** à la configuration, avec une erreur explicite, plutôt qu'ignorée.
+- `R-16` **Pause et +30 s.** Le meneur peut mettre en pause le minuteur en cours, le reprendre, ou lui ajouter 30 secondes. En pause, le moteur range la durée restante (`remaining = deadline − now`) et retire l'échéance, donc `Timeout` est refusé. À la reprise, `deadline = now + remaining`. « +30 s » ajoute 30 secondes à l'échéance, ou à la durée restante si le minuteur est en pause. Ces trois commandes sont refusées quand aucun minuteur ne court, et la pause tombe d'elle-même quand l'étape change (le nouveau minuteur démarre normalement). Elles ne révèlent rien et s'annulent (`R-11`). Seuls ceux qui voyaient le minuteur voient la nouvelle échéance ou la pause, ce qui garde la nuit uniforme.
 
 ## 3. Déroulé de la nuit
 
@@ -114,6 +115,7 @@ Le Maire est un **titre** (badge), pas un rôle. Il se cumule avec n'importe que
 - `R-60` Un joueur mort voit le canal « cimetière » et, si l'option `deadSeeRoles` est active, tous les rôles. Il ne voit jamais les canaux des vivants.
 - `R-61` Un joueur déconnecté reste dans la partie. Ses actions passent en attente puis prennent leur valeur par défaut à la fin du minuteur. Le meneur voit l'état de connexion de chacun.
 - `R-62` Le meneur peut **remplacer** un joueur déconnecté par un nouvel utilisateur, qui hérite alors du rôle et de l'état.
+- `R-63` Le **pseudo** d'un joueur est unique dans la partie, sans tenir compte de la casse ni des espaces en début et en fin. Un pseudo déjà pris est refusé (`NAME_TAKEN`). L'état de connexion (`R-61`) n'est pas un fait de jeu : il vit dans le Durable Object, hors du moteur et du journal (`docs/04`).
 
 ## 8. Options de partie (récapitulatif)
 

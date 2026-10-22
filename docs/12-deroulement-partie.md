@@ -77,7 +77,7 @@ Tous les minuteurs se règlent dans la configuration (M06). `null` signifie « p
 Toutes les valeurs restent réglables par partie (M06), et chaque minuteur peut y être désactivé.
 
 - Les minuteurs **de nuit** ne sont visibles que par le joueur qui agit et par le meneur. Les autres écrans restent identiques (J04).
-- Le meneur peut faire **Pause** ou **+30 s** à tout moment, et chaque minuteur expiré est noté dans le journal.
+- Le meneur peut faire **Pause** ou **+30 s** à tout moment (`R-16`), et chaque minuteur expiré est noté dans le journal.
 
 ## 5. Sons et vibrations
 
@@ -137,10 +137,10 @@ Chaque ligne doit passer en ✅ (ou être modifiée) avant le jalon indiqué. Cl
 | D-15 | Role play : la conversion vampire reste possible la nuit 1 | Oui (`RP-11`) | M5 |
 | D-16 ✅ | Langue de la V1 | **Validé** : français seul à la sortie, i18n prêt dès M0, traduction anglaise en M9 | M0 |
 | D-17 | Nom de domaine | `rougarou.<compte>.workers.dev` au départ ; domaine personnalisé plus tard | M8 |
-| D-18 | Fournisseur d'e-mails (vérification, mot de passe oublié) | À choisir en M2 parmi les offres avec formule gratuite (ADR à écrire) | M2 |
+| D-18 ✅ | Fournisseur d'e-mails (vérification, mot de passe oublié) | **Validé** : Resend (formule gratuite), derrière une interface. Tant qu'aucun domaine n'est vérifié (D-17), la vérification d'e-mail et la réinitialisation par e-mail restent désactivées (ADR 0009) | M2 |
 | D-19 | Compte Apple Developer (iOS natif, signature macOS) | Pas en V1 : iPhone via la PWA | M8 |
 | D-20 ✅ | Visuels des rôles | **Validé** : pixel art animé (D-24). Sprites de travail de `design/sprites/` pendant le développement, sprites dessinés à la main en M9 | M9 |
-| D-21 | Données personnelles | Pseudo, e-mail, historique. Suppression du compte en libre-service. Aucun traqueur | M2 |
+| D-21 ✅ | Données personnelles | **Validé** : pseudo, e-mail, historique. Suppression du compte en libre-service : le compte disparaît et ses lignes de parties sont anonymisées. Aucun traqueur | M2 |
 | D-23 ✅ | Distribution des rôles | **Validé** : `simultaneous` par défaut, `ceremony` (un par un) en option (§3) | M4 |
 | D-24 ✅ | Direction visuelle | **Validé** : Lanterne (nocturne cinématique, sobre) + pixel art animé 32×32 pour les personnages | M4 |
 | D-22 | Synthèse vocale du texte à lire | Optionnelle, voix du navigateur (gratuite) | M4 |
