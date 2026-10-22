@@ -18,6 +18,7 @@ import { advanceDeal, confirmRoleSeen } from './phases/deal.ts';
 import { advanceElection, castElectionVote, setCandidacy } from './phases/election.ts';
 import { joinGame, kickPlayer, leaveGame, openConfig, reorderSeats } from './phases/lobby.ts';
 import { succeed, type EngineError, type Result } from './result.ts';
+import { extendTimer, pauseTimer, resumeTimer } from './timers.ts';
 import { emptyState, type GameState } from './state.ts';
 import { createTx, engineError, type Context, type Push, type Tx } from './tx.ts';
 
@@ -71,6 +72,12 @@ function dispatch(tx: Tx, actor: Actor, cmd: Command): EngineError | null {
       return confirmRoleSeen(tx, actor);
     case 'AdvancePhase':
       return requireNarrator(actor) ?? advancePhase(tx, cmd.force ? 'force' : 'advance');
+    case 'PauseTimer':
+      return requireNarrator(actor) ?? pauseTimer(tx);
+    case 'ResumeTimer':
+      return requireNarrator(actor) ?? resumeTimer(tx);
+    case 'ExtendTimer':
+      return requireNarrator(actor) ?? extendTimer(tx);
     case 'Undo':
       // L'annulation reecrit le journal : elle passe par `GameRecord` (`R-11`).
       return engineError('INVALID_COMMAND', 'errors.undo_needs_record');

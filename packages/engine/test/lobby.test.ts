@@ -36,6 +36,19 @@ describe('Salon', () => {
     );
   });
 
+  it('R-63 : refuse un pseudo deja pris, sans tenir compte de la casse ni des espaces', () => {
+    lobby(['Alice'])
+      .rejects(player('Bob'), { type: 'JoinGame', name: ' alice ' }, 'NAME_TAKEN')
+      .rejects(player('Bob'), { type: 'JoinGame', name: 'ALICE' }, 'NAME_TAKEN')
+      .as('Bob', { type: 'JoinGame', name: 'Alicia' });
+  });
+
+  it('R-63 : un pseudo libere par un depart peut etre repris', () => {
+    lobby(['Alice'])
+      .as('Alice', { type: 'LeaveGame' })
+      .as('Bob', { type: 'JoinGame', name: 'Alice' });
+  });
+
   it('refuse un 25e joueur (D-07)', () => {
     const game = lobby(Array.from({ length: 24 }, (_, index) => `p${index}`));
 

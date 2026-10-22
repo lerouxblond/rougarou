@@ -67,7 +67,19 @@ export function evolve(state: GameState, event: GameEvent): GameState {
       return state;
 
     case 'DeadlineSet':
-      return { ...state, deadline: event.deadline };
+      // Un nouveau minuteur remplace celui qui etait en pause (`R-16`).
+      return { ...state, deadline: event.deadline, pausedRemaining: null };
+
+    case 'TimerPaused':
+      return { ...state, deadline: null, pausedRemaining: event.remaining };
+
+    case 'TimerResumed':
+      return { ...state, deadline: event.deadline, pausedRemaining: null };
+
+    case 'TimerExtended':
+      return state.pausedRemaining === null
+        ? { ...state, deadline: (state.deadline ?? 0) + event.by }
+        : { ...state, pausedRemaining: state.pausedRemaining + event.by };
 
     case 'NightStarted':
       return {
@@ -231,7 +243,7 @@ function enterPhase(state: GameState, phase: GameState['phase']): GameState {
     case 'MAYOR_ELECTION':
       return { ...state, phase, dawn: null };
     case 'ENDED':
-      return { ...state, phase, deadline: null };
+      return { ...state, phase, deadline: null, pausedRemaining: null };
     default:
       return { ...state, phase };
   }

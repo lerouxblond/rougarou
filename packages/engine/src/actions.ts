@@ -20,8 +20,17 @@ export function availableActions(state: GameState, viewer: Viewer): ActionDescri
   }
 
   return viewer.kind === 'narrator'
-    ? narratorActions(state)
+    ? [...narratorActions(state), ...timerActions(state)]
     : playerActions(state, viewer.playerId);
+}
+
+/** Pause, reprise et +30 s, tant qu'un minuteur court ou attend (`R-16`). */
+function timerActions(state: GameState): ActionDescriptor[] {
+  if (state.pausedRemaining !== null) {
+    return [{ type: 'ResumeTimer' }, { type: 'ExtendTimer' }];
+  }
+
+  return state.deadline === null ? [] : [{ type: 'PauseTimer' }, { type: 'ExtendTimer' }];
 }
 
 function narratorActions(state: GameState): ActionDescriptor[] {

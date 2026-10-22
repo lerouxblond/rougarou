@@ -132,6 +132,8 @@ describe('Actions possibles', () => {
 
     expect(availableActions(game.state, { kind: 'narrator' })).toEqual([
       { type: 'AdvancePhase', blocked: true },
+      { type: 'PauseTimer' },
+      { type: 'ExtendTimer' },
     ]);
   });
 

@@ -56,6 +56,10 @@ export const commandSchema = z.discriminatedUnion('type', [
   // Pilotage du meneur
   z.strictObject({ type: z.literal('AdvancePhase'), force: z.boolean().default(false) }),
   z.strictObject({ type: z.literal('Undo') }),
+  // Minuteur en cours (`R-16`)
+  z.strictObject({ type: z.literal('PauseTimer') }),
+  z.strictObject({ type: z.literal('ResumeTimer') }),
+  z.strictObject({ type: z.literal('ExtendTimer') }),
   // Nuit
   z.strictObject({ type: z.literal('SubmitNightAction'), action: nightActionSchema }),
   z.strictObject({ type: z.literal('ResolveWolfTie'), target: playerIdSchema }),

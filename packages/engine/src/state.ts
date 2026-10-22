@@ -44,6 +44,11 @@ export interface GameState {
    * minuteur, c'est le meneur qui avance.
    */
   readonly deadline: number | null;
+  /**
+   * Duree restante d'un minuteur en pause, en millisecondes (`R-16`). Quand
+   * elle est remplie, `deadline` est `null`.
+   */
+  readonly pausedRemaining: number | null;
   readonly winner: Winner | null;
 }
 
@@ -149,6 +154,7 @@ export function emptyState(): GameState {
     vote: null,
     pending: [],
     deadline: null,
+    pausedRemaining: null,
     winner: null,
   };
 }

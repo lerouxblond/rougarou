@@ -79,6 +79,9 @@ export const actionDescriptorSchema = z.discriminatedUnion('type', [
     blocked: z.boolean(),
   }),
   z.strictObject({ type: z.literal('ResolveWolfTie'), targets: playerIdList }),
+  z.strictObject({ type: z.literal('PauseTimer') }),
+  z.strictObject({ type: z.literal('ResumeTimer') }),
+  z.strictObject({ type: z.literal('ExtendTimer') }),
 ]);
 
 export type ActionDescriptor = z.infer<typeof actionDescriptorSchema>;
@@ -144,6 +147,8 @@ export const playerViewSchema = z.strictObject({
   nightNumber: z.int().min(0),
   /** Echeance visible du lecteur : la nuit, seulement s'il agit (`docs/12` §4). */
   deadline: z.int().nullable(),
+  /** Duree restante d'un minuteur en pause, en ms, visible aux memes conditions (`R-16`). */
+  pausedRemaining: z.int().min(0).nullable(),
   night: playerNightSchema.nullable(),
   /** Morts de la nuit, une fois annoncees ; la cause n'est jamais publique. */
   deaths: playerIdList.nullable(),
@@ -192,6 +197,7 @@ export const narratorViewSchema = z.strictObject({
   composition: compositionSchema,
   nightNumber: z.int().min(0),
   deadline: z.int().nullable(),
+  pausedRemaining: z.int().min(0).nullable(),
   night: narratorNightSchema.nullable(),
   dawn: z.strictObject({ deaths: z.array(deathSchema), announced: z.boolean() }).nullable(),
   election: playerElectionSchema.nullable(),

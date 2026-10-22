@@ -65,14 +65,14 @@ export function startTimer(tx: Tx, key: TimerKey): void {
   const seconds = tx.state.options.timers[key];
   const deadline = seconds === null ? null : tx.ctx.now + seconds * 1000;
 
-  if (deadline !== tx.state.deadline) {
+  if (deadline !== tx.state.deadline || tx.state.pausedRemaining !== null) {
     tx.emit({ type: 'DeadlineSet', deadline });
   }
 }
 
-/** Arrete le minuteur en cours, s'il y en a un. */
+/** Arrete le minuteur en cours, s'il y en a un, meme en pause. */
 export function clearTimer(tx: Tx): void {
-  if (tx.state.deadline !== null) {
+  if (tx.state.deadline !== null || tx.state.pausedRemaining !== null) {
     tx.emit({ type: 'DeadlineSet', deadline: null });
   }
 }

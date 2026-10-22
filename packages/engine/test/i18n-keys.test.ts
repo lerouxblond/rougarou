@@ -22,6 +22,7 @@ const ERROR_CODES = {
   INVALID_COMMAND: true,
   INVALID_COMPOSITION: true,
   INVALID_TARGET: true,
+  NAME_TAKEN: true,
   NOT_YOUR_TURN: true,
   NOTHING_TO_UNDO: true,
   PENDING_ACTIONS: true,

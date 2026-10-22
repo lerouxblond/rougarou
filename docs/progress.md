@@ -350,7 +350,7 @@ Quatre PR : **A** (T1–T3, règles et protocole), **B** (T4–T6, base et compt
   - Fichiers : `docs/01-regles-du-jeu.md` (`R-16` pour P13, `R-63` pour P16), `docs/04-architecture.md` (P14, P15, colonne `grp` de la table `events`, alarme multiplexée), `docs/12-deroulement-partie.md` (D-18 et D-21 → ✅), `docs/adr/0009-email-et-comptes-invites.md` (Resend inactif sans domaine, plugin `anonymous` de Better Auth pour D-04). Les versions des nouvelles dépendances entrent dans `docs/05` avec la tâche qui les ajoute
   - Tests attendus : aucun (document)
 
-- [ ] **T2 — Moteur : Pause, reprise, +30 s, unicité du pseudo** *(PR A)*
+- [x] **T2 — Moteur : Pause, reprise, +30 s, unicité du pseudo** *(PR A)*
   - Fichiers : `packages/protocol/src/{commands,views}.ts`, `packages/engine/src/{state,events,evolve,apply,actions,project,timers}.ts`, `phases/lobby.ts`, `test/{timers,lobby}.test.ts`, `test/bot.ts`, i18n
   - Tests attendus : P13 (pause → `Timeout` refusé ; reprise → échéance décalée de la durée de pause ; +30 s en marche et en pause ; refus sans minuteur ; annulable) ; la vue d'un joueur qui ne voit pas le minuteur reste identique pendant la nuit (non-fuite) ; P16 (`Alice` puis ` alice ` → `NAME_TAKEN`) ; les 1 000 parties aléatoires tirent aussi ces commandes ; couverture ≥ 90 %
 

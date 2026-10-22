@@ -18,6 +18,7 @@ export type EngineErrorCode =
   | 'INVALID_COMMAND'
   | 'INVALID_COMPOSITION'
   | 'INVALID_TARGET'
+  | 'NAME_TAKEN'
   | 'NOT_YOUR_TURN'
   | 'NOTHING_TO_UNDO'
   | 'PENDING_ACTIONS'
