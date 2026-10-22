@@ -144,10 +144,10 @@ type ServerMessage =
 | `user`, `session`, `account`, `verification` | Gérées par Better Auth |
 | `profile` | `user_id` PK, `display_name`, `avatar_id`, `locale`, `prefs` (JSON) |
 | `game` | `id` (ULID), `code`, `narrator_id`, `status`, `play_mode` (présentiel/distanciel), `game_mode_id` (écrit seulement à `ENDED` pour un mode déguisé), `options` (JSON), `created_at`, `ended_at`, `winner` |
-| `game_player` | `game_id`, `user_id`, `seat`, `character` (JSON, role play), `final_role`, `team`, `alive_at_end`, `won` |
+| `game_player` | `game_id`, `user_id` (`null` après suppression du compte, D-21), `seat`, `display_name` (pseudo de la partie, qui reste dans l'historique des autres), `character` (JSON, role play), `final_role`, `team`, `alive_at_end`, `won` |
 | `preset` | `id`, `owner_id`, `mode_id`, `name`, `composition` (JSON), `options` (JSON) |
 
-- On versionne les migrations avec `drizzle-kit`, et on les applique avec `wrangler d1 migrations apply` en CI.
+- Le schéma vit dans `apps/server/src/db/schema.ts`. On génère les migrations avec `drizzle-kit generate` (dans `apps/server/migrations`), et on les applique avec `wrangler d1 migrations apply <base> --env <env>` en CI. Les tests du serveur les appliquent sur une D1 vierge.
 - Le code de partie actif est réservé dans D1 avec un index unique sur (`code`, `status != ended`).
 
 ## Client web

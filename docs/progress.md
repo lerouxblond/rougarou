@@ -359,7 +359,7 @@ Quatre PR : **A** (T1–T3, règles et protocole), **B** (T4–T6, base et compt
   - Contenu : `ClientMessage` (`cmd`, `ping` ; `chat` arrive en M5) et `ServerMessage` (`state`, `ack`, `error`, `presence`, `pong`), chacun avec `v` ; `ErrorCode` (`PROTOCOL_OUTDATED`, `RATE_LIMITED`, `INVALID_MESSAGE` et les codes du moteur) ; DTO REST (`CreateGame`, `JoinByCode`, `Ticket`, `Me`) ; code de partie à 6 caractères sans `0/O/1/I`
   - Tests attendus : chaque message valide passe ; une clé inconnue et un `v` absent sont refusés ; le code refuse les caractères ambigus
 
-- [ ] **T4 — D1, Drizzle et migrations** *(PR B)*
+- [x] **T4 — D1, Drizzle et migrations** *(PR B)* — bases `rougarou-db` et `rougarou-db-preview` créées le 2026-10-22 (région `weur`)
   - Fichiers : `apps/server/src/db/schema.ts`, `apps/server/drizzle.config.ts`, `apps/server/migrations/0000_*.sql` (générée), `wrangler.jsonc` (D1 par environnement), `vitest.config.ts`, `pnpm-workspace.yaml` (`drizzle-orm` 0.45.4, `drizzle-kit` 0.31.11)
   - Contenu : tables de Better Auth, `profile`, `game`, `game_player`, `preset` (`docs/04`), index unique partiel `game(code) where status != 'ended'`
   - Tests attendus : les migrations s'appliquent sur la D1 de test ; deux parties actives ne partagent pas un code ; une partie terminée libère le sien

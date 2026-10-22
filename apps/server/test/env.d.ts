@@ -1,5 +1,8 @@
 /// <reference types="@cloudflare/vitest-plugin/types" />
 
+import type { D1Migration } from '@cloudflare/vitest-plugin';
+
+import type { Env as WorkerEnv } from '../src/env.ts';
 import type app from '../src/index.ts';
 
 /**
@@ -14,6 +17,11 @@ declare global {
   namespace Cloudflare {
     interface GlobalProps {
       mainModule: { default: typeof app };
+    }
+
+    /** Les bindings du Worker, plus les migrations injectees par `vitest.config.ts`. */
+    interface Env extends WorkerEnv {
+      readonly TEST_MIGRATIONS: D1Migration[];
     }
   }
 }
