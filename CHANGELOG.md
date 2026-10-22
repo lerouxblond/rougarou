@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.2.0](https://github.com/lerouxblond/rougarou/compare/v0.1.0...v0.2.0) (2026-10-22)
+
+
+### Fonctionnalites
+
+* M2 rules, timer pause and protocol v2 ([#5](https://github.com/lerouxblond/rougarou/issues/5)) ([24ec73c](https://github.com/lerouxblond/rougarou/commit/24ec73c4fb80dbc1efbe8e1b30a98fe7fb5c4f85))
+* **server:** D1, accounts, guests and game creation ([#6](https://github.com/lerouxblond/rougarou/issues/6)) ([66e1366](https://github.com/lerouxblond/rougarou/commit/66e1366a8a3803fbf5df9b202985f53b502b7eab))
+* **server:** run each game in a GameRoom durable object ([#7](https://github.com/lerouxblond/rougarou/issues/7)) ([4dfb43f](https://github.com/lerouxblond/rougarou/commit/4dfb43f59f9d60f0e36a89e264fe72d5a769d1d2))
+* **web:** web client and six-browser end-to-end game ([#8](https://github.com/lerouxblond/rougarou/issues/8)) ([8aed39b](https://github.com/lerouxblond/rougarou/commit/8aed39b8176f19236f5e4136a24cc201e01734c2))
+
+
+### Documentation
+
+* close milestone M2 ([#10](https://github.com/lerouxblond/rougarou/issues/10)) ([295eefd](https://github.com/lerouxblond/rougarou/commit/295eefd8cc91a84dc99d8d1f6f29d239c3299d56))
+
 ## 0.1.0 (2026-10-22)
 
 
