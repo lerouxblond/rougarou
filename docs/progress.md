@@ -272,6 +272,29 @@ P10 → `R-14`, P11 → `R-15`, P12 → ADR 0008.
   - Fichiers : `packages/engine/test/properties/random-games.test.ts`
   - Tests attendus : 1 000 parties aléatoires (5 à 24 joueurs, toutes options, actions et forçages au hasard) se terminent. Invariants : aucun mort n'agit ni ne vote, il y a au plus un Maire et il est vivant, le rejeu égale l'état, le décompte des camps est cohérent, et la victoire est conforme à `R-01`/`R-02`
 
-- [ ] **T13 — Vérification de la définition de « terminé » et rapport**
+- [x] **T13 — Vérification de la définition de « terminé » et rapport**
   - Fichiers : `docs/progress.md`
   - Tests attendus : `pnpm check` au vert, couverture du moteur ≥ 90 % (lignes et branches)
+  - Écart relevé pendant la vérification : la roadmap demande la **retouche de projection** dans l'architecture des modes, et elle manquait. Elle a été ajoutée (`GameModeDefinition.project`), sans mode qui s'en serve avant M7.
+
+### Vérification de la définition de « terminé »
+
+| Point | État | Preuve |
+|---|---|---|
+| **Couverture du moteur > 90 %** | ✅ | 95,4 % des lignes, 92,1 % des branches, 99,5 % des fonctions. Le seuil est appliqué à chaque `pnpm test` |
+| **1 000 parties aléatoires sans violer d'invariant** | ✅ | `test/properties/random-games.test.ts`, de 5 à 24 joueurs, toutes options, environ 14 s. Un bogue volontaire a été injecté et détecté |
+| `GameState`, commandes, événements, `apply`, `evolve`, rejeu, `Undo`, `Rng` à graine | ✅ | `src/{state,events,evolve,apply,record}.ts`. Le rejeu est vérifié à chaque partie aléatoire |
+| Machine d'états (`docs/01` §2) | ✅ sauf `PRESENTATIONS` | `PRESENTATIONS` appartient au role play (M5) et est refusé par `R-15` |
+| Options (schéma Zod) | ✅ | `packages/protocol/src/options.ts` (ADR 0008) |
+| Votes `R-30` à `R-35` (et `R-36` à `R-38`) | ✅ | `test/vote.test.ts`, `test/mayor.test.ts` |
+| Maire `R-50` à `R-52`, `designate` et `reelect` | ✅ | `test/mayor.test.ts`. `R-53` attend l'Idiot du village (M6) |
+| Pipeline des morts `R-40` à `R-43` (et `R-44`) | ✅ | `test/dawn.test.ts`, `test/mayor.test.ts` |
+| Victoire `R-01` à `R-06` | ✅ pour `R-01`, `R-02`, `R-05` et `R-06` | `R-03` (amoureux, M3) et `R-04` (rôles solo, M6) se brancheront sur `WinCondition` et sa priorité |
+| Rôles `werewolf` et `villager` en plugins, avec registre | ✅ | `src/roles/`. L'étape de nuit des loups appartient au plugin du rôle |
+| Registre des modes avec `classic` : étapes de nuit, victoire, retouche de projection | ✅ | `src/modes/` |
+| `projectView` en liste blanche et test de non-fuite générique | ✅ | `src/project.ts`, `test/leaks/generic.test.ts`. Deux fuites volontaires ont été détectées |
+| DSL de test et tests de propriétés fast-check | ✅ | `test/dsl.ts`, `test/bot.ts`, `test/properties/` |
+
+**Total des tests : 184 dans le moteur (14 fichiers), plus 45 dans le protocole.**
+
+**M1 est terminé.** Il reste une action en dehors du jalon : relancer le job « Preview » de la PR #1, puisque les secrets Cloudflare existent maintenant, pour clore M0.
