@@ -218,9 +218,9 @@ P10 → `R-14`, P11 → `R-15`, P12 → ADR 0008.
   - Fichiers : `docs/01-regles-du-jeu.md` (P1 à P11), `docs/04-architecture.md` (P12), `docs/adr/0008-schemas-dans-protocol.md`
   - Tests attendus : aucun (document)
 
-- [ ] **T2 — Outillage de test du moteur**
-  - Fichiers : `pnpm-workspace.yaml` (ajout de `fast-check` ; `@vitest/coverage-v8` ramené en 4.1.12 pour suivre Vitest), `packages/engine/package.json`, `packages/engine/vitest.config.ts` (seuils de 90 % en lignes et en branches), `docs/05-stack.md`
-  - Tests attendus : `pnpm --filter @rougarou/engine test -- --coverage` tourne et applique les seuils
+- [x] **T2 — Outillage de test du moteur**
+  - Fichiers : `pnpm-workspace.yaml` (ajout de `fast-check`), `docs/05-stack.md` (Vitest 5 et `@cloudflare/vitest-plugin`, que M0 avait adoptés sans mettre la doc à jour), `packages/engine/package.json`, `packages/engine/vitest.config.ts` (seuils de 90 % en lignes et en branches, mesurés à chaque `pnpm test`)
+  - Tests attendus : `pnpm --filter @rougarou/engine test` mesure la couverture et échoue sous 90 % ; une branche non testée du `Rng` (graine non entière) a été couverte
 
 - [ ] **T3 — `protocol` : identifiants, options, commandes**
   - Fichiers : `packages/protocol/src/{ids,options,commands}.ts`, `test/{options,commands}.test.ts`
