@@ -1,13 +1,9 @@
-import {
-  createRootRoute,
-  createRoute,
-  createRouter,
-  Outlet,
-  type AnyRoute,
-} from '@tanstack/react-router';
+import { createRootRoute, createRoute, createRouter, Outlet } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 
+import { Game } from './routes/Game.tsx';
 import { Home } from './routes/Home.tsx';
+import { Join } from './routes/Join.tsx';
 
 /**
  * Racine du routage. Le lien d'evitement est le premier element focusable de
@@ -38,9 +34,21 @@ const homeRoute = createRoute({
   component: Home,
 });
 
-// Routage par code plutot que par fichiers : une seule route a ce jalon, et
-// cela evite une etape de generation supplementaire dans la CI.
-const routeTree = rootRoute.addChildren([homeRoute as AnyRoute]);
+const joinRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/join/$code',
+  component: Join,
+});
+
+const gameRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/game/$gameId',
+  component: Game,
+});
+
+// Routage par code plutot que par fichiers : peu de routes, et cela evite une
+// etape de generation supplementaire dans la CI.
+const routeTree = rootRoute.addChildren([homeRoute, joinRoute, gameRoute]);
 
 export function createAppRouter() {
   return createRouter({ routeTree, defaultPreload: 'intent' });

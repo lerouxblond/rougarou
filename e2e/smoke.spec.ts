@@ -9,8 +9,9 @@ test("l'accueil s'affiche et vient d'i18n", async ({ page }) => {
   await page.goto('/');
 
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('La nuit tombe sur le village');
-  await expect(page.getByRole('button', { name: 'Créer une partie' })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Rejoindre une partie' })).toBeVisible();
+  // Sans session : connexion, ou jeu en invite (D-04).
+  await expect(page.getByRole('heading', { name: 'Connexion' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Jouer en invité' })).toBeVisible();
 });
 
 test('la page est en theme nuit hors partie (docs/06)', async ({ page }) => {
@@ -70,9 +71,9 @@ test('le premier Tab atteint le lien d evitement (CLAUDE.md regle 9)', async ({
 test('les boutons sont atteignables au clavier', async ({ page }) => {
   await page.goto('/');
 
-  await page.getByRole('button', { name: 'Créer une partie' }).focus();
+  await page.getByRole('button', { name: 'Jouer en invité' }).focus();
 
-  await expect(page.locator(':focus')).toHaveText('Créer une partie');
+  await expect(page.locator(':focus')).toHaveText('Jouer en invité');
 });
 
 test('la PWA est installable : manifest et service worker sont servis', async ({ request }) => {

@@ -51,5 +51,11 @@ export default defineConfig({
   },
   server: {
     port: 5173,
+    // En developpement, l'API et la WebSocket sont servies par `wrangler dev`.
+    // Le proxy garde une seule origine, comme en production (cookies `SameSite=Lax`).
+    proxy: {
+      '/api': 'http://localhost:8787',
+      '/ws': { target: 'ws://localhost:8787', ws: true },
+    },
   },
 });

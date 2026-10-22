@@ -401,20 +401,22 @@ Quatre PR : **A** (T1–T3, règles et protocole), **B** (T4–T6, base et compt
 > corrigés et testés. La PR C dépasse 400 lignes, surtout en tests : la découper aurait livré un
 > Durable Object qu'on ne peut pas tester.
 
-- [ ] **T10 — Client : store Zustand, socket, indicateur de connexion** *(PR D)*
+- [x] **T10 — Client : store Zustand, socket, indicateur de connexion** *(PR D)*
   - Fichiers : `apps/web/src/game/{socket,store,useGameView,useSendCommand}.ts`, `src/components/ConnectionIndicator.tsx`, `test/socket.test.ts`, `pnpm-workspace.yaml` (`zustand` 5.0.16, `@tanstack/react-query` 5.104.5)
   - Contenu : chaque `ServerMessage` validé par Zod ; la dernière vue fait foi ; reconnexion à délai croissant (US-90) ; un trou de `seq` déclenche une resynchronisation ; `ack` et `error` corrélés par `id`
   - Tests attendus : message invalide ignoré ; reconnexion après coupure avec des délais croissants ; l'indicateur s'annonce par `aria-live`
 
-- [ ] **T11 — Écrans bruts : auth, accueil, salon, configuration, distribution, débogage** *(PR D)*
-  - Fichiers : `apps/web/src/routes/{Login,Signup,Home,Join,Game}.tsx`, `src/game/screens/{Lobby,Config,Deal,DebugView}.tsx`, `src/api.ts`, i18n
-  - Contenu : connexion, inscription, « Jouer en invité » ; créer ou rejoindre par code et `/join/:code`, avec retour au salon après connexion (US-11) ; salon (code, liste, connexion vue par le meneur, monter/descendre, expulser) ; configuration brute (compteurs loups/villageois, options) ; carte à maintenir pour révéler et « J'ai vu mon rôle » ; vue de débogage : la vue projetée et un bouton par entrée de `availableActions`, de quoi jouer toute la partie
-  - Tests attendus : Testing Library + axe sur chaque écran ; aucun texte en dur (test existant) ; un bouton par action reçue, aucun quand la vue n'en porte pas
+- [x] **T11 — Écrans bruts : auth, accueil, salon, configuration, distribution, débogage** *(PR D)*
+  - Fichiers : `apps/web/src/routes/{Home,Join,Game}.tsx`, `src/components/{AuthGate,Field}.tsx`, `src/game/{ActionPanel,Lobby,Config,RoleCard}.tsx`, `src/{api,session,form}.ts`, i18n ; côté serveur `GET /api/games/:id` ; côté `ui`, `Button` accepte `type="submit"`
+  - Écarts au plan : (1) pas de routes `/auth/login` et `/auth/signup` séparées : une porte `AuthGate` affiche connexion, inscription et invité **à la place** de la page demandée, ce qui ramène directement au salon après connexion (US-11) sans paramètre de redirection ; (2) `GET /api/games/:id` ajouté, car le code de la partie vit dans D1 et pas dans la vue projetée ; (3) le détecteur de texte en dur prenait les génériques TypeScript pour du JSX : son motif est affiné et testé dans les deux sens
+  - Tests : accueil sans session et connecté, axe sur chaque écran, un contrôle par action reçue et aucun sans action, salon (connexion, déplacement, expulsion), carte maintenue pour révéler, à la souris et au clavier
 
-- [ ] **T12 — E2E : 1 meneur + 5 joueurs, reconnexion de nuit** *(PR D)*
-  - Fichiers : `e2e/m2-full-game.spec.ts`, `e2e/m2-reconnect.spec.ts`, `e2e/fixtures/table.ts`, `playwright.config.ts` (`BASE_URL` pour viser la preview ou la production)
-  - Tests attendus : 6 contextes jouent jusqu'à la victoire ; un joueur recharge en pleine nuit et retrouve exactement sa vue ; aucun joueur n'a le rôle d'un autre dans son DOM
+- [x] **T12 — E2E : 1 meneur + 5 joueurs, reconnexion de nuit** *(PR D)*
+  - Fichiers : `e2e/fixtures/table.ts`, `e2e/m2-full-game.spec.ts`, `e2e/m2-reconnect.spec.ts`, `e2e/smoke.spec.ts` (l'accueil sans session montre maintenant la connexion), `playwright.config.ts` (`E2E_BASE_URL` pour viser un déploiement ; en local, migrations D1 puis `wrangler dev` avec un secret propre aux tests)
+  - Résultat en local (2026-10-22) : la partie à six navigateurs va jusqu'à la victoire du village en 9 s, chaque vue de joueur est contrôlée contre la fuite de rôle à chaque tour, et chaque joueur (puis le meneur) recharge en pleine nuit et retrouve exactement sa vue. 19 tests e2e passent ; les deux scénarios à six navigateurs ne tournent que sur Chromium
+  - Bogue trouvé : la session invité et la déconnexion partaient sans corps JSON, et Better Auth répond alors 415. Corrigé dans `apps/web/src/api.ts`
 
 - [ ] **T13 — Déploiement, vérification et rapport**
-  - Actions : créer les bases `rougarou-db` et `rougarou-db-preview`, `wrangler secret put BETTER_AUTH_SECRET` sur les deux environnements, merger, puis lancer les e2e de T12 **contre l'URL de production**
-  - Tests attendus : `pnpm check` au vert ; e2e au vert en local, sur la preview et en production ; vérification point par point de la définition de « terminé »
+  - Fait le 2026-10-22 : bases D1 créées, `BETTER_AUTH_SECRET` posé sur la preview et la production, `deploy.yml` applique la migration du Durable Object avant un téléversement de preview (`versions upload` ne le sait pas, `docs/08` mis à jour)
+  - **Preview de la PR #8** (`rougarou-preview.neyteck-pro.workers.dev`) : les 11 tests e2e Chromium passent, dont la partie à six navigateurs jusqu'à la victoire (25 s) et la reconnexion en pleine nuit (29 s). Aucune erreur 1102 sur une douzaine de sessions
+  - **Reste à faire** : merger les PR #5 à #8 dans `main` (déploiement de production), puis `E2E_BASE_URL=https://rougarou.neyteck-pro.workers.dev pnpm exec playwright test --project=chromium`

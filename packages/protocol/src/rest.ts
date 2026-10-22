@@ -19,6 +19,15 @@ export const createGameResponseSchema = z.strictObject({
 
 export type CreateGameResponse = z.infer<typeof createGameResponseSchema>;
 
+/** `GET /api/games/:id` : le code a afficher dans le salon, et si l'on mene la partie. */
+export const gameSummaryResponseSchema = z.strictObject({
+  gameId: gameIdSchema,
+  code: gameCodeSchema,
+  narrator: z.boolean(),
+});
+
+export type GameSummaryResponse = z.infer<typeof gameSummaryResponseSchema>;
+
 /** `POST /api/games/join` : un joueur rejoint par code (US-11). */
 export const joinGameRequestSchema = z.strictObject({ code: gameCodeSchema });
 
