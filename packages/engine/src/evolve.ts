@@ -185,6 +185,7 @@ export function evolve(state: GameState, event: GameEvent): GameState {
           round: event.round,
           tie: null,
           closed: false,
+          result: null,
         },
       };
 
@@ -195,7 +196,11 @@ export function evolve(state: GameState, event: GameEvent): GameState {
       }));
 
     case 'VoteClosed':
-      return withVote(state, (vote) => ({ ...vote, closed: true }));
+      return withVote(state, (vote) => ({
+        ...vote,
+        closed: true,
+        result: { tally: event.tally, outcome: event.outcome },
+      }));
 
     case 'TieBreakRequested':
       return withVote(state, (vote) => ({ ...vote, tie: [...event.tied] }));

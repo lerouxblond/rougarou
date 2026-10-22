@@ -1,4 +1,12 @@
-import type { Ballot, Composition, GameOptions, Phase, PlayerId, RoleId } from '@rougarou/protocol';
+import type {
+  Ballot,
+  Composition,
+  GameOptions,
+  Phase,
+  PlayerId,
+  RoleId,
+  VoteOutcome,
+} from '@rougarou/protocol';
 
 import type { Death, NightStepId, PendingEffect, Winner } from './state.ts';
 
@@ -90,12 +98,6 @@ export type GameEvent =
 
 /** Le type d'un evenement. */
 export type GameEventType = GameEvent['type'];
-
-/** Issue d'un vote du village, avant l'execution (`R-33`, `R-36`, `R-38`). */
-export type VoteOutcome =
-  | { readonly kind: 'execute'; readonly playerId: PlayerId }
-  | { readonly kind: 'nobody'; readonly reason: 'spare' | 'noBallots' | 'tie' }
-  | { readonly kind: 'tie'; readonly tied: readonly PlayerId[] };
 
 /**
  * Evenements qui revelent une information aux joueurs : une commande qui en a

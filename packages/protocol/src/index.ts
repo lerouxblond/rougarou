@@ -42,3 +42,13 @@ export {
   type Timers,
 } from './options.ts';
 export { PROTOCOL_VERSION } from './version.ts';
+export {
+  actionDescriptorSchema,
+  narratorViewSchema,
+  playerViewSchema,
+  voteOutcomeSchema,
+  type ActionDescriptor,
+  type NarratorView,
+  type PlayerView,
+  type VoteOutcome,
+} from './views.ts';

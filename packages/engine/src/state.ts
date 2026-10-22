@@ -7,6 +7,7 @@ import {
   type PlayerId,
   type RoleId,
   type TeamId,
+  type VoteOutcome,
 } from '@rougarou/protocol';
 
 /**
@@ -110,6 +111,11 @@ export interface VoteState {
   readonly tie: readonly PlayerId[] | null;
   /** Le vote est clos ; l'execution suit. */
   readonly closed: boolean;
+  /** Decompte et issue, une fois le vote clos. */
+  readonly result: {
+    readonly tally: Readonly<Record<string, number>>;
+    readonly outcome: VoteOutcome;
+  } | null;
 }
 
 /** Le Maire mort doit designer son successeur (`R-52`, `designate`). */

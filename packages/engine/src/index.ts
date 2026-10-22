@@ -1,10 +1,6 @@
+export { availableActions, type Viewer } from './actions.ts';
 export { apply, compositionIssues, createGame, type ApplyResult } from './apply.ts';
-export {
-  REVEALING_EVENTS,
-  type GameEvent,
-  type GameEventType,
-  type VoteOutcome,
-} from './events.ts';
+export { REVEALING_EVENTS, type GameEvent, type GameEventType } from './events.ts';
 export { evolve } from './evolve.ts';
 export {
   applyToRecord,
@@ -18,6 +14,7 @@ export {
 } from './record.ts';
 export { findMode, getMode, type GameModeDefinition } from './modes/index.ts';
 export { findRole, getRole, registeredRoles, teamOf, type RoleDefinition } from './roles/index.ts';
+export { projectView } from './project.ts';
 export { createRng, type Rng } from './rng.ts';
 export { fail, succeed, type EngineError, type EngineErrorCode, type Result } from './result.ts';
 export {

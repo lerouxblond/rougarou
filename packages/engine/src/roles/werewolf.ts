@@ -115,6 +115,23 @@ const wolvesStep: NightStepSpec = {
     // Pas d'accord avant la fin : pas de victime (`R-34`, `R-13`).
     tx.emit({ type: 'WolvesResolved', victim: null });
   },
+
+  actionsFor(state) {
+    const wolves = livingWolves(state);
+    const targets = alivePlayers(state)
+      .map((player) => player.id)
+      .filter((id) => !wolves.includes(id));
+
+    return [{ type: 'SubmitNightAction', kind: 'wolfVote', targets }];
+  },
+
+  viewFor(state) {
+    return {
+      step: 'wolves',
+      resolved: state.night?.stepResolved ?? false,
+      wolfVotes: { ...state.night?.wolfVotes },
+    };
+  },
 };
 
 /**

@@ -1,8 +1,7 @@
-import type { Actor, Ballot, PlayerId } from '@rougarou/protocol';
+import type { Actor, Ballot, PlayerId, VoteOutcome } from '@rougarou/protocol';
 
 import { isError, requireAlivePlayer } from '../auth.ts';
 import { killPlayers, settlePendingEffects } from '../deaths.ts';
-import type { VoteOutcome } from '../events.ts';
 import { startNight } from '../night/flow.ts';
 import type { EngineError } from '../result.ts';
 import { alivePlayers, type GameState } from '../state.ts';
@@ -109,7 +108,7 @@ function outcomeOf(state: GameState, ranked: readonly string[]): VoteOutcome {
     return { kind: 'nobody', reason: 'tie' };
   }
 
-  return { kind: 'tie', tied: ranked };
+  return { kind: 'tie', tied: [...ranked] };
 }
 
 /** Le Maire vivant, s'il y en a un. */

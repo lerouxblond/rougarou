@@ -1,4 +1,10 @@
-import type { NightAction, PlayerId, TimerKey } from '@rougarou/protocol';
+import type {
+  ActionDescriptor,
+  NightAction,
+  PlayerId,
+  PlayerView,
+  TimerKey,
+} from '@rougarou/protocol';
 
 import type { EngineError } from '../result.ts';
 import type { GameState, NightStepId } from '../state.ts';
@@ -26,6 +32,10 @@ export interface NightStepSpec {
   submit(tx: Tx, actor: PlayerId, action: NightAction): EngineError | null;
   /** Resout l'etape avec l'action par defaut : minuteur ou forcage (`R-10`, `R-13`). */
   resolveByDefault(tx: Tx): void;
+  /** Ce qu'un acteur peut faire pendant l'etape (`availableActions`). */
+  actionsFor(state: GameState, actor: PlayerId): ActionDescriptor[];
+  /** Ce qu'un acteur voit de l'etape. Les autres joueurs n'en voient rien (`docs/12` §4). */
+  viewFor(state: GameState, actor: PlayerId): NonNullable<PlayerView['night']>;
 }
 
 /** L'etape se joue-t-elle cette nuit-la ? */
