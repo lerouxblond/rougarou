@@ -41,6 +41,8 @@ export const nightActionSchema = z.discriminatedUnion('kind', [
   }),
   /** Un amoureux confirme avoir decouvert l'autre. */
   z.strictObject({ kind: z.literal('loversConfirm') }),
+  /** La Petite fille espionne la meute (`docs/02`) : elle prend le risque d'etre reperee. */
+  z.strictObject({ kind: z.literal('spy') }),
 ]);
 
 export type NightAction = z.infer<typeof nightActionSchema>;

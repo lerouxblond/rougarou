@@ -105,6 +105,9 @@
     },
     "lovers": {
       "already_confirmed": "Vous avez déjà confirmé."
+    },
+    "little_girl": {
+      "already_spied": "Vous espionnez déjà cette nuit."
     }
   },
   "roles": {
@@ -163,6 +166,15 @@
         "sleep": "Cupidon se rendort.",
         "lovers_wake": "Je touche l'épaule des deux amoureux. Ouvrez les yeux et découvrez-vous.",
         "lovers_sleep": "Les amoureux se rendorment, le cœur battant."
+      }
+    },
+    "little_girl": {
+      "name": "Petite fille",
+      "short": "Elle entrouvre les yeux pendant que les loups chassent.",
+      "description": "Curieuse et téméraire, elle épie la meute. Plus elle ose, plus elle risque d'être repérée.",
+      "rules": "Pendant le tour des loups, vous pouvez choisir d'espionner. Vous voyez alors leurs votes en direct, chaque loup sous un pseudo dont seules quelques lettres apparaissent. Chaque nuit d'espionnage augmente le risque d'être repérée : les loups reçoivent alors une liste de trois suspects, dont vous. Vous gagnez avec le village.",
+      "narrator": {
+        "spy": "La Petite fille peut entrouvrir les yeux… à ses risques et périls."
       }
     }
   },
@@ -304,6 +316,7 @@
     "cupid_link": "Former le couple",
     "cupid_first": "Premier amoureux",
     "cupid_second": "Second amoureux",
-    "lovers_confirm": "J'ai découvert mon amoureux"
+    "lovers_confirm": "J'ai découvert mon amoureux",
+    "spy": "Espionner la meute"
   }
 }

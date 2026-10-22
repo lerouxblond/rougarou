@@ -105,6 +105,9 @@
     },
     "lovers": {
       "already_confirmed": "You have already confirmed."
+    },
+    "little_girl": {
+      "already_spied": "You are already spying tonight."
     }
   },
   "roles": {
@@ -163,6 +166,15 @@
         "sleep": "Cupid goes back to sleep.",
         "lovers_wake": "I touch the shoulders of the two lovers. Open your eyes and meet each other.",
         "lovers_sleep": "The lovers go back to sleep, hearts pounding."
+      }
+    },
+    "little_girl": {
+      "name": "Little Girl",
+      "short": "She peeks while the wolves hunt.",
+      "description": "Curious and daring, she spies on the pack. The more she dares, the more likely she is to be spotted.",
+      "rules": "During the wolves' turn, you may choose to spy. You then see their votes live, each wolf under a name showing only a few letters. Each night of spying raises the risk of being spotted: the wolves then receive a list of three suspects, including you. You win with the village.",
+      "narrator": {
+        "spy": "The Little Girl may half-open her eyes… at her own risk."
       }
     }
   },
@@ -304,6 +316,7 @@
     "cupid_link": "Form the couple",
     "cupid_first": "First lover",
     "cupid_second": "Second lover",
-    "lovers_confirm": "I have met my lover"
+    "lovers_confirm": "I have met my lover",
+    "spy": "Spy on the pack"
   }
 }

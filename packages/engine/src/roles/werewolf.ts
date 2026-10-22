@@ -7,7 +7,7 @@ import { engineError, type Tx } from '../tx.ts';
 import type { RoleDefinition } from './types.ts';
 
 /** Les loups vivants : ceux dont le role est du camp des loups. */
-function livingWolves(state: GameState): PlayerId[] {
+export function livingWolves(state: GameState): PlayerId[] {
   return alivePlayers(state)
     .filter((player) => player.role !== null && WOLF_ROLES.has(player.role))
     .map((player) => player.id);

@@ -38,6 +38,8 @@ export interface GameState {
   readonly dawn: DawnState | null;
   readonly election: ElectionState | null;
   readonly vote: VoteState | null;
+  /** Nombre de nuits ou chaque Petite fille a espionne (`docs/02`, risque croissant). */
+  readonly spyNights: Readonly<Record<PlayerId, number>>;
   /** Le couple forme par Cupidon (`docs/02`, `R-03`). */
   readonly lovers: Couple | null;
   /** Potions restantes de chaque Sorciere (`docs/02`). Absente : les deux. */
@@ -92,6 +94,22 @@ export interface NightState {
   readonly witch: WitchChoice | null;
   /** Les amoureux qui ont confirme leur decouverte, la nuit 1. */
   readonly loversConfirmed: readonly PlayerId[];
+  /** La Petite fille a espionne cette nuit : ce qu'elle a vu de la meute. */
+  readonly spy: SpyGlimpse | null;
+}
+
+/** Un loup tel que la Petite fille le voit : les positions devoilees de son pseudo. */
+export interface GlimpsedWolf {
+  readonly wolf: PlayerId;
+  readonly revealed: readonly number[];
+}
+
+/** Ce que la Petite fille a vu en espionnant, et si elle a ete reperee. */
+export interface SpyGlimpse {
+  readonly playerId: PlayerId;
+  /** Les loups, dans l'ordre tire au hasard. */
+  readonly pack: readonly GlimpsedWolf[];
+  readonly caught: boolean;
 }
 
 /** Deux amoureux. */
@@ -184,6 +202,7 @@ export function emptyState(): GameState {
     dawn: null,
     election: null,
     vote: null,
+    spyNights: {},
     lovers: null,
     potions: {},
     pending: [],

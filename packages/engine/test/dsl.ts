@@ -63,6 +63,7 @@ export interface GameDriver {
   shoot(hunter: PlayerId, target: PlayerId): GameDriver;
   link(cupid: PlayerId, first: PlayerId, second: PlayerId): GameDriver;
   confirmLove(lover: PlayerId): GameDriver;
+  spy(littleGirl: PlayerId): GameDriver;
   vote(voter: PlayerId, target: Choice): GameDriver;
   votes(ballots: Readonly<Record<PlayerId, Choice>>): GameDriver;
 }
@@ -180,6 +181,7 @@ export function newGame(seed = 1, gameId = 'game-1'): GameDriver {
     link: (cupid, first, second) =>
       driver.night(cupid, { kind: 'cupidLink', lovers: [first, second] }),
     confirmLove: (lover) => driver.night(lover, { kind: 'loversConfirm' }),
+    spy: (littleGirl) => driver.night(littleGirl, { kind: 'spy' }),
     vote: (voter, target) => driver.as(voter, { type: 'CastVote', ballot: toBallot(target) }),
     votes(ballots) {
       for (const [voter, target] of Object.entries(ballots)) {

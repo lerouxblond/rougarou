@@ -208,6 +208,10 @@ function narratorView(state: GameState): NarratorView {
             wolfTie: night.wolfTie === null ? null : [...night.wolfTie],
             wolfVictim: night.wolfVictim,
             witch: night.witch === null ? null : { ...night.witch },
+            spy:
+              night.spy === null
+                ? null
+                : { playerId: night.spy.playerId, caught: night.spy.caught },
           },
     dawn:
       dawn === null

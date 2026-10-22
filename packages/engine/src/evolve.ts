@@ -96,6 +96,7 @@ export function evolve(state: GameState, event: GameEvent): GameState {
           wolfVictim: null,
           witch: null,
           loversConfirmed: [],
+          spy: null,
         },
       };
 
@@ -128,6 +129,21 @@ export function evolve(state: GameState, event: GameEvent): GameState {
 
     case 'LoversLinked':
       return { ...state, lovers: event.lovers };
+
+    case 'LittleGirlSpied':
+      return withNight(
+        {
+          ...state,
+          spyNights: {
+            ...state.spyNights,
+            [event.playerId]: (state.spyNights[event.playerId] ?? 0) + 1,
+          },
+        },
+        (night) => ({
+          ...night,
+          spy: { playerId: event.playerId, pack: event.pack, caught: event.caught },
+        }),
+      );
 
     case 'LoverConfirmed':
       return withNight(state, (night) => ({
