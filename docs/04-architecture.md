@@ -90,9 +90,11 @@ function checkVictory(state: GameState): Victory | null;
 ## Durable Object `GameRoom`
 
 - Il est identifié par `idFromName(gameId)`, et le `gameId` est un ULID.
-- Il stocke dans le SQLite du DO les tables `events(seq, type, payload, at)`, `snapshot(seq, state)` et `members(userId, role: 'narrator'|'player'|'spectator', seat, connected)`.
+- Il stocke dans le SQLite du DO les tables `events(seq, grp, type, payload, at)`, `snapshot(seq, state)` et `members(userId, kind: 'narrator'|'player')`. `grp` numérote la commande qui a produit l'événement : `Undo` supprime les lignes du dernier groupe (`R-11`). Au réveil, le DO recharge le dernier instantané et rejoue les événements qui le suivent.
+- Le **meneur** est l'utilisateur qui a créé la partie. Un utilisateur qui ouvre la WebSocket sans être membre ne peut envoyer que `JoinGame`, qui fait de lui un joueur.
+- L'**état de connexion** (`R-61`) n'est pas un fait de jeu : il vit dans le DO, jamais dans `GameState` ni dans le journal, sinon `Undo` l'annulerait. Le DO l'envoie au meneur seul, par un message `presence`.
 - Il utilise l'**API WebSocket Hibernation** (`ctx.acceptWebSocket`, `webSocketMessage`, `webSocketClose`) : les sockets restent ouverts pendant que le DO hiberne, ce qui le garde dans la formule gratuite.
-- Les **minuteurs** passent par `ctx.storage.setAlarm()`. À l'expiration, le DO applique `AdvancePhase` avec un motif `timeout`.
+- Les **minuteurs** passent par `ctx.storage.setAlarm()`. Un DO n'a qu'une alarme : elle vise la plus proche de deux échéances, celle du moteur (`state.deadline`) et la purge à J+7 d'une partie terminée. À l'échéance du moteur, le DO applique la commande `Timeout` avec l'acteur `system` (`R-14`). Pause et +30 s (`R-16`) replanifient l'alarme.
 - Boucle de traitement d'un message :
   1. On valide le message avec Zod (`ClientMessage`).
   2. On identifie l'utilisateur (attaché au socket lors de l'upgrade).
@@ -114,22 +116,26 @@ type ClientMessage =
 type ServerMessage =
   | { t: 'state'; seq: number; view: PlayerView | NarratorView }
   | { t: 'ack'; id: string }
-  | { t: 'error'; id?: string; code: ErrorCode; message: string }
+  | { t: 'error'; id?: string; code: ErrorCode; messageKey: string }  // clé i18n, jamais un texte
   | { t: 'chat'; channel: ChannelId; msg: ChatMessage }
   | { t: 'private'; info: PrivateInfo }              // résultat Voyante, Renard…
+  | { t: 'presence'; connected: PlayerId[] }         // au meneur seul (R-61)
   | { t: 'pong' };
 ```
 
 - Chaque message porte un `v` (version du protocole). Si le client a une version trop ancienne, le serveur renvoie `error: 'PROTOCOL_OUTDATED'`, et l'app invite l'utilisateur à se mettre à jour.
-- Le `seq` est croissant. Si le client détecte un trou dans la séquence, il demande un `state` complet.
+- Le `seq` est la **révision** de la partie : il croît à chaque commande acceptée, `Undo` compris (le nombre d'événements, lui, diminue). Si le client détecte un trou dans la séquence, il demande un `state` complet.
+- Les schémas sont dans `packages/protocol/src/ws.ts` (WebSocket) et `rest.ts` (REST). Le chat (`t: 'chat'`) et `private` arrivent avec leurs jalons (M5, M3). Une réponse REST en erreur a la forme `{ code, messageKey }`.
 
 ## Authentification
 
 - On utilise **Better Auth** dans le Worker (handler Hono sur `/api/auth/*`), avec l'adaptateur Drizzle pour **D1**.
-- Méthodes : e-mail + mot de passe, Google OAuth (optionnel, activé par variable d'environnement). L'envoi des e-mails de vérification et de réinitialisation passe par un fournisseur transactionnel (au choix au jalon M2, voir l'ADR à écrire).
+- Méthodes : e-mail + mot de passe, Google OAuth (optionnel, activé par variable d'environnement), et invité (D-04).
 - **Web (PWA)** : cookie de session `HttpOnly`, `Secure`, `SameSite=Lax`, sur le même domaine que l'API.
 - **Tauri** : plugin *bearer* de Better Auth. Le jeton est stocké dans le stockage sécurisé de l'OS (plugin Tauri `stronghold` ou keychain), jamais dans `localStorage`.
-- **WebSocket** : le client obtient d'abord un **ticket** à usage unique valable 30 s (`POST /api/games/:id/ticket`), puis ouvre `wss://…/ws/:gameId?ticket=…`. Le Worker vérifie le ticket avant de transférer au DO. On ne met jamais le jeton de session dans l'URL.
+- **WebSocket** : le client obtient d'abord un **ticket** à usage unique valable 30 s (`POST /api/games/:id/ticket`), puis ouvre `wss://…/ws/:gameId?ticket=…`. Le Worker vérifie la session à l'émission ; le ticket est émis et **consommé par le DO de la partie**, qui seul peut garantir l'usage unique : il refuse un ticket inconnu, expiré ou déjà servi. On ne met jamais le jeton de session dans l'URL.
+- **Invités** (D-04) : plugin `anonymous` de Better Auth. Un invité a une session et un identifiant comme un compte ; la conversion en compte garde cet identifiant (ADR 0009).
+- **E-mails** : Resend, derrière une interface `EmailSender`. Tant qu'aucun domaine n'est vérifié, la vérification d'e-mail et la réinitialisation par e-mail sont désactivées (ADR 0009).
 
 ## Base de données D1 (Drizzle)
 

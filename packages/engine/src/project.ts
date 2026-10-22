@@ -60,6 +60,8 @@ function playerView(state: GameState, viewerId: PlayerId): PlayerView {
   const hiddenDawn = state.phase === 'DAWN' && state.dawn?.announced !== true;
   const acting = actsTonight(state, viewerId);
   const secret = state.options.voteVisibility === 'secret';
+  // La nuit, seul celui qui agit voit le minuteur (`docs/12` §4), pause comprise (`R-16`).
+  const seesTimer = !(state.phase === 'NIGHT' && !acting) && !hiddenDawn;
 
   return {
     kind: 'player',
@@ -83,8 +85,8 @@ function playerView(state: GameState, viewerId: PlayerId): PlayerView {
     options: state.options,
     composition: state.composition,
     nightNumber: state.nightNumber,
-    // La nuit, seul celui qui agit voit le minuteur (`docs/12` §4).
-    deadline: state.phase === 'NIGHT' && !acting ? null : hiddenDawn ? null : state.deadline,
+    deadline: seesTimer ? state.deadline : null,
+    pausedRemaining: seesTimer ? state.pausedRemaining : null,
     night: acting ? currentStep(state).viewFor(state, viewerId) : null,
     deaths:
       state.dawn?.announced === true ? state.dawn.deaths.map((death) => death.playerId) : null,
@@ -153,6 +155,7 @@ function narratorView(state: GameState): NarratorView {
     composition: state.composition,
     nightNumber: state.nightNumber,
     deadline: state.deadline,
+    pausedRemaining: state.pausedRemaining,
     night:
       night === null
         ? null

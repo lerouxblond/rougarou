@@ -11,6 +11,11 @@ function seatingOpen(state: GameState): boolean {
   return state.phase === 'LOBBY' || state.phase === 'CONFIG';
 }
 
+/** `R-63` : deux pseudos sont les memes a la casse et aux espaces pres. */
+function nameKey(name: string): string {
+  return name.trim().toLocaleLowerCase('fr');
+}
+
 export function joinGame(tx: Tx, actor: Actor, name: string): EngineError | null {
   if (actor.kind !== 'player') {
     return engineError('FORBIDDEN');
@@ -22,6 +27,12 @@ export function joinGame(tx: Tx, actor: Actor, name: string): EngineError | null
 
   if (tx.state.players[actor.playerId] !== undefined) {
     return engineError('INVALID_COMMAND', 'errors.already_joined');
+  }
+
+  const key = nameKey(name);
+
+  if (Object.values(tx.state.players).some((other) => nameKey(other.name) === key)) {
+    return engineError('NAME_TAKEN');
   }
 
   if (tx.state.seats.length >= CLASSIC_MAX_PLAYERS) {

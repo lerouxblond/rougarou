@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 
+import { apiError } from './api-error.ts';
 import { health } from './routes/health.ts';
 
 /**
@@ -38,15 +39,13 @@ app.route('/api', health);
  * Une route d'API inconnue renvoie du JSON, jamais le `index.html` de la SPA :
  * un client qui recoit du HTML sur `/api/*` est beaucoup plus dur a diagnostiquer.
  */
-app.notFound((context) =>
-  context.json({ code: 'NOT_FOUND', message: 'Route inconnue.' } as const, 404),
-);
+app.notFound((context) => context.json(apiError('NOT_FOUND'), 404));
 
 app.onError((error, context) => {
   // Logs structures, sans aucune donnee personnelle ni role cache (docs/04).
   console.error(JSON.stringify({ message: 'unhandled_error', error: String(error) }));
 
-  return context.json({ code: 'INTERNAL', message: 'Erreur interne.' } as const, 500);
+  return context.json(apiError('INTERNAL'), 500);
 });
 
 export default app;

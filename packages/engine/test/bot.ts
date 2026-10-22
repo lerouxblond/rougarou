@@ -37,6 +37,9 @@ function toCommand(game: GameDriver, rng: Rng, descriptor: ActionDescriptor): Co
     case 'ConfirmRoleSeen':
     case 'DeclareCandidacy':
     case 'WithdrawCandidacy':
+    case 'PauseTimer':
+    case 'ResumeTimer':
+    case 'ExtendTimer':
       return { type: descriptor.type };
     case 'SubmitNightAction': {
       const pack = mostCommon(Object.values(game.state.night?.wolfVotes ?? {}));

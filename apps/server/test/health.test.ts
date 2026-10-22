@@ -1,5 +1,5 @@
 import { exports as worker } from 'cloudflare:workers';
-import { healthResponseSchema, PROTOCOL_VERSION } from '@rougarou/protocol';
+import { apiErrorSchema, healthResponseSchema, PROTOCOL_VERSION } from '@rougarou/protocol';
 import { describe, expect, it } from 'vitest';
 
 describe('GET /api/health', () => {
@@ -41,7 +41,10 @@ describe('routes inconnues', () => {
 
     expect(response.status).toBe(404);
     expect(response.headers.get('content-type')).toContain('application/json');
-    expect(await response.json()).toEqual({ code: 'NOT_FOUND', message: 'Route inconnue.' });
+    expect(apiErrorSchema.parse(await response.json())).toEqual({
+      code: 'NOT_FOUND',
+      messageKey: 'errors.not_found',
+    });
   });
 });
 

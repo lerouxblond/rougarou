@@ -37,6 +37,9 @@ export type GameEvent =
   | { readonly type: 'PhaseForced'; readonly phase: Phase }
   | { readonly type: 'TimerExpired'; readonly phase: Phase }
   | { readonly type: 'DeadlineSet'; readonly deadline: number | null }
+  | { readonly type: 'TimerPaused'; readonly remaining: number }
+  | { readonly type: 'TimerResumed'; readonly deadline: number }
+  | { readonly type: 'TimerExtended'; readonly by: number }
   // Nuit
   | {
       readonly type: 'NightStarted';

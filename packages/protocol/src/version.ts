@@ -6,4 +6,4 @@
  * On l'incremente des qu'un message change de forme de facon incompatible,
  * et la liste de controle de release le verifie (`docs/08`).
  */
-export const PROTOCOL_VERSION = 1;
+export const PROTOCOL_VERSION = 2;
