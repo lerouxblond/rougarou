@@ -122,7 +122,7 @@ Trois éléments de la définition de « terminé » sortent de ce que je peux f
 
 1. **Secrets GitHub** `CLOUDFLARE_API_TOKEN` et `CLOUDFLARE_ACCOUNT_ID` à créer dans le dépôt.
 2. **URL de production et de preview** : elles n'existent qu'après un premier `wrangler deploy`, qui exige le compte Cloudflare connecté.
-3. **La branche courante est `master`**, alors que `docs/08` et `docs/09` parlent de `main`. Les workflows seront écrits sur `master` sauf indication contraire.
+3. **La branche courante était `master`**, alors que `docs/08` et `docs/09` parlent de `main`. Résolu en T15 : la branche a été renommée en `main`.
 
 ### Vérification de la définition de « terminé »
 
@@ -151,3 +151,22 @@ Trois éléments de la définition de « terminé » sortent de ce que je peux f
 
 Tant que ces trois points ne sont pas faits, M0 est **complet côté code** mais sa
 définition de « terminé » n'est pas entièrement vérifiable.
+
+### Clôture de M0 (reprise du 2026-10-22)
+
+Constat : les trois workflows se déclenchent sur `push: [main]`, mais la branche par
+défaut du dépôt GitHub est `master`. **Aucune exécution de CI n'a jamais eu lieu**
+(`gh run list` vide), aucune PR n'est ouverte et aucun secret n'est défini.
+
+- [x] **T15 — Aligner la branche de déploiement** (option A retenue le 2026-10-22 : `master` renommée en `main`)
+  - Option A (conforme à `docs/08` et `docs/09`) : renommer `master` en `main` sur GitHub (`gh api -X POST repos/lerouxblond/rougarou/branches/master/rename -f new_name=main`), puis `git branch -m` en local. Aucun fichier modifié.
+  - Option B : passer les workflows sur `master` et mettre à jour `docs/08` et `docs/09` dans le même commit.
+  - Tests attendus : `gh api repos/lerouxblond/rougarou --jq .default_branch` renvoie la branche retenue
+
+- [ ] **T16 — Secrets Cloudflare** (action humaine)
+  - `gh secret set CLOUDFLARE_API_TOKEN` et `gh secret set CLOUDFLARE_ACCOUNT_ID`
+  - Tests attendus : `gh secret list` les affiche
+
+- [ ] **T17 — PR de vérification**
+  - Pousser `init/jalon-01`, ouvrir une PR vers la branche par défaut
+  - Tests attendus : `ci.yml` au vert, `deploy.yml` commente une URL de preview sur la PR ; après merge, l'URL de production affiche l'accueil et la PWA est installable
