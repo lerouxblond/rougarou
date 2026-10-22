@@ -2,7 +2,8 @@ import type { NarratorView, PlayerId, PlayerView } from '@rougarou/protocol';
 
 import { availableActions, type Viewer } from './actions.ts';
 import { getMode } from './modes/index.ts';
-import { currentStep } from './night/flow.ts';
+import { currentStep, observerSpecOf } from './night/flow.ts';
+import type { PlayerNightView } from './night/types.ts';
 import { everyoneVoted } from './phases/day.ts';
 import { getRole, teamOf } from './roles/index.ts';
 import { getPlayer, type GameState, type PlayerState } from './state.ts';
@@ -48,9 +49,27 @@ function canSeeRole(
     return true;
   }
 
+  // Ses infos lui ont appris ce role : Voyante, amoureux (ADR 0010).
+  if (learnedRole(viewer, target)) {
+    return true;
+  }
+
   // Les loups se connaissent (`docs/02`).
   return (
     getRole(viewer.role).knowsTeammates && teamOf(state, viewer.id) === teamOf(state, target.id)
+  );
+}
+
+/**
+ * Une info du lecteur donne-t-elle le role actuel de `target` ? Une info est
+ * un instantane : si le role a change depuis (M6), elle ne le donne plus.
+ */
+function learnedRole(viewer: PlayerState, target: PlayerState): boolean {
+  return viewer.knowledge.some(
+    (info) =>
+      (info.kind === 'seerRole' || info.kind === 'lover') &&
+      info.playerId === target.id &&
+      info.role === target.role,
   );
 }
 
@@ -58,7 +77,8 @@ function playerView(state: GameState, viewerId: PlayerId): PlayerView {
   const me = state.players[viewerId];
   // `R-12` : avant « Lever le jour », l'aube est encore la nuit pour les joueurs.
   const hiddenDawn = state.phase === 'DAWN' && state.dawn?.announced !== true;
-  const acting = actsTonight(state, viewerId);
+  const night = nightViewOf(state, viewerId);
+  const acting = night !== null;
   const secret = state.options.voteVisibility === 'secret';
   // La nuit, seul celui qui agit voit le minuteur (`docs/12` §4), pause comprise (`R-16`).
   const seesTimer = !(state.phase === 'NIGHT' && !acting) && !hiddenDawn;
@@ -70,7 +90,13 @@ function playerView(state: GameState, viewerId: PlayerId): PlayerView {
     me:
       me === undefined
         ? null
-        : { id: me.id, role: me.role, alive: me.alive, roleSeen: me.roleSeen },
+        : {
+            id: me.id,
+            role: me.role,
+            alive: me.alive,
+            roleSeen: me.roleSeen,
+            knowledge: [...me.knowledge],
+          },
     players: state.seats.map((id) => {
       const player = getPlayer(state, id);
 
@@ -87,7 +113,7 @@ function playerView(state: GameState, viewerId: PlayerId): PlayerView {
     nightNumber: state.nightNumber,
     deadline: seesTimer ? state.deadline : null,
     pausedRemaining: seesTimer ? state.pausedRemaining : null,
-    night: acting ? currentStep(state).viewFor(state, viewerId) : null,
+    night,
     deaths:
       state.dawn?.announced === true ? state.dawn.deaths.map((death) => death.playerId) : null,
     election:
@@ -119,9 +145,22 @@ function playerView(state: GameState, viewerId: PlayerId): PlayerView {
   };
 }
 
-/** Le lecteur agit-il dans l'etape de nuit en cours ? */
-function actsTonight(state: GameState, viewerId: PlayerId): boolean {
-  return state.phase === 'NIGHT' && currentStep(state).actors(state).includes(viewerId);
+/**
+ * Ce que le lecteur voit de l'etape de nuit en cours : rien, sauf s'il y agit
+ * ou la regarde (`docs/04` §Projection, nuit uniforme).
+ */
+function nightViewOf(state: GameState, viewerId: PlayerId): PlayerNightView | null {
+  if (state.phase !== 'NIGHT') {
+    return null;
+  }
+
+  const step = currentStep(state);
+
+  if (step.actors(state).includes(viewerId)) {
+    return step.viewFor(state, viewerId);
+  }
+
+  return observerSpecOf(state, viewerId)?.viewFor(state, viewerId) ?? null;
 }
 
 /** Seul le bulletin du lecteur, en vote secret (`R-30`). */
@@ -149,6 +188,7 @@ function narratorView(state: GameState): NarratorView {
         role: player.role,
         roleSeen: player.roleSeen,
         roleRevealed: player.roleRevealed,
+        knowledge: [...player.knowledge],
       };
     }),
     options: state.options,

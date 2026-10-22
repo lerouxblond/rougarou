@@ -35,13 +35,79 @@ export type VoteOutcome = z.infer<typeof voteOutcomeSchema>;
 /** Un decompte : voix par joueur, et `@spare` pour « Epargner ». */
 const tallySchema = z.record(z.string(), z.int().min(0));
 
-/** Un effet a la mort en attente : public, puisque la mort l'est. */
+/**
+ * Un effet a la mort en attente (`R-42`) : public, puisque la mort l'est. Le
+ * tir du Chasseur revele donc son role (`R-45`).
+ */
 const pendingSchema = z.discriminatedUnion('kind', [
+  z.strictObject({ kind: z.literal('hunterShot'), from: playerIdSchema }),
   z.strictObject({ kind: z.literal('mayorSuccession'), from: playerIdSchema }),
 ]);
 
-/** Ce qu'un spectateur de la partie sait du vainqueur. */
-const winnerSchema = z.union([teamIdSchema, z.literal('nobody')]).nullable();
+/** Issue d'une partie (`docs/01` §1) : un camp, le couple mixte (`R-03`) ou personne. */
+export const winnerSchema = z.union([teamIdSchema, z.literal('lovers'), z.literal('nobody')]);
+
+export type Winner = z.infer<typeof winnerSchema>;
+
+/** Numero d'une nuit. */
+const nightNumberSchema = z.int().min(1);
+
+/**
+ * Un pseudo partiellement devoile (`docs/02`, Petite fille) : une case par
+ * caractere, `null` quand il est cache. Les espaces restent visibles.
+ */
+export const maskSchema = z.array(z.string().min(1).max(2).nullable());
+
+/**
+ * Une information privee, rangee dans l'etat et envoyee a son seul
+ * destinataire par sa vue (`me.knowledge`, ADR 0010).
+ */
+export const knowledgeSchema = z.discriminatedUnion('kind', [
+  /** Voyante, `seerMode: 'role'` : le role du joueur sonde. */
+  z.strictObject({
+    kind: z.literal('seerRole'),
+    night: nightNumberSchema,
+    playerId: playerIdSchema,
+    role: roleIdSchema,
+  }),
+  /** Voyante, `seerMode: 'team'` : son camp effectif. */
+  z.strictObject({
+    kind: z.literal('seerTeam'),
+    night: nightNumberSchema,
+    playerId: playerIdSchema,
+    team: teamIdSchema,
+  }),
+  /** Cupidon : le couple qu'il a forme, sans les roles. */
+  z.strictObject({ kind: z.literal('couple'), players: z.tuple([playerIdSchema, playerIdSchema]) }),
+  /** Un amoureux : son partenaire et le role de celui-ci. */
+  z.strictObject({ kind: z.literal('lover'), playerId: playerIdSchema, role: roleIdSchema }),
+  /** Petite fille : les pseudos partiels des loups vus une nuit. */
+  z.strictObject({
+    kind: z.literal('wolfGlimpse'),
+    night: nightNumberSchema,
+    masks: z.array(maskSchema),
+  }),
+  /** Loups : la Petite fille, reperee, est l'un de ces joueurs. */
+  z.strictObject({
+    kind: z.literal('littleGirlSuspects'),
+    night: nightNumberSchema,
+    players: playerIdList,
+  }),
+]);
+
+export type Knowledge = z.infer<typeof knowledgeSchema>;
+
+/**
+ * Une action de nuit proposee : son genre et ses choix possibles. Chaque role
+ * qui agit la nuit ajoute son cas.
+ */
+const nightActionDescriptorSchema = z.discriminatedUnion('kind', [
+  z.strictObject({
+    type: z.literal('SubmitNightAction'),
+    kind: z.literal('wolfVote'),
+    targets: playerIdList,
+  }),
+]);
 
 /**
  * Une action possible pour celui qui regarde : le client en tire ses boutons,
@@ -52,11 +118,7 @@ export const actionDescriptorSchema = z.discriminatedUnion('type', [
   z.strictObject({ type: z.literal('JoinGame') }),
   z.strictObject({ type: z.literal('LeaveGame') }),
   z.strictObject({ type: z.literal('ConfirmRoleSeen') }),
-  z.strictObject({
-    type: z.literal('SubmitNightAction'),
-    kind: z.literal('wolfVote'),
-    targets: playerIdList,
-  }),
+  nightActionDescriptorSchema,
   z.strictObject({ type: z.literal('DeclareCandidacy') }),
   z.strictObject({ type: z.literal('WithdrawCandidacy') }),
   z.strictObject({
@@ -67,6 +129,7 @@ export const actionDescriptorSchema = z.discriminatedUnion('type', [
   }),
   z.strictObject({ type: z.literal('BreakTie'), targets: playerIdList }),
   z.strictObject({ type: z.literal('DesignateSuccessor'), targets: playerIdList }),
+  z.strictObject({ type: z.literal('HunterShoot'), targets: playerIdList }),
   // Meneur
   z.strictObject({ type: z.literal('KickPlayer'), targets: playerIdList }),
   z.strictObject({ type: z.literal('ReorderSeats') }),
@@ -103,15 +166,22 @@ const selfSchema = z.strictObject({
   role: roleIdSchema.nullable(),
   alive: z.boolean(),
   roleSeen: z.boolean(),
+  /** Ses infos privees, « Mes infos » (ADR 0010). */
+  knowledge: z.array(knowledgeSchema),
 });
 
-/** L'etape de nuit, vue seulement par ceux qui y agissent. */
-const playerNightSchema = z.strictObject({
-  step: z.literal('wolves'),
-  resolved: z.boolean(),
-  /** Votes de la meute, visibles des seuls loups (`docs/12` #7). */
-  wolfVotes: z.record(playerIdSchema, playerIdSchema),
-});
+/**
+ * L'etape de nuit, vue seulement par ceux qui y agissent ou la regardent.
+ * Chaque etape a sa forme.
+ */
+const playerNightSchema = z.discriminatedUnion('step', [
+  z.strictObject({
+    step: z.literal('wolves'),
+    resolved: z.boolean(),
+    /** Votes de la meute, visibles des seuls loups (`docs/12` #7). */
+    wolfVotes: z.record(playerIdSchema, playerIdSchema),
+  }),
+]);
 
 const playerElectionSchema = z.strictObject({
   stage: z.enum(['candidacy', 'vote']),
@@ -155,7 +225,7 @@ export const playerViewSchema = z.strictObject({
   election: playerElectionSchema.nullable(),
   vote: playerVoteSchema.nullable(),
   pending: z.array(pendingSchema),
-  winner: winnerSchema,
+  winner: winnerSchema.nullable(),
   actions: z.array(actionDescriptorSchema),
 });
 
@@ -171,6 +241,7 @@ const narratorPlayerSchema = z.strictObject({
   role: roleIdSchema.nullable(),
   roleSeen: z.boolean(),
   roleRevealed: z.boolean(),
+  knowledge: z.array(knowledgeSchema),
 });
 
 const narratorNightSchema = z.strictObject({
@@ -185,7 +256,7 @@ const narratorNightSchema = z.strictObject({
 
 const deathSchema = z.strictObject({
   playerId: playerIdSchema,
-  cause: z.enum(['wolves', 'vote']),
+  cause: z.enum(['wolves', 'witch', 'vote', 'hunter', 'grief']),
 });
 
 export const narratorViewSchema = z.strictObject({
@@ -203,7 +274,7 @@ export const narratorViewSchema = z.strictObject({
   election: playerElectionSchema.nullable(),
   vote: playerVoteSchema.nullable(),
   pending: z.array(pendingSchema),
-  winner: winnerSchema,
+  winner: winnerSchema.nullable(),
   /** Tous les votants ont vote : le bouton de cloture le signale (`R-37`). */
   everyoneVoted: z.boolean(),
   actions: z.array(actionDescriptorSchema),

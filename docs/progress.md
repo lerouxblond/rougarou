@@ -484,7 +484,7 @@ Trois PR : **A** (T1–T2, règles et points d'accroche), **B** (T3–T7, les r�
   - Fichiers : `docs/01-regles-du-jeu.md` (`R-03` et `R-42` précisés par P23 et P24, `R-45` révélation du Chasseur, option `littleGirlRisk` au §8 : `{ base: 10, increase: 10 }`, plafond 75 %), `docs/02-roles.md` (fiches précisées par P18 à P22 ; la fiche de la Petite fille est réécrite selon P21 revue), `docs/04-architecture.md` (P17, points d'accroche des rôles), `docs/10-roadmap.md` (P25), `docs/12-deroulement-partie.md` (D-11 réécrite, puis → ✅ ; la ligne #7 du §2 est mise à jour), `docs/07-assets.md` (la police d'affichage est Cormorant Garamond dans `tokens.css`, pas Cinzel), `docs/adr/0010-infos-privees-dans-la-vue.md`
   - Tests attendus : aucun (document)
 
-- [ ] **T2 — Points d'accroche génériques du moteur** *(PR A)*
+- [x] **T2 — Points d'accroche génériques du moteur** *(PR A)*
   - Fichiers : `packages/engine/src/{state,events,evolve,deaths,project,actions,victory}.ts`, `roles/types.ts` (`nightSteps[]`, `onDeath`), `night/{types,flow}.ts` (`observers` d'une étape, morts de l'aube déclarées par chaque étape), `packages/protocol/src/{commands,views,options}.ts` (`me.knowledge`, genres d'effets en attente, causes de mort, `littleGirlRisk`), `test/deaths.test.ts`
   - Contenu : aucun changement de comportement pour les loups et les villageois ; la file d'effets accepte plusieurs genres d'effets (P24)
   - Tests attendus : les 202 tests existants passent ; ordre de la file `R-42` ; couverture ≥ 90 %

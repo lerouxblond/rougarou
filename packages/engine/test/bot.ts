@@ -71,6 +71,7 @@ function toCommand(game: GameDriver, rng: Rng, descriptor: ActionDescriptor): Co
     }
     case 'BreakTie':
     case 'DesignateSuccessor':
+    case 'HunterShoot':
       return { type: descriptor.type, playerId: rng.pick(descriptor.targets) };
     case 'ResolveWolfTie':
       return { type: 'ResolveWolfTie', target: rng.pick(descriptor.targets) };

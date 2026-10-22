@@ -19,6 +19,7 @@ const LABELS: Record<ActionType, string> = {
   CastVote: 'actions.cast_vote',
   BreakTie: 'actions.break_tie',
   DesignateSuccessor: 'actions.designate_successor',
+  HunterShoot: 'actions.hunter_shoot',
   KickPlayer: 'actions.kick_player',
   ReorderSeats: 'actions.reorder_seats',
   SetOptions: 'actions.set_options',
@@ -82,6 +83,7 @@ function ActionControl({
     case 'CastVote':
     case 'BreakTie':
     case 'DesignateSuccessor':
+    case 'HunterShoot':
     case 'ResolveWolfTie':
     case 'KickPlayer':
       return <TargetControl action={action} names={names} />;
@@ -168,6 +170,7 @@ type TargetAction = Extract<
       | 'CastVote'
       | 'BreakTie'
       | 'DesignateSuccessor'
+      | 'HunterShoot'
       | 'ResolveWolfTie'
       | 'KickPlayer';
   }
@@ -245,6 +248,7 @@ function toCommand(action: TargetAction, choice: string): CommandInput {
       return { type: 'ResolveWolfTie', target: choice };
     case 'BreakTie':
     case 'DesignateSuccessor':
+    case 'HunterShoot':
     case 'KickPlayer':
       return { type: action.type, playerId: choice };
   }

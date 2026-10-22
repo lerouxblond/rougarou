@@ -27,6 +27,7 @@ describe('commandSchema', () => {
     { type: 'DeclareCandidacy' },
     { type: 'WithdrawCandidacy' },
     { type: 'DesignateSuccessor', playerId: 'p2' },
+    { type: 'HunterShoot', playerId: 'p3' },
     { type: 'CastVote', ballot: { kind: 'player', playerId: 'p2' } },
     { type: 'CastVote', ballot: { kind: 'spare' } },
     { type: 'CastVote', ballot: { kind: 'abstain' } },

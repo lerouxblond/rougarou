@@ -116,6 +116,15 @@ const wolvesStep: NightStepSpec = {
     tx.emit({ type: 'WolvesResolved', victim: null });
   },
 
+  dawn(state, deaths) {
+    // `R-40` : la cible des loups en premier, si elle est encore en vie.
+    const victim = state.night?.wolfVictim ?? null;
+
+    return victim !== null && state.players[victim]?.alive === true
+      ? [...deaths, { playerId: victim, cause: 'wolves' }]
+      : [...deaths];
+  },
+
   actionsFor(state) {
     const wolves = livingWolves(state);
     const targets = alivePlayers(state)
@@ -163,6 +172,6 @@ export const werewolf: RoleDefinition = {
   tier: 'core',
   unique: false,
   wakes: 'everyNight',
-  nightStep: wolvesStep,
+  nightSteps: [wolvesStep],
   knowsTeammates: true,
 };

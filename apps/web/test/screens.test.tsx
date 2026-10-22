@@ -55,6 +55,7 @@ const narratorView: NarratorView = {
       role: null,
       roleSeen: false,
       roleRevealed: false,
+      knowledge: [],
     },
     {
       id: 'p2',
@@ -64,6 +65,7 @@ const narratorView: NarratorView = {
       role: null,
       roleSeen: false,
       roleRevealed: false,
+      knowledge: [],
     },
   ],
   options: {} as NarratorView['options'],

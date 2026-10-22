@@ -33,6 +33,17 @@ export type Timers = z.infer<typeof timersSchema>;
 export type TimerKey = keyof Timers;
 
 /**
+ * Risque pour la Petite fille d'etre reperee (`docs/02`), en points de % : la
+ * n-ieme nuit ou elle espionne, `min(base + (n - 1) * increase, 75)`.
+ */
+export const littleGirlRiskSchema = z.strictObject({
+  base: z.int().min(0).max(50).default(10),
+  increase: z.int().min(0).max(25).default(10),
+});
+
+export type LittleGirlRisk = z.infer<typeof littleGirlRiskSchema>;
+
+/**
  * Options d'une partie (`docs/01` §8), source unique pour le moteur et l'ecran
  * de configuration (ADR 0008).
  *
@@ -56,6 +67,7 @@ export const gameOptionsSchema = z.strictObject({
   wolfVoteMode: z.enum(['unanimous', 'majority']).default('unanimous'),
   wolvesWinOnParity: z.boolean().default(false),
   seerMode: z.enum(['role', 'team']).default('role'),
+  littleGirlRisk: littleGirlRiskSchema.prefault({}),
   witchSelfSave: z.enum(['never', 'firstNightOnly', 'always']).default('firstNightOnly'),
   /**
    * `true` par defaut en presentiel, `false` a distance (`R-20`). Absente,

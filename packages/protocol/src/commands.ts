@@ -68,6 +68,8 @@ export const commandSchema = z.discriminatedUnion('type', [
   z.strictObject({ type: z.literal('DeclareCandidacy') }),
   z.strictObject({ type: z.literal('WithdrawCandidacy') }),
   z.strictObject({ type: z.literal('DesignateSuccessor'), playerId: playerIdSchema }),
+  // Effets a la mort (`R-42`)
+  z.strictObject({ type: z.literal('HunterShoot'), playerId: playerIdSchema }),
   // Votes
   z.strictObject({ type: z.literal('CastVote'), ballot: ballotSchema }),
   z.strictObject({ type: z.literal('BreakTie'), playerId: playerIdSchema }),

@@ -29,6 +29,7 @@ export function evolve(state: GameState, event: GameEvent): GameState {
             alive: true,
             roleSeen: false,
             roleRevealed: false,
+            knowledge: [],
           },
         },
       };
@@ -120,6 +121,9 @@ export function evolve(state: GameState, event: GameEvent): GameState {
         stepResolved: true,
       }));
 
+    case 'NightStepResolved':
+      return withNight(state, (night) => ({ ...night, stepResolved: true }));
+
     case 'NightEnded':
       return { ...state, dawn: { deaths: [...event.deaths], announced: false } };
 
@@ -141,6 +145,18 @@ export function evolve(state: GameState, event: GameEvent): GameState {
 
     case 'EffectResolved':
       return { ...state, pending: state.pending.slice(1) };
+
+    case 'RoleRevealed':
+      return updatePlayer(state, event.playerId, { roleRevealed: true });
+
+    case 'KnowledgeGained':
+      return updatePlayer(state, event.playerId, {
+        knowledge: [...getPlayer(state, event.playerId).knowledge, event.knowledge],
+      });
+
+    case 'HunterShot':
+      // Trace du tir : la mort vient de l'evenement `PlayerKilled` qui suit.
+      return state;
 
     case 'MayorDesignated':
       return { ...state, mayor: event.to };
