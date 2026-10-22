@@ -13,6 +13,7 @@ Ce document est la **spécification exécutable** du moteur. Chaque règle a un 
 
 - `R-05` On vérifie la victoire **après chaque résolution de morts** (aube, exécution, morts en chaîne), jamais en cours de résolution.
 - `R-06` Si plusieurs conditions sont remplies au même moment, la priorité est : conditions solo > amoureux > loups > village. Si tout le monde est mort, la partie est déclarée « Personne ne gagne ».
+- `R-07` **Composition valide en Classique** : autant de rôles que de joueurs (plus les cartes en trop du Voleur), de 5 à 24 joueurs (D-07), au moins un loup, et strictement moins de loups que de non-loups. Chaque mode peut durcir ces règles (`validateComposition`, `docs/11`).
 
 ## 2. Machine d'états d'une partie
 
@@ -42,15 +43,21 @@ Le **mode de jeu** (`docs/11-modes-de-jeu.md`) peut ajouter des sous-étapes de 
 | `DEAL` | Distribution aléatoire avec graine. Chaque joueur révèle son rôle en privé et confirme « J'ai vu mon rôle » | Le meneur, une fois tous les joueurs confirmés (il peut forcer) |
 | `PRESENTATIONS` | **Role play uniquement** (§9). Jour 1 : chaque joueur présente son personnage à tour de rôle | Le meneur, après le dernier joueur |
 | `NIGHT` | Les sous-étapes de l'ordre de nuit s'enchaînent (voir §3). La nuit n°1 inclut les rôles qui n'agissent que la première nuit | Automatique quand toutes les sous-étapes sont résolues. Le meneur peut passer une étape (minuteur expiré) |
-| `DAWN` | Les morts de la nuit sont résolues (§5), annoncées, puis les effets à la mort s'appliquent | Le meneur |
-| `MAYOR_ELECTION` | Candidatures (facultatives), puis vote de tous les vivants (`R-35`). Voir §6 | Automatique quand tous les vivants ont voté, ou le meneur |
+| `DAWN` | Les morts de la nuit sont résolues (§5), annoncées, puis les effets à la mort s'appliquent (`R-12`) | Le meneur |
+| `MAYOR_ELECTION` | Candidatures (facultatives), puis vote de tous les vivants (`R-35`). Voir §6 | Le meneur, ou la fin du minuteur (`R-37`) |
 | `DAY_DEBATE` | Débat libre (à voix haute ou par chat). Minuteur optionnel | Le meneur |
-| `DAY_VOTE` | Vote du village (§4) | Automatique quand tous les vivants ont voté, ou fin du minuteur, ou le meneur |
+| `DAY_VOTE` | Vote du village (§4) | Le meneur, ou la fin du minuteur (`R-37`) |
 | `EXECUTION` | Mort du joueur désigné, effets à la mort, vérification de victoire | Le meneur |
 | `ENDED` | Révélation de tous les rôles, du journal complet et des statistiques | — |
 
 - `R-10` Une phase ne peut se terminer que si ses actions obligatoires sont résolues. Le meneur peut toujours forcer la transition. Les actions manquantes reçoivent alors l'action par défaut du rôle (en général « ne rien faire »), et le forçage est journalisé.
 - `R-11` Le meneur peut **annuler la dernière commande** tant que la phase suivante n'a pas révélé d'information aux joueurs. Le moteur conserve un historique des états (event sourcing, voir `docs/04`).
+  - Une annulation retire le dernier **groupe d'événements**, c'est-à-dire tout ce qu'une commande a produit. On peut annuler plusieurs fois de suite.
+  - Elle est refusée si ce groupe contient une **révélation** : la distribution des rôles, l'annonce des morts, la clôture d'un vote, l'élection du Maire ou la fin de partie.
+- `R-12` **L'aube se joue en deux temps.** À l'entrée en `DAWN`, les morts sont calculées (§5), et seul le meneur les voit (il lit le texte). L'action « Lever le jour » les annonce aux joueurs, puis les effets à la mort s'enchaînent (§5). Une seconde action du meneur passe à la phase suivante, une fois la file d'effets vide.
+- `R-13` **Valeurs par défaut d'un forçage** (`R-10`) : vote des loups → pas de victime ; vote du village ou du Maire → clôture avec les bulletins déjà déposés ; successeur du Maire → tirage au sort parmi les vivants ; égalité tranchée par le Maire → personne n'est exécuté ; « J'ai vu mon rôle » → ignoré. Chaque forçage produit un événement journalisé.
+- `R-14` **Minuteurs.** Le moteur n'a pas d'horloge : il range une échéance (`deadline = now + durée`, `now` étant injecté) sur l'étape en cours, et accepte la commande système `Timeout` seulement si `now ≥ deadline`. L'expiration applique les mêmes valeurs par défaut qu'un forçage (`R-13`). Le Durable Object programme l'alarme à partir de cette échéance (`docs/04`).
+- `R-15` Une option prévue par le schéma mais pas encore prise en charge par le moteur est **refusée** à la configuration, avec une erreur explicite, plutôt qu'ignorée.
 
 ## 3. Déroulé de la nuit
 
@@ -70,7 +77,15 @@ Le **mode de jeu** (`docs/11-modes-de-jeu.md`) peut ajouter des sous-étapes de 
   - `nobody` : personne ne meurt.
   - Le **Bouc émissaire**, s'il est vivant, l'emporte sur toutes ces options (voir `docs/02`).
 - `R-34` Vote des loups (nuit) : les loups vivants doivent s'accorder sur **une** victime. Selon l'option `wolfVoteMode`, c'est soit l'unanimité (par défaut), soit la majorité simple, et en cas d'égalité le meneur tranche. Si le minuteur expire sans accord, il n'y a pas de victime.
-- `R-35` Élection du Maire : vote de tous les joueurs. En cas d'égalité, on fait un second vote, puis un tirage au sort.
+  - `unanimous` : l'étape se résout dès que **tous** les loups vivants désignent la même cible.
+  - `majority` : l'étape se résout dès que tous les loups vivants ont voté. La cible qui a le plus de voix l'emporte. En cas d'égalité, le meneur choisit parmi les ex æquo.
+  - Un loup peut changer d'avis tant que l'étape n'est pas résolue. Il n'existe pas de choix « personne » : seuls le minuteur ou le forçage donnent une nuit sans victime.
+- `R-35` Élection du Maire : vote de tous les joueurs **vivants**. En cas d'égalité, on fait un second vote entre les ex æquo, puis un tirage au sort entre eux. On peut voter pour soi-même (la règle « pas de vote contre soi-même » de D-08 vise l'exécution). Il n'y a pas d'abstention. Si aucun bulletin n'est déposé, le Maire est tiré au sort parmi les éligibles.
+- `R-37` **Clôture d'un vote.** Le vote du village et celui du Maire ne se closent jamais seuls : c'est le meneur qui les clôt, ou la fin du minuteur. Quand tous les votants ont voté, le moteur le signale au meneur, sans rien clore (`R-31` permet de changer d'avis jusqu'au bout).
+- `R-38` **Précisions sur l'égalité au vote du village** (`R-33`) :
+  - `mayor` : le Maire dispose de 30 s pour choisir parmi les ex æquo. Passé ce délai, personne n'est exécuté.
+  - `revote` : seuls les ex æquo sont candidats au second vote, sans le choix « Épargner ».
+  - Si aucun bulletin n'est déposé, personne n'est exécuté.
 
 ## 5. Résolution des morts
 
@@ -81,6 +96,7 @@ Le **mode de jeu** (`docs/11-modes-de-jeu.md`) peut ajouter des sous-étapes de 
 - `R-41` **Morts en chaîne** : à chaque mort, on applique les effets « à la mort » (le Chasseur tire, l'amoureux meurt de chagrin, l'Enfant sauvage se transforme, le Maire désigne son successeur…). On répète jusqu'à ce qu'il n'y ait plus de nouveaux effets, puis on vérifie la victoire (`R-05`).
 - `R-42` L'ordre des effets à la mort est : chagrin des amoureux → Chasseur → succession du Maire.
 - `R-43` Option `revealRoleOnDeath` (par défaut : `true`) : le rôle d'un joueur est révélé à tous quand il meurt. Si elle vaut `false`, seul le meneur le voit.
+- `R-44` La victoire (`R-05`) est vérifiée quand la file des effets à la mort est **vide**. Seule exception : la succession du Maire, qui ne peut tuer personne, est sautée si la partie est déjà gagnée.
 
 ## 6. Le Maire (option `mayor`, activée par défaut)
 
@@ -122,7 +138,7 @@ Le Maire est un **titre** (badge), pas un rôle. Il se cumule avec n'importe que
 | `witchSelfSave` | `never` \| `firstNightOnly` \| `always` | `firstNightOnly` | Sorcière |
 | `fakeWakeForDeadRoles` | bool | `true` en présentiel | R-20 |
 | `parallelNight` | bool | `false` | R-22 |
-| `timers` | objet (secondes par phase, `null` = pas de minuteur) | voir `packages/engine/src/defaults.ts` | — |
+| `timers` | objet (secondes par phase, `null` = pas de minuteur) | voir `packages/protocol/src/options.ts` (D-02) | `R-14` |
 
 ## 9. Modificateur « Role play » (option `roleplay`)
 
@@ -151,4 +167,6 @@ DEAL (+ fiches) → PRESENTATIONS (jour 1) → NIGHT 1 (sans mort) → DAWN → 
 - Nuit blanche : compatible. Le modificateur est visible par tout le monde, ce qui ne trahit pas le mode. L'absence de mort la nuit 1 vaut pour tous les modes.
 - Vampire : compatible (voir `RP-11`).
 
-Chaque option est définie dans un schéma Zod unique (`packages/engine/src/options.ts`), qui alimente à la fois le moteur et l'écran de configuration.
+Chaque option est définie dans un schéma Zod unique (`packages/protocol/src/options.ts`, ADR 0008), qui alimente à la fois le moteur et l'écran de configuration.
+
+Options présentes dans le schéma mais refusées par le moteur tant que leur jalon n'est pas atteint (`R-15`) : `roleplay: true` (M5), `dealMode: 'ceremony'` (M4), `parallelNight: true` (M5), et un `gameMode` autre que `classic` (M7).

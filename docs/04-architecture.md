@@ -79,6 +79,7 @@ function checkVictory(state: GameState): Victory | null;
 - **Modificateurs en plugins** : `modifiers/<id>.ts` (`docs/11` §Modificateurs), par exemple Role play. Ils sont actifs dans `GameConfigured.modifiers[]`, et le moteur consulte leurs points d'accroche (`extraPhases`, `disabledNightEffects`).
 - **Rôles en plugins** : voir `docs/02` §Modèle. Le cœur expose des points d'accroche (`onDeath`, `onDawn`, `onVoteResolved`, `onTargeted`) et un pipeline de résolution des morts (`R-40` à `R-42`).
 - **Projection et modes déguisés** : pour un mode `disguised` (Nuit blanche), `projectView` construit la vue d'un joueur **comme si** la partie était du mode `disguiseAs` avec la composition leurre. Le vrai mode n'existe que dans `NarratorView`. Le test `W-33` compare la forme des messages envoyés dans les deux cas.
+- **Ce qui vit où** (ADR 0008) : les schémas Zod des **options**, des **commandes** et des **vues projetées** sont dans `packages/protocol`, parce qu'ils traversent le réseau. Le moteur importe ces types. `GameState` et les **événements** restent internes au moteur : ils ne quittent jamais le serveur, seule la vue projetée en sort.
 - **Projection** : `projectView` est la **seule** fonction autorisée à produire ce qui part vers un client. Elle part d'une vue vide et **ajoute** ce que le viewer a le droit de voir (liste blanche, jamais liste noire).
 
 ## Durable Object `GameRoom`
