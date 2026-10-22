@@ -48,7 +48,7 @@ Il faut une illustration par rôle (27 au total, Vampire originel compris), une 
 - **Camps** : `icon-team-village` (maison à toit pointu), `icon-team-wolves` (empreinte de loup), `icon-team-solo` (étoile à 5 branches), `icon-team-vampires` (crocs ou goutte inversée).
 - **États** : `icon-dead` (croix ou pierre tombale), `icon-mayor` (écharpe tricolore stylisée ou médaille), `icon-vampire-converted` (morsure), `icon-lovers` (cœur percé), `icon-charmed` (note de musique), `icon-infected` (goutte), `icon-disconnected`, `icon-muted`.
 - **Phases** : `icon-moon`, `icon-sun`, `icon-dawn`, `icon-vote` (main levée).
-- Les icônes sont regroupées en sprite ou en composants React via `svgr` dans `packages/ui/icons`.
+- Les sources SVG vivent dans `packages/ui/icons`. Les composants React `RoleIcon` et `TeamIcon` en recopient les dessins, sans `svgr` (aucune dépendance de plus), et un test vérifie qu'ils restent identiques aux fichiers. La carte de repli `RoleCardArt` les assemble (M3).
 
 ### Arrière-plans et textures
 
