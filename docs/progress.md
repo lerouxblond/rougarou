@@ -256,7 +256,7 @@ P10 → `R-14`, P11 → `R-15`, P12 → ADR 0008.
   - Fichiers : `src/phases/mayor-election.ts`, `src/mayor.ts`, `test/mayor/*.test.ts`
   - Tests attendus : `R-50` à `R-52` (`designate` et `reelect`, y compris une mort à l'exécution suivie d'un `tieBreak` → `revote`), P6, P7, double voix (`R-32`). `R-53` reste sans objet tant que l'Idiot n'existe pas (M6) : le point d'accroche est prévu, mais pas de test
 
-- [ ] **T9 — Rejeu, instantanés, `Undo`**
+- [x] **T9 — Rejeu, instantanés, `Undo`**
   - Fichiers : `src/replay.ts`, `src/undo.ts`, `test/{replay,undo}.test.ts`
   - Tests attendus : `events.reduce(evolve)` redonne l'état, un instantané est pris tous les 50 événements, et P4 (annulation acceptée ou refusée, plusieurs fois de suite)
 
