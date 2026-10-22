@@ -222,7 +222,7 @@ P10 → `R-14`, P11 → `R-15`, P12 → ADR 0008.
   - Fichiers : `pnpm-workspace.yaml` (ajout de `fast-check`), `docs/05-stack.md` (Vitest 5 et `@cloudflare/vitest-plugin`, que M0 avait adoptés sans mettre la doc à jour), `packages/engine/package.json`, `packages/engine/vitest.config.ts` (seuils de 90 % en lignes et en branches, mesurés à chaque `pnpm test`)
   - Tests attendus : `pnpm --filter @rougarou/engine test` mesure la couverture et échoue sous 90 % ; une branche non testée du `Rng` (graine non entière) a été couverte
 
-- [ ] **T3 — `protocol` : identifiants, options, commandes**
+- [x] **T3 — `protocol` : identifiants, options, commandes**
   - Fichiers : `packages/protocol/src/{ids,options,commands}.ts`, `test/{options,commands}.test.ts`
   - Contenu : `GameOptions` (toutes les clés de `docs/01` §8 avec leurs défauts et les minuteurs de D-02), l'union discriminée `Command` avec son enveloppe `{ actor, cmd }`
   - Tests attendus : l'objet vide se complète avec les défauts, une clé inconnue est refusée, chaque commande valide passe et un `type` inconnu est refusé
