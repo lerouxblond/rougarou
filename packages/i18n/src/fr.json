@@ -136,6 +136,15 @@
         "wake": "La Sorcière se réveille. Je lui montre la victime de la nuit : veut-elle la sauver, ou empoisonner quelqu'un ?",
         "sleep": "La Sorcière range ses fioles et se rendort."
       }
+    },
+    "hunter": {
+      "name": "Chasseur",
+      "short": "S'il tombe, il n'emporte pas son dernier coup de feu au tombeau.",
+      "description": "Un villageois au doigt sur la détente. Quoi qu'il lui arrive, il emporte quelqu'un avec lui.",
+      "rules": "Vous n'agissez pas la nuit. Quand vous mourez, quelle qu'en soit la cause, vous désignez aussitôt un joueur vivant, qui meurt à son tour. Si vous mourez la nuit, vous tirez à l'aube. Sans choix avant la fin du minuteur, vous ne tirez pas. Votre rôle est révélé dès que votre tir est attendu.",
+      "narrator": {
+        "shot": "Le Chasseur, dans un dernier souffle, épaule son fusil. Qui emporte-t-il avec lui ?"
+      }
     }
   },
   "phase": {

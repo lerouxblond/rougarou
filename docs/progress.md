@@ -497,7 +497,7 @@ Trois PR : **A** (T1–T2, règles et points d'accroche), **B** (T3–T7, les r�
   - Fichiers : `src/roles/witch.ts`, `test/roles/witch.test.ts`, `test/leaks/witch.test.ts`, i18n, icône, crédits
   - Tests attendus : P19 (vie sans victime refusée, potion épuisée refusée, deux potions la même nuit, `witchSelfSave` × 3, potion de vie consommée, potion de mort tue à l'aube, réveil sans potion) ; non-fuite : la victime n'est vue que d'elle (et des loups), la cause `witch` jamais par un joueur
 
-- [ ] **T5 — Chasseur** *(PR B)*
+- [x] **T5 — Chasseur** *(PR B)*
   - Fichiers : `src/roles/hunter.ts`, `test/roles/hunter.test.ts`, `test/leaks/hunter.test.ts`, i18n, icône, crédits
   - Tests attendus : P20 (tir à l'aube après une mort de nuit, tir après exécution, minuteur et forçage → pas de tir, Chasseur Maire : tir puis succession, tir sur le dernier loup → victoire du village, révélation avec `revealRoleOnDeath: false`)
 
