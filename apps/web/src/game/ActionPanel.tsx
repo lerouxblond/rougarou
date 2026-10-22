@@ -80,11 +80,23 @@ function ActionControl({
 
   switch (action.type) {
     case 'SubmitNightAction':
-      return action.kind === 'witchPotions' ? (
-        <WitchControl action={action} names={names} />
-      ) : (
-        <TargetControl action={action} names={names} />
-      );
+      switch (action.kind) {
+        case 'witchPotions':
+          return <WitchControl action={action} names={names} />;
+        case 'cupidLink':
+          return <CoupleControl action={action} names={names} />;
+        case 'loversConfirm':
+          return (
+            <SimpleButton
+              label={t(NIGHT_LABELS.loversConfirm)}
+              busy={busy}
+              error={error}
+              onClick={() => send({ type: 'SubmitNightAction', action: { kind: 'loversConfirm' } })}
+            />
+          );
+        default:
+          return <TargetControl action={action} names={names} />;
+      }
     case 'CastVote':
     case 'BreakTie':
     case 'DesignateSuccessor':
@@ -168,7 +180,10 @@ function SimpleButton({
 }
 
 /** Les actions qui se reglent en choisissant un joueur dans une liste. */
-type TargetAction = Extract<ActionDescriptor, { targets: readonly string[] }>;
+type TargetAction = Exclude<
+  Extract<ActionDescriptor, { targets: readonly string[] }>,
+  { kind: 'cupidLink' }
+>;
 
 /** Libelle de chaque action de nuit ; `Record` exhaustif, comme `LABELS`. */
 const NIGHT_LABELS: Record<
@@ -178,6 +193,8 @@ const NIGHT_LABELS: Record<
   wolfVote: 'actions.submit_night_action',
   seerProbe: 'actions.seer_probe',
   witchPotions: 'actions.witch_potions',
+  cupidLink: 'actions.cupid_link',
+  loversConfirm: 'actions.lovers_confirm',
 };
 
 function labelOf(action: TargetAction): string {
@@ -327,6 +344,74 @@ function WitchControl({
         </>
       ) : null}
       <Button type="submit" disabled={busy}>
+        {t('common.confirm')}
+      </Button>
+      <FormError message={error === null ? null : t(error)} />
+    </form>
+  );
+}
+
+type CoupleAction = Extract<ActionDescriptor, { kind: 'cupidLink' }>;
+
+/** Cupidon choisit deux amoureux distincts (`docs/02`) : le serveur refuse deux fois le meme. */
+function CoupleControl({
+  action,
+  names,
+}: {
+  readonly action: CoupleAction;
+  readonly names: ReadonlyMap<string, string>;
+}) {
+  const { t } = useTranslation();
+  const firstId = useId();
+  const secondId = useId();
+  const { send, busy, error } = useSendCommand();
+  const [first, setFirst] = useState(action.targets[0] ?? '');
+  const [second, setSecond] = useState(action.targets[1] ?? '');
+  const options = action.targets.map((target) => (
+    <option key={target} value={target}>
+      {names.get(target) ?? target}
+    </option>
+  ));
+
+  return (
+    <form
+      className="flex flex-col gap-2"
+      onSubmit={(event) => {
+        event.preventDefault();
+        void send({
+          type: 'SubmitNightAction',
+          action: { kind: 'cupidLink', lovers: [first, second] },
+        });
+      }}
+    >
+      <p className="text-sm text-text">{t(NIGHT_LABELS.cupidLink)}</p>
+      <label htmlFor={firstId} className="text-sm text-text">
+        {t('actions.cupid_first')}
+      </label>
+      <select
+        id={firstId}
+        value={first}
+        onChange={(event) => {
+          setFirst(event.target.value);
+        }}
+        className="min-h-11 rounded-card border border-border bg-surface px-3 text-text"
+      >
+        {options}
+      </select>
+      <label htmlFor={secondId} className="text-sm text-text">
+        {t('actions.cupid_second')}
+      </label>
+      <select
+        id={secondId}
+        value={second}
+        onChange={(event) => {
+          setSecond(event.target.value);
+        }}
+        className="min-h-11 rounded-card border border-border bg-surface px-3 text-text"
+      >
+        {options}
+      </select>
+      <Button type="submit" disabled={busy || first === second}>
         {t('common.confirm')}
       </Button>
       <FormError message={error === null ? null : t(error)} />

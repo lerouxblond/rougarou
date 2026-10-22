@@ -51,6 +51,17 @@ function nightAction(
 
       return { kind: 'witchPotions', save, kill };
     }
+    case 'cupidLink': {
+      const [first, second] = rng.shuffle(descriptor.targets);
+
+      if (first === undefined || second === undefined) {
+        throw new Error('Cupidon sans deux cibles.');
+      }
+
+      return { kind: 'cupidLink', lovers: [first, second] };
+    }
+    case 'loversConfirm':
+      return { kind: 'loversConfirm' };
   }
 }
 

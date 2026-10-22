@@ -120,6 +120,12 @@ const nightActionDescriptorSchema = z.discriminatedUnion('kind', [
     /** Cibles de la potion de mort, vide si elle est bue. */
     killTargets: playerIdList,
   }),
+  z.strictObject({
+    type: z.literal('SubmitNightAction'),
+    kind: z.literal('cupidLink'),
+    targets: playerIdList,
+  }),
+  z.strictObject({ type: z.literal('SubmitNightAction'), kind: z.literal('loversConfirm') }),
 ]);
 
 /**
@@ -205,6 +211,15 @@ const playerNightSchema = z.discriminatedUnion('step', [
     resolved: z.boolean(),
     victim: playerIdSchema.nullable(),
     potions: potionsSchema,
+  }),
+  /** Cupidon : le couple entre dans ses infos. */
+  z.strictObject({ step: z.literal('cupid'), resolved: z.boolean() }),
+  /** Un amoureux decouvre l'autre et confirme. */
+  z.strictObject({
+    step: z.literal('lovers'),
+    resolved: z.boolean(),
+    partner: playerIdSchema,
+    confirmed: z.boolean(),
   }),
 ]);
 
@@ -297,6 +312,8 @@ export const narratorViewSchema = z.strictObject({
   deadline: z.int().nullable(),
   pausedRemaining: z.int().min(0).nullable(),
   night: narratorNightSchema.nullable(),
+  /** Le couple forme par Cupidon (`R-03`). */
+  lovers: z.tuple([playerIdSchema, playerIdSchema]).nullable(),
   /** Potions restantes de chaque Sorciere. */
   potions: z.record(playerIdSchema, potionsSchema),
   dawn: z.strictObject({ deaths: z.array(deathSchema), announced: z.boolean() }).nullable(),

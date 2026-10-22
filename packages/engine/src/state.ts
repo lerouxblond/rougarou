@@ -38,6 +38,8 @@ export interface GameState {
   readonly dawn: DawnState | null;
   readonly election: ElectionState | null;
   readonly vote: VoteState | null;
+  /** Le couple forme par Cupidon (`docs/02`, `R-03`). */
+  readonly lovers: Couple | null;
   /** Potions restantes de chaque Sorciere (`docs/02`). Absente : les deux. */
   readonly potions: Readonly<Record<PlayerId, Potions>>;
   /** Effets a la mort en attente, dans l'ordre de `R-42`. */
@@ -88,7 +90,12 @@ export interface NightState {
   readonly wolfVictim: PlayerId | null;
   /** Le choix de la Sorciere cette nuit, resolu a l'aube (`R-40`). */
   readonly witch: WitchChoice | null;
+  /** Les amoureux qui ont confirme leur decouverte, la nuit 1. */
+  readonly loversConfirmed: readonly PlayerId[];
 }
+
+/** Deux amoureux. */
+export type Couple = readonly [PlayerId, PlayerId];
 
 /** Les potions d'une Sorciere : `true` tant qu'elle ne l'a pas bue. */
 export interface Potions {
@@ -177,6 +184,7 @@ export function emptyState(): GameState {
     dawn: null,
     election: null,
     vote: null,
+    lovers: null,
     potions: {},
     pending: [],
     deadline: null,
