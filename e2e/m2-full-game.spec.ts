@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { openTable, playToTheEnd, readView, startNight } from './fixtures/table.ts';
+import { openTable, playToTheEnd, readView, startNight, voteAgainst } from './fixtures/table.ts';
 
 /**
  * Definition de « termine » de M2 (`docs/10`) : 1 meneur et 5 joueurs, chacun
@@ -31,7 +31,7 @@ test.describe('US-10, US-11, US-30 : une partie a six navigateurs', () => {
         expect(others.every((player) => player.role === null)).toBe(true);
       }
 
-      const end = await playToTheEnd(table, wolf?.id ?? '');
+      const end = await playToTheEnd(table, voteAgainst(wolf?.id ?? ''));
 
       expect(end.winner).toBe('village');
 

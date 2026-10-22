@@ -519,7 +519,7 @@ Trois PR : **A** (T1–T2, règles et points d'accroche), **B** (T3–T7, les r�
   - Contenu : contrôles bruts pour sonder, les potions, désigner deux amoureux, confirmer, espionner, tirer ; « Mes infos » ; la carte de rôle utilise `RoleCardArt`
   - Tests attendus : un contrôle par action reçue, aucun sans action, « Mes infos » annoncé par `aria-live`, axe sur chaque écran
 
-- [ ] **T10 — E2E à 8 joueurs avec tous les rôles classiques** *(PR C)*
+- [x] **T10 — E2E à 8 joueurs avec tous les rôles classiques** *(PR C)*
   - Fichiers : `e2e/fixtures/table.ts` (N joueurs, composition imposée), `e2e/m3-classic-roles.spec.ts`
   - Tests attendus : 1 meneur + 8 joueurs (2 loups, Voyante, Sorcière, Chasseur, Cupidon, Petite fille, Villageois) ; chaque rôle agit au moins une fois ; contrôle de non-fuite de rôle à chaque tour ; la partie va jusqu'à une victoire
 

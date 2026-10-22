@@ -7,11 +7,19 @@ import { FormError } from '../components/Field.tsx';
 import { useSendCommand } from './hooks.ts';
 import { roleKey } from './roles.ts';
 
-/** Les roles proposes en M2 : loups contre villageois (`docs/10`). */
-const ROLES: readonly RoleId[] = ['werewolf', 'villager'];
+/** Les roles proposes : ceux du palier `core` (M3, `docs/02`). Les autres arrivent en M6. */
+const ROLES: readonly RoleId[] = [
+  'werewolf',
+  'villager',
+  'seer',
+  'witch',
+  'hunter',
+  'cupid',
+  'little-girl',
+];
 
 /**
- * Configuration brute (M2) : compteurs par role, puis « Distribuer ». La
+ * Configuration brute (M2, roles de M3) : compteurs par role, puis « Distribuer ». La
  * composition en cours d'edition est un etat de formulaire ; c'est le moteur
  * qui la valide (`Deal.issues`).
  */
