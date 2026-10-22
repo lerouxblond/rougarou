@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 import { FormError } from '../components/Field.tsx';
 import { useSendCommand } from './hooks.ts';
+import { roleKey } from './roles.ts';
 
 /** Les roles proposes en M2 : loups contre villageois (`docs/10`). */
 const ROLES: readonly RoleId[] = ['werewolf', 'villager'];
@@ -35,7 +36,7 @@ export function Config({ view }: { readonly view: NarratorView }) {
       </p>
       <ul className="flex flex-col gap-2">
         {ROLES.map((role) => {
-          const name = t(`roles.${role}.name`);
+          const name = t(`roles.${roleKey(role)}.name`);
 
           return (
             <li key={role} className="flex items-center gap-3 rounded-card bg-surface p-3">

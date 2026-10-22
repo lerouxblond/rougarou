@@ -318,5 +318,57 @@
     "cupid_second": "Second lover",
     "lovers_confirm": "I have met my lover",
     "spy": "Spy on the pack"
+  },
+  "teams": {
+    "village": "Village",
+    "wolves": "Wolves",
+    "solo": "Solo",
+    "vampires": "Vampires"
+  },
+  "my_info": {
+    "title": "My notes",
+    "seer_role": "Night {{night}}: {{name}} is {{role}}.",
+    "seer_team": "Night {{night}}: {{name}} belongs to the {{team}} team.",
+    "couple": "You joined {{first}} and {{second}}.",
+    "lover": "You love {{name}} ({{role}}). If one of you dies, the other follows out of grief.",
+    "wolf_glimpse": "Night {{night}}: you caught a glimpse of the pack.",
+    "little_girl_suspects": "Night {{night}}: the Little Girl is watching you. She is one of these players: {{names}}."
+  },
+  "night": {
+    "resolved": "Step over.",
+    "wolves": {
+      "title": "The pack",
+      "vote": "{{wolf}} → {{target}}"
+    },
+    "seer": {
+      "title": "Seer",
+      "prompt": "Pick the player whose secret you want to uncover."
+    },
+    "witch": {
+      "title": "Witch",
+      "victim": "Tonight, {{name}} was attacked.",
+      "no_victim": "Nobody was attacked tonight.",
+      "life_left": "Healing potion available",
+      "life_used": "Healing potion used",
+      "death_left": "Poison available",
+      "death_used": "Poison used"
+    },
+    "cupid": {
+      "title": "Cupid",
+      "prompt": "Pick the two lovers."
+    },
+    "lovers": {
+      "title": "Lovers",
+      "partner": "You are in love with {{name}}.",
+      "confirmed": "You have met them."
+    },
+    "spy": {
+      "title": "Little Girl",
+      "prompt": "The wolves are hunting. You may spy on them, at the risk of being spotted.",
+      "hidden": "hidden letter",
+      "space": "space",
+      "undecided": "has not chosen yet",
+      "target": "→ {{name}}"
+    }
   }
 }

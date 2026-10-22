@@ -318,5 +318,57 @@
     "cupid_second": "Second amoureux",
     "lovers_confirm": "J'ai découvert mon amoureux",
     "spy": "Espionner la meute"
+  },
+  "teams": {
+    "village": "Village",
+    "wolves": "Loups",
+    "solo": "Solo",
+    "vampires": "Vampires"
+  },
+  "my_info": {
+    "title": "Mes infos",
+    "seer_role": "Nuit {{night}} : {{name}} est {{role}}.",
+    "seer_team": "Nuit {{night}} : {{name}} appartient au camp {{team}}.",
+    "couple": "Vous avez uni {{first}} et {{second}}.",
+    "lover": "Vous aimez {{name}} ({{role}}). Si l'un de vous meurt, l'autre le suit de chagrin.",
+    "wolf_glimpse": "Nuit {{night}} : vous avez aperçu la meute.",
+    "little_girl_suspects": "Nuit {{night}} : la Petite fille vous observe. C'est l'une de ces personnes : {{names}}."
+  },
+  "night": {
+    "resolved": "Étape terminée.",
+    "wolves": {
+      "title": "La meute",
+      "vote": "{{wolf}} → {{target}}"
+    },
+    "seer": {
+      "title": "Voyante",
+      "prompt": "Choisissez le joueur dont vous voulez percer le secret."
+    },
+    "witch": {
+      "title": "Sorcière",
+      "victim": "Cette nuit, {{name}} a été attaqué.",
+      "no_victim": "Personne n'a été attaqué cette nuit.",
+      "life_left": "Potion de vie disponible",
+      "life_used": "Potion de vie bue",
+      "death_left": "Potion de mort disponible",
+      "death_used": "Potion de mort bue"
+    },
+    "cupid": {
+      "title": "Cupidon",
+      "prompt": "Désignez les deux amoureux."
+    },
+    "lovers": {
+      "title": "Amoureux",
+      "partner": "Vous êtes amoureux de {{name}}.",
+      "confirmed": "Vous l'avez découvert."
+    },
+    "spy": {
+      "title": "Petite fille",
+      "prompt": "Les loups chassent. Vous pouvez les espionner, au risque d'être repérée.",
+      "hidden": "lettre cachée",
+      "space": "espace",
+      "undecided": "n'a pas encore choisi",
+      "target": "→ {{name}}"
+    }
   }
 }

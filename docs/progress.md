@@ -514,7 +514,7 @@ Trois PR : **A** (T1–T2, règles et points d'accroche), **B** (T3–T7, les r�
   - Contenu : carte 3:4, fond texturé en SVG, accent du camp (tokens), icône centrée, nom du rôle en police d'affichage, dans les deux thèmes ; texte alternatif traduit
   - Tests attendus : une carte par rôle de M3, nom lu par les lecteurs d'écran, axe sans violation
 
-- [ ] **T9 — Client : actions et « Mes infos »** *(PR C)*
+- [x] **T9 — Client : actions et « Mes infos »** *(PR C)*
   - Fichiers : `apps/web/src/game/{ActionPanel,RoleCard,MyInfo,NightPanel}.tsx`, i18n, `test/*.test.tsx`
   - Contenu : contrôles bruts pour sonder, les potions, désigner deux amoureux, confirmer, espionner, tirer ; « Mes infos » ; la carte de rôle utilise `RoleCardArt`
   - Tests attendus : un contrôle par action reçue, aucun sans action, « Mes infos » annoncé par `aria-live`, axe sur chaque écran
