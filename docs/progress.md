@@ -264,7 +264,7 @@ P10 → `R-14`, P11 → `R-15`, P12 → ADR 0008.
   - Fichiers : `packages/protocol/src/views.ts`, `packages/engine/src/project.ts`, `test/leaks/generic.test.ts`
   - Tests attendus : chaque vue est validée par le schéma `.strict()`. Sur des parties simulées, à chaque événement et pour chaque joueur, aucun rôle d'autrui ne fuit, sauf les loups entre eux, `revealRoleOnDeath` et `deadSeeRoles`. Aucune cible de nuit et aucun bulletin secret ne fuit non plus. `availableActions` est cohérent avec ce que `apply` accepte
 
-- [ ] **T11 — Textes i18n du moteur**
+- [x] **T11 — Textes i18n du moteur**
   - Fichiers : `packages/i18n/src/{fr,en}.json`, `packages/engine/test/i18n-keys.test.ts`
   - Tests attendus : toutes les `messageKey` du moteur et tous les noms de rôles, de phases et de modes existent en `fr`
 

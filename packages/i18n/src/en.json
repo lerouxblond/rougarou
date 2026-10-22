@@ -25,6 +25,114 @@
     "unknown_player": "That player could not be found.",
     "wrong_phase": "That action is not possible in this phase.",
     "protocol_outdated": "Your app is out of date. Please update it to continue.",
-    "network": "Connection lost. Retrying…"
+    "network": "Connection lost. Retrying…",
+    "game_full": "The game is full.",
+    "invalid_composition": "The roles cannot be dealt with this composition.",
+    "invalid_target": "That target is not valid.",
+    "nothing_to_undo": "There is nothing to undo.",
+    "pending_actions": "Some actions are still pending. Force to move on.",
+    "too_early": "The timer has not run out yet.",
+    "undo_blocked": "Cannot undo: the players have already been told.",
+    "unsupported_option": "This option is not available yet.",
+    "already_joined": "You are already in this game.",
+    "dead_cannot_act": "The dead can no longer act.",
+    "nothing_to_expire": "No timer is running.",
+    "seats_not_permutation": "The new order must list each player exactly once.",
+    "target_dead": "That player is dead.",
+    "undo_needs_record": "Undo goes through the game record.",
+    "composition": {
+      "count_mismatch": "There must be as many roles as players.",
+      "duplicate_unique": "A unique role appears more than once.",
+      "no_wolf": "There must be at least one wolf.",
+      "player_count": "This number of players is not allowed in this mode.",
+      "role_not_allowed": "A role is not allowed in this mode.",
+      "role_unavailable": "A role in the composition is not available yet.",
+      "too_many_wolves": "There must be fewer wolves than other players."
+    },
+    "election": {
+      "candidacy_closed": "Candidacies are closed.",
+      "not_eligible": "That player cannot be elected.",
+      "player_only": "Vote for a player.",
+      "vote_closed": "The vote is not open."
+    },
+    "options": {
+      "ceremony_unavailable": "Dealing one by one is not available yet.",
+      "mode_unavailable": "This game mode is not available yet.",
+      "parallel_night_unavailable": "Parallel night is not available yet.",
+      "roleplay_unavailable": "Role play is not available yet."
+    },
+    "vote": {
+      "closed": "The vote is closed.",
+      "no_abstain": "Abstaining is not allowed in this game.",
+      "no_spare": "The “Spare” choice is not offered.",
+      "no_tie": "There is no tie to break.",
+      "not_candidate": "That player is not a candidate.",
+      "not_tied": "That player is not among the tied players.",
+      "self": "You cannot vote against yourself."
+    },
+    "wolves": {
+      "already_resolved": "The pack has already chosen its victim.",
+      "no_tie": "There is no tie to break.",
+      "not_tied": "That player is not among the tied players.",
+      "target_is_wolf": "A wolf cannot target another wolf."
+    }
+  },
+  "roles": {
+    "werewolf": {
+      "name": "Werewolf",
+      "description": "Each night, the pack gathers and picks a victim. By day, it hides among the villagers."
+    },
+    "villager": {
+      "name": "Villager",
+      "description": "No power, only instinct and a voice. Debates and votes to unmask the wolves."
+    }
+  },
+  "phase": {
+    "lobby": {
+      "title": "Lobby"
+    },
+    "config": {
+      "title": "Setup"
+    },
+    "deal": {
+      "title": "Dealing"
+    },
+    "presentations": {
+      "title": "Introductions"
+    },
+    "night": {
+      "title": "Night"
+    },
+    "dawn": {
+      "title": "Dawn"
+    },
+    "mayor_election": {
+      "title": "Mayor election"
+    },
+    "day_debate": {
+      "title": "Debate"
+    },
+    "day_vote": {
+      "title": "Vote"
+    },
+    "execution": {
+      "title": "Execution"
+    },
+    "ended": {
+      "title": "Game over"
+    }
+  },
+  "modes": {
+    "classic": {
+      "name": "Classic",
+      "description": "Wolves against the village, with roles and a Mayor."
+    }
+  },
+  "winner": {
+    "village": "The village wins.",
+    "wolves": "The wolves win.",
+    "solo": "A lone player wins.",
+    "vampires": "The vampires win.",
+    "nobody": "Nobody wins."
   }
 }

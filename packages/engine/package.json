@@ -15,6 +15,7 @@
   },
   "devDependencies": {
     "@rougarou/config": "workspace:*",
+    "@rougarou/i18n": "workspace:*",
     "@vitest/coverage-v8": "catalog:",
     "fast-check": "catalog:",
     "typescript": "catalog:",
