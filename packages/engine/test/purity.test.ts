@@ -75,7 +75,7 @@ describe('Registre des roles', () => {
       registeredRoles()
         .map((role) => role.id)
         .sort(),
-    ).toEqual(['cupid', 'hunter', 'seer', 'villager', 'werewolf', 'witch']);
+    ).toEqual(['cupid', 'hunter', 'little-girl', 'seer', 'villager', 'werewolf', 'witch']);
     expect(findRole('werewolf')?.team).toBe('wolves');
     expect(findRole('villager')?.team).toBe('village');
     expect(findRole('guardian')).toBeUndefined();

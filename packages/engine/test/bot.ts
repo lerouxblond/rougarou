@@ -62,6 +62,8 @@ function nightAction(
     }
     case 'loversConfirm':
       return { kind: 'loversConfirm' };
+    case 'spy':
+      return { kind: 'spy' };
   }
 }
 
@@ -202,5 +204,35 @@ export function randomRoles(count: number, wolves: number, seed: number): Record
 
   return Object.fromEntries(
     shuffled.map((role, index) => [`p${String(index).padStart(2, '0')}`, role]),
+  );
+}
+
+/** Les roles speciaux du village de M3 (`docs/02`, palier `core`). */
+const CLASSIC_SPECIALS: readonly RoleId[] = ['seer', 'witch', 'hunter', 'cupid', 'little-girl'];
+
+/**
+ * Une distribution avec les roles classiques : `wolves` loups, puis chaque
+ * role special tire au hasard (une chance sur trois d'etre absent), le reste
+ * en villageois. Il reste toujours au moins un villageois.
+ */
+export function randomClassicRoles(
+  count: number,
+  wolves: number,
+  seed: number,
+): Record<PlayerId, RoleId> {
+  const rng = createRng(seed * 31 + 7);
+  const room = count - wolves - 1;
+  const specials = rng
+    .shuffle(CLASSIC_SPECIALS)
+    .filter(() => rng.next() < 2 / 3)
+    .slice(0, Math.max(0, room));
+  const deck: RoleId[] = [
+    ...Array.from({ length: wolves }, () => 'werewolf' as const),
+    ...specials,
+    ...Array.from({ length: count - wolves - specials.length }, () => 'villager' as const),
+  ];
+
+  return Object.fromEntries(
+    rng.shuffle(deck).map((role, index) => [`p${String(index).padStart(2, '0')}`, role]),
   );
 }

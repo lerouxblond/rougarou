@@ -9,3 +9,4 @@ Licences acceptées : production originale du projet, CC0, CC-BY (avec attributi
 | `packages/ui/icons/icon-role-witch.svg` | Dessin original (SVG écrit à la main) | Projet Rougarou | Production originale |
 | `packages/ui/icons/icon-role-hunter.svg` | Dessin original (SVG écrit à la main) | Projet Rougarou | Production originale |
 | `packages/ui/icons/icon-role-cupid.svg` | Dessin original (SVG écrit à la main) | Projet Rougarou | Production originale |
+| `packages/ui/icons/icon-role-little-girl.svg` | Dessin original (SVG écrit à la main) | Projet Rougarou | Production originale |

@@ -4,11 +4,11 @@ import { describe, expect, it } from 'vitest';
 
 import { emptyState, evolve, teamOf, type GameState } from '../../src/index.ts';
 import { checkVictory } from '../../src/victory.ts';
-import { playRandomGame, randomRoles } from '../bot.ts';
+import { playRandomGame, randomClassicRoles } from '../bot.ts';
 import type { GameDriver } from '../dsl.ts';
 
 /**
- * Tests de proprietes (`docs/09`, definition de « termine » de M1) : 1 000
+ * Tests de proprietes (`docs/09`, definition de « termine » de M1, M3) : 1 000
  * parties aleatoires, de 5 a 24 joueurs, avec toutes les options du moteur,
  * se terminent sans jamais violer un invariant.
  *
@@ -33,6 +33,12 @@ const optionsArbitrary: fc.Arbitrary<GameOptionsInput> = fc.record({
   tieBreak: fc.constantFrom('mayor', 'revote', 'nobody'),
   wolfVoteMode: fc.constantFrom('unanimous', 'majority'),
   wolvesWinOnParity: fc.boolean(),
+  seerMode: fc.constantFrom('role', 'team'),
+  witchSelfSave: fc.constantFrom('never', 'firstNightOnly', 'always'),
+  littleGirlRisk: fc.record({
+    base: fc.integer({ min: 0, max: 50 }),
+    increase: fc.integer({ min: 0, max: 25 }),
+  }),
 });
 
 /** Une partie : nombre de joueurs, loups (moins que les autres, R-07), options et graine. */
@@ -48,6 +54,9 @@ const gameArbitrary = fc.integer({ min: 5, max: 24 }).chain((count) =>
 function living(state: GameState) {
   return state.seats.map((id) => state.players[id]!).filter((player) => player.alive);
 }
+
+/** Les evenements vus au fil des parties : chaque role doit avoir agi au moins une fois. */
+const played = new Set<string>();
 
 /** Les invariants verifies apres chaque coup. */
 function checkInvariants(game: GameDriver): void {
@@ -71,9 +80,22 @@ function checkInvariants(game: GameDriver): void {
     expect(Object.keys(state.vote.ballots).every((voter) => alive.has(voter))).toBe(true);
   }
 
+  // Chagrin immediat (`R-41`) : les amoureux vivent ou meurent ensemble.
+  if (state.lovers !== null) {
+    const [first, second] = state.lovers;
+
+    expect(alive.has(first)).toBe(alive.has(second));
+  }
+
+  for (const event of game.last) {
+    played.add(event.type);
+  }
+
   // Au plus un Maire, vivant, sauf le temps de designer son successeur (R-52).
   if (state.mayor !== null) {
-    const designating = state.pending[0]?.from === state.mayor;
+    const designating = state.pending.some(
+      (effect) => effect.kind === 'mayorSuccession' && effect.from === state.mayor,
+    );
 
     expect(alive.has(state.mayor) || designating, `le Maire ${state.mayor} est mort`).toBe(true);
   }
@@ -87,7 +109,11 @@ function checkInvariants(game: GameDriver): void {
   if (state.phase === 'ENDED') {
     expect(state.winner).toBe(checkVictory(state));
   } else {
-    expect(checkVictory(state)).toBeNull();
+    // `R-44` : un tir de Chasseur en attente retarde la verification.
+    if (state.pending.length === 0) {
+      expect(checkVictory(state)).toBeNull();
+    }
+
     expect(state.winner).toBeNull();
   }
 }
@@ -106,6 +132,10 @@ function checkWinner(state: GameState): void {
       expect(wolves).toBe(0);
       expect(others).toBeGreaterThan(0);
       break;
+    case 'lovers':
+      expect(players).toHaveLength(2);
+      expect(players.map((player) => player.id).sort()).toEqual([...(state.lovers ?? [])].sort());
+      break;
     case 'wolves':
       expect(wolves).toBeGreaterThan(0);
       expect(others === 0 || (state.options.wolvesWinOnParity && wolves >= others)).toBe(true);
@@ -120,7 +150,7 @@ describe('Parties aleatoires (docs/09, M1)', () => {
     fc.assert(
       fc.property(gameArbitrary, ({ count, wolves, options, seed }) => {
         const game = playRandomGame({
-          roles: randomRoles(count, wolves, seed),
+          roles: randomClassicRoles(count, wolves, seed),
           options,
           seed,
           maxMoves: MAX_MOVES,
@@ -136,5 +166,16 @@ describe('Parties aleatoires (docs/09, M1)', () => {
       }),
       { numRuns: RUNS, seed: SEED },
     );
+
+    for (const type of [
+      'KnowledgeGained',
+      'WitchActed',
+      'HunterShot',
+      'LoversLinked',
+      'LoverConfirmed',
+      'LittleGirlSpied',
+    ]) {
+      expect(played, type).toContain(type);
+    }
   });
 });

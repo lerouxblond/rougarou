@@ -94,6 +94,15 @@ function ActionControl({
               onClick={() => send({ type: 'SubmitNightAction', action: { kind: 'loversConfirm' } })}
             />
           );
+        case 'spy':
+          return (
+            <SimpleButton
+              label={t(NIGHT_LABELS.spy)}
+              busy={busy}
+              error={error}
+              onClick={() => send({ type: 'SubmitNightAction', action: { kind: 'spy' } })}
+            />
+          );
         default:
           return <TargetControl action={action} names={names} />;
       }
@@ -195,6 +204,7 @@ const NIGHT_LABELS: Record<
   witchPotions: 'actions.witch_potions',
   cupidLink: 'actions.cupid_link',
   loversConfirm: 'actions.lovers_confirm',
+  spy: 'actions.spy',
 };
 
 function labelOf(action: TargetAction): string {

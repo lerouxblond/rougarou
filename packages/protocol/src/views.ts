@@ -126,6 +126,7 @@ const nightActionDescriptorSchema = z.discriminatedUnion('kind', [
     targets: playerIdList,
   }),
   z.strictObject({ type: z.literal('SubmitNightAction'), kind: z.literal('loversConfirm') }),
+  z.strictObject({ type: z.literal('SubmitNightAction'), kind: z.literal('spy') }),
 ]);
 
 /**
@@ -221,6 +222,18 @@ const playerNightSchema = z.discriminatedUnion('step', [
     partner: playerIdSchema,
     confirmed: z.boolean(),
   }),
+  /**
+   * La Petite fille regarde l'etape des loups. Tant qu'elle n'espionne pas,
+   * elle ne voit rien (`pack: null`) ; ensuite, chaque loup sous un pseudo
+   * partiel, dans un ordre tire au hasard, et sa cible en direct.
+   */
+  z.strictObject({
+    step: z.literal('spy'),
+    resolved: z.boolean(),
+    pack: z
+      .array(z.strictObject({ mask: maskSchema, target: playerIdSchema.nullable() }))
+      .nullable(),
+  }),
 ]);
 
 const playerElectionSchema = z.strictObject({
@@ -294,6 +307,8 @@ const narratorNightSchema = z.strictObject({
   wolfVictim: playerIdSchema.nullable(),
   /** Le choix de la Sorciere cette nuit, une fois fait. */
   witch: z.strictObject({ save: z.boolean(), kill: playerIdSchema.nullable() }).nullable(),
+  /** La Petite fille a espionne cette nuit, et a-t-elle ete reperee. */
+  spy: z.strictObject({ playerId: playerIdSchema, caught: z.boolean() }).nullable(),
 });
 
 const deathSchema = z.strictObject({
