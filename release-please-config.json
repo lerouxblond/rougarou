@@ -3,6 +3,8 @@
   "release-type": "node",
   "include-component-in-tag": false,
   "bootstrap-sha": "1ee47e2",
+  "bump-minor-pre-major": true,
+  "initial-version": "0.1.0",
   "packages": {
     ".": {
       "package-name": "rougarou",
