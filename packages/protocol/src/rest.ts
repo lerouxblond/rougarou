@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from './zod.ts';
 
 import { errorCodeSchema, messageKeySchema } from './errors.ts';
 import { gameCodeSchema, gameIdSchema } from './game-code.ts';

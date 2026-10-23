@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from './zod.ts';
 
 /**
  * Identifiant d'un joueur dans une partie.
