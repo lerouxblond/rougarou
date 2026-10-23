@@ -603,7 +603,7 @@ au moment de les ajouter) : Radix UI Primitives (dialog, tabs, toast, switch), M
 ### Tâches
 
 Neuf PR de moins de 400 lignes de code non généré : **A** (T1, #17), **B1** (T2–T3, #18) et **B2** (T4–T5, #19) pour le moteur, la B ayant été coupée en deux pour tenir la limite,
-**C1**, **C2** (T6) et **C3** (T7) pour le design system, **D** (T8, joueur), **E** (T9, meneur), **F** (T10–T11, salon,
+**C1**, **C2** (T6), **C3** et **C4** (T7) pour le design system, **D** (T8, joueur), **E** (T9, meneur), **F** (T10–T11, salon,
 configuration, fin), **G** (T12, ambiance), **H** (T13), puis T14.
 
 - [x] **T1 — Docs, règles, ADR 0011** *(PR A)*
@@ -635,9 +635,10 @@ configuration, fin), **G** (T12, ambiance), **H** (T13), puis T14.
   - Tests attendus : axe sans violation sur chaque histoire, nuit et jour ; `IconButton` sans `aria-label` refusé par le typage ; contraste (test existant) ; clavier (Tabs, Dialog, Stepper)
   - Fait en deux PR pour tenir la limite de 400 lignes : **C1** (polices, `IconButton`, `Badge`, `Avatar`, `Stepper`, `EmptyState`, `Skeleton` ; `test/foundations.test.tsx`, 5 tests) et **C2** (contrôles Radix `Switch`, `Tabs`, `Dialog`, `Sheet`, `Toast` ; `test/controls.test.tsx`, 7 tests), chacune avec ses histoires Ladle. Versions (catalogue pnpm, vérifiées le 2026-10-23) : `@radix-ui/react-dialog` 1.3.1, `react-tabs` 1.2.1, `react-switch` 1.4.1, `react-toast` 1.3.1, `@fontsource/cormorant-garamond`, `dm-sans` et `pixelify-sans` 5.3.0 (sous-ensemble latin seulement, environ 196 ko pour les huit graisses). Budget du bundle : 163 ko de JS et 5,4 ko de CSS au premier rendu. **Écart à l'ADR 0011** : `@dnd-kit/core` n'a rien publié depuis décembre 2024, plus de 12 mois (`docs/05`) ; T10 prendra `@dnd-kit/react` (0.5.1, octobre 2026), et l'ADR est corrigé avant sa fusion
 
-- [ ] **T7 — Design system : composants de jeu** *(PR C)*
+- [x] **T7 — Design system : composants de jeu** *(PR C)*
   - Fichiers : `packages/ui/src/{RoleCard,PlayerChip,MayorBadge,PlayerCircle,TargetPicker,VoteBoard,PhaseBanner,Timer,NarratorScript,NightStepList,BalanceMeter}.tsx`, histoires, tests
   - Tests attendus : `RoleCard` maintenir pour révéler (souris, toucher, Espace, « Révéler 5 s ») ; `PlayerCircle` en grille sous 640 px ; `TargetPicker` ne propose que les cibles reçues et demande une confirmation ; `Timer` annonce 30 s, 10 s et 0 s par `aria-live` ; `VoteBoard` public (badges) et secret (compteur) ; axe sur tout
+  - Fait en deux PR : **C3** (#22 : `RoleCard`, `PlayerChip`, `MayorBadge`, `PlayerCircle`, `TargetPicker` ; `test/game-components.test.tsx`, 9 tests ; la carte du web ne fournit plus que la face du rôle) et **C4** (`Timer`, `PhaseBanner`, `NarratorScript`, `NightStepList`, `VoteBoard`, `BalanceMeter` ; `test/board.test.tsx`, 13 tests). `ui` ne dépend pas de `protocol` (`docs/04`) : les composants prennent des props simples et des libellés déjà traduits. **Limite connue** : le `Timer` compare l'échéance du serveur à l'horloge du navigateur ; un décalage d'horloge décale l'affichage. La synchronisation sur l'heure du serveur arrive en M4b avec les sons (`docs/12` §5)
 
 - [ ] **T8 — Vue joueur** *(PR D)*
   - Fichiers : `apps/web/src/game/player/*.tsx` (mise en page par taille, barre basse « Ma carte », « Infos », « Joueurs », nuit uniforme, action, vote, élection, aube, cimetière), `routes/Game.tsx` (table `(phase, lecteur) → écran`), i18n, tests
