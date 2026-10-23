@@ -8,3 +8,7 @@ export { EmptyState } from './EmptyState.tsx';
 export { IconButton, type IconButtonProps } from './IconButton.tsx';
 export { Skeleton } from './Skeleton.tsx';
 export { Stepper, type StepperProps } from './Stepper.tsx';
+export { Dialog, Sheet, type DialogProps } from './Dialog.tsx';
+export { Switch, type SwitchProps } from './Switch.tsx';
+export { Tabs, type TabItem } from './Tabs.tsx';
+export { Toast, ToastRegion, type ToastProps } from './Toast.tsx';
