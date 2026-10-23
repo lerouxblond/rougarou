@@ -103,13 +103,11 @@ describe('ActionPanel (regle 1 : le client ne montre que ce que le serveur propo
     expect(screen.getByRole('button', { name: fr.actions.confirm_role_seen })).toBeDefined();
     expect(screen.getByRole('button', { name: fr.actions.advance_phase_force })).toBeDefined();
 
-    const ballot = screen.getByLabelText(fr.actions.cast_vote);
+    const ballot = screen.getByRole('group', { name: fr.actions.cast_vote });
 
-    expect([...ballot.querySelectorAll('option')].map((option) => option.textContent)).toEqual([
-      'Alice',
-      'Bob',
-      fr.actions.spare,
-    ]);
+    expect(
+      [...ballot.querySelectorAll('input')].map((input) => input.labels?.[0]?.textContent),
+    ).toEqual(['Alice', 'Bob', fr.actions.spare]);
   });
 
   it('aucun bouton quand la vue ne porte aucune action', () => {

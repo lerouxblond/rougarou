@@ -405,5 +405,30 @@
     "label": "Players",
     "dead": "Dead",
     "mayor": "Mayor"
+  },
+  "vote": {
+    "board": "Votes",
+    "progress": "{{count}} of {{total}} have voted",
+    "progress_one": "{{count}} of {{total}} has voted",
+    "secret": "Secret vote: only the result will be announced.",
+    "votes": "{{count}} votes",
+    "votes_one": "{{count}} vote",
+    "outcome": {
+      "execute": "The village chose {{name}}.",
+      "nobody_spare": "The village spares everyone.",
+      "nobody_tie": "The tie remains: nobody is executed.",
+      "tie": "Tie between {{names}}.",
+      "nobody_no_ballots": "Nobody voted: nobody is executed."
+    }
+  },
+  "dawn": {
+    "title": "This morning…",
+    "nobody": "Nobody died last night.",
+    "death": "{{name}} was found dead.",
+    "death_role": "{{name}} was found dead. They were: {{role}}."
+  },
+  "pending": {
+    "hunter_shot": "{{name}}, the Hunter, is about to shoot.",
+    "mayor_succession": "{{name}} is choosing a successor."
   }
 }

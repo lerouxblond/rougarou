@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ActionPanel } from './ActionPanel.tsx';
+import { DawnNews } from './DawnNews.tsx';
 import { PlayerLobby } from './Lobby.tsx';
 import { MyInfo } from './MyInfo.tsx';
 import { NightPanel } from './NightPanel.tsx';
@@ -11,6 +12,7 @@ import { RoleCard } from './RoleCard.tsx';
 import { BottomBar } from './BottomBar.tsx';
 import { DealScreen } from './DealScreen.tsx';
 import { UniformNight } from './UniformNight.tsx';
+import { VotePanel } from './VotePanel.tsx';
 
 type Screen = (view: PlayerView, me: MeResponse, names: ReadonlyMap<string, string>) => ReactNode;
 
@@ -62,7 +64,9 @@ function DayScreen({
       {view.winner === null ? null : (
         <p className="font-display text-2xl text-accent">{t(`winner.${view.winner}`)}</p>
       )}
+      <DawnNews view={view} />
       <ActionPanel actions={view.actions} names={names} />
+      <VotePanel view={view} />
     </>
   );
 }
