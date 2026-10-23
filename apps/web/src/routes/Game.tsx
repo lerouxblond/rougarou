@@ -13,6 +13,8 @@ import { ActionPanel } from '../game/ActionPanel.tsx';
 import { useGameConnection, useGameView, useSendCommand } from '../game/hooks.ts';
 import { Config } from '../game/Config.tsx';
 import { NarratorLobby, PlayerLobby } from '../game/Lobby.tsx';
+import { MyInfo } from '../game/MyInfo.tsx';
+import { NightPanel } from '../game/NightPanel.tsx';
 import { RoleCard } from '../game/RoleCard.tsx';
 import { useGameStore } from '../game/store.ts';
 
@@ -131,6 +133,8 @@ function PlayerTable({ view, me }: { readonly view: PlayerView; readonly me: MeR
     <>
       {SCREENS[view.phase]?.player?.(view, me)}
       {role === null ? null : <RoleCard role={role} />}
+      {view.night === null ? null : <NightPanel night={view.night} names={namesOf(view)} />}
+      <MyInfo knowledge={view.me?.knowledge ?? []} names={namesOf(view)} />
       {view.me?.alive === false ? <p className="text-danger">{t('game.you_are_dead')}</p> : null}
       {view.winner === null ? null : (
         <p className="font-display text-2xl text-accent">{t(`winner.${view.winner}`)}</p>

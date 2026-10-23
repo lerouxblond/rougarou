@@ -5,12 +5,21 @@ import { useTranslation } from 'react-i18next';
 
 import { FormError } from '../components/Field.tsx';
 import { useSendCommand } from './hooks.ts';
+import { roleKey } from './roles.ts';
 
-/** Les roles proposes en M2 : loups contre villageois (`docs/10`). */
-const ROLES: readonly RoleId[] = ['werewolf', 'villager'];
+/** Les roles proposes : ceux du palier `core` (M3, `docs/02`). Les autres arrivent en M6. */
+const ROLES: readonly RoleId[] = [
+  'werewolf',
+  'villager',
+  'seer',
+  'witch',
+  'hunter',
+  'cupid',
+  'little-girl',
+];
 
 /**
- * Configuration brute (M2) : compteurs par role, puis « Distribuer ». La
+ * Configuration brute (M2, roles de M3) : compteurs par role, puis « Distribuer ». La
  * composition en cours d'edition est un etat de formulaire ; c'est le moteur
  * qui la valide (`Deal.issues`).
  */
@@ -35,7 +44,7 @@ export function Config({ view }: { readonly view: NarratorView }) {
       </p>
       <ul className="flex flex-col gap-2">
         {ROLES.map((role) => {
-          const name = t(`roles.${role}.name`);
+          const name = t(`roles.${roleKey(role)}.name`);
 
           return (
             <li key={role} className="flex items-center gap-3 rounded-card bg-surface p-3">

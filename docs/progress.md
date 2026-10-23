@@ -509,20 +509,40 @@ Trois PR : **A** (T1–T2, règles et points d'accroche), **B** (T3–T7, les r�
   - Fichiers : `src/roles/little-girl.ts`, `test/roles/little-girl.test.ts`, `test/leaks/little-girl.test.ts`, i18n, icône, crédits ; `test/bot.ts` et `test/properties/random-games.test.ts` (les bots jouent tous les rôles classiques)
   - Tests attendus : P21. Sans espionnage, elle ne voit rien. Masque des pseudos : longueur conservée, espaces visibles, ⌊lettres / 3⌋ lettres dévoilées (au moins 1 à partir de 3 lettres, aucune en dessous). Positions et ordre des loups retirés d'une nuit à l'autre, mais identiques au rejeu. Risque : avec base et hausse à 0, jamais repérée ; avec les défauts, 10 %, 20 %, 30 % sur les nuits espionnées successives, les nuits sans espionnage ne comptent pas, et le plafond est de 75 % ; avec des graines connues, repérée puis non repérée. Liste des suspects : 3 noms, elle comprise, aucun loup, moins s'il manque des non-loups vivants ; elle reste dans les infos des loups les nuits suivantes ; une deuxième détection ajoute une nouvelle liste, tirée à part. Elle ne bloque jamais l'étape. Non-fuite : jamais un identifiant de loup ni un pseudo complet dans sa vue (sauf si le rôle est déjà révélé), et seuls les loups voient la liste des suspects. 1 000 parties aléatoires avec tous les rôles classiques sans violer d'invariant. Couverture ≥ 90 %
 
-- [ ] **T8 — Cartes de rôle en SVG de repli** *(PR C)*
+- [x] **T8 — Cartes de rôle en SVG de repli** *(PR C)*
   - Fichiers : `packages/ui/src/{RoleCardArt,RoleIcon}.tsx`, `packages/ui/icons/*.svg` (les 7 rôles de M3, dessins originaux), `RoleCardArt.stories.tsx`, `test/role-card-art.test.tsx`
   - Contenu : carte 3:4, fond texturé en SVG, accent du camp (tokens), icône centrée, nom du rôle en police d'affichage, dans les deux thèmes ; texte alternatif traduit
   - Tests attendus : une carte par rôle de M3, nom lu par les lecteurs d'écran, axe sans violation
 
-- [ ] **T9 — Client : actions et « Mes infos »** *(PR C)*
+- [x] **T9 — Client : actions et « Mes infos »** *(PR C)*
   - Fichiers : `apps/web/src/game/{ActionPanel,RoleCard,MyInfo,NightPanel}.tsx`, i18n, `test/*.test.tsx`
   - Contenu : contrôles bruts pour sonder, les potions, désigner deux amoureux, confirmer, espionner, tirer ; « Mes infos » ; la carte de rôle utilise `RoleCardArt`
   - Tests attendus : un contrôle par action reçue, aucun sans action, « Mes infos » annoncé par `aria-live`, axe sur chaque écran
 
-- [ ] **T10 — E2E à 8 joueurs avec tous les rôles classiques** *(PR C)*
+- [x] **T10 — E2E à 8 joueurs avec tous les rôles classiques** *(PR C)*
   - Fichiers : `e2e/fixtures/table.ts` (N joueurs, composition imposée), `e2e/m3-classic-roles.spec.ts`
   - Tests attendus : 1 meneur + 8 joueurs (2 loups, Voyante, Sorcière, Chasseur, Cupidon, Petite fille, Villageois) ; chaque rôle agit au moins une fois ; contrôle de non-fuite de rôle à chaque tour ; la partie va jusqu'à une victoire
 
-- [ ] **T11 — Déploiement, vérification et rapport**
+- [ ] **T11 — Déploiement, vérification et rapport** (vérification locale faite ; reste le déploiement)
   - Fichiers : `docs/progress.md`
   - Tests attendus : `pnpm check` au vert, e2e M3 contre la production, définition de « terminé » vérifiée point par point
+
+### Vérification de la définition de « terminé » (locale, 2026-10-22)
+
+| Point | État | Preuve |
+|---|---|---|
+| Chaque rôle a ses tests | ✅ | `test/roles/{seer,witch,hunter,cupid,little-girl}.test.ts` ; file d'effets dans `test/deaths.test.ts` |
+| Chaque rôle a son test de non-fuite | ✅ | `test/leaks/{seer,witch,hunter,lovers,little-girl}.test.ts` ; le test générique joue désormais tous les rôles classiques, avec un oracle de nuit uniforme par étape |
+| Chaque rôle a ses textes i18n | ✅ | `roles.<id>.{name,description,short,rules}` et `narrator.*` en fr et en en, vérifiés par `test/i18n-keys.test.ts` |
+| Partie e2e à 8 joueurs avec tous les rôles classiques | ✅ en local | `e2e/m3-classic-roles.spec.ts` : 1 meneur + 8 joueurs, chaque rôle agit, non-fuite à chaque tour, victoire du village. Toute la suite e2e passe (20 tests) |
+| Cas limites 1 et 3 | ✅ | `test/roles/cupid.test.ts` ; cas 2 et 9 reportés en M6 (P25) |
+| 1 000 parties aléatoires avec tous les rôles | ✅ | `test/properties/random-games.test.ts`, chaque rôle y agit au moins une fois |
+| Couverture du moteur ≥ 90 % | ✅ | lignes 96,6 %, branches 92,9 % |
+| `pnpm check` | ✅ | lint, typecheck, tests |
+| e2e M3 contre la production | ⏳ | Demande le push des branches, les PR et la fusion sur `master` |
+
+Précisions prises en codant (cohérentes avec P17 à P25, à relire) :
+- `R-46` : à la fin d'un minuteur, seul l'effet en tête de file prend sa valeur par défaut, puis le suivant lance son propre minuteur ; un forçage résout toute la file.
+- Un tir de Chasseur sans aucun vivant à viser est sauté.
+- La Petite fille compte comme « lettres » tous les caractères hors espaces (un trait d'union compte). L'exemple de P21 (« A _ _ x _ _ e », 3 lettres sur 7) contredisait la règle ⌊7 / 3⌋ = 2 : l'exemple de `docs/02` montre maintenant 2 lettres.
+- Quand Cupidon se choisit lui-même, il reçoit aussi l'info `lover` de son partenaire.

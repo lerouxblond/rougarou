@@ -1,11 +1,14 @@
 import type { RoleId } from '@rougarou/protocol';
+import { RoleCardArt } from '@rougarou/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import { CARD_TEAMS, hasCardArt, roleKey } from './roles.ts';
 
 /**
  * La carte du joueur, face cachee par defaut. Elle se retourne tant qu'on la
  * maintient (doigt, souris, ou Espace et Entree au clavier) et se recache des
- * qu'on relache (US-30). Version brute de M2 : le visuel arrive en M4.
+ * qu'on relache (US-30). Visible, elle montre la carte de repli du role (`docs/07`).
  */
 export function RoleCard({ role }: { readonly role: RoleId }) {
   const { t } = useTranslation();
@@ -38,9 +41,20 @@ export function RoleCard({ role }: { readonly role: RoleId }) {
         onKeyUp={hide}
       >
         {revealed ? (
-          <span className="flex flex-col gap-2">
-            <span className="font-display text-2xl">{t(`roles.${role}.name`)}</span>
-            <span className="text-sm text-text-muted">{t(`roles.${role}.description`)}</span>
+          <span className="flex flex-col items-center gap-2">
+            {hasCardArt(role) ? (
+              <RoleCardArt
+                role={role}
+                team={CARD_TEAMS[role]}
+                name={t(`roles.${roleKey(role)}.name`)}
+                teamLabel={t(`teams.${CARD_TEAMS[role]}`)}
+              />
+            ) : (
+              <span className="font-display text-2xl">{t(`roles.${roleKey(role)}.name`)}</span>
+            )}
+            <span className="text-sm text-text-muted">
+              {t(`roles.${roleKey(role)}.description`)}
+            </span>
           </span>
         ) : (
           <span className="flex flex-col gap-1">
