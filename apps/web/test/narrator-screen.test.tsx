@@ -1,5 +1,5 @@
 import { catalogs } from '@rougarou/i18n';
-import type { NarratorView } from '@rougarou/protocol';
+import { gameOptionsSchema, type NarratorView } from '@rougarou/protocol';
 import { cleanup, fireEvent, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -37,7 +37,7 @@ function narrator(overrides: Partial<NarratorView> = {}): NarratorView {
         knowledge: [],
       },
     ],
-    options: {} as NarratorView['options'],
+    options: gameOptionsSchema.parse({}),
     composition: {},
     nightNumber: 1,
     deadline: null,
@@ -93,11 +93,12 @@ describe('Tableau du meneur (US-41, docs/12 §1)', () => {
     vi.unstubAllGlobals();
   });
 
-  it('sur telephone, des onglets : Script, ordre de la nuit, joueurs, journal (docs/06)', () => {
+  it('sur telephone, le texte, puis des onglets : ordre de la nuit, joueurs, journal (docs/06)', () => {
     renderWithProviders(<NarratorScreen view={narrator()} />);
 
+    // Le texte a lire et les actions restent visibles au-dessus des onglets.
+    expect(screen.getByText(fr.roles.seer.narrator.wake)).toBeDefined();
     expect(screen.getAllByRole('tab').map((tab) => tab.textContent)).toEqual([
-      fr.narrator.script,
       fr.narrator.steps,
       fr.players.label,
       fr.journal.title,

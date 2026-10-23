@@ -285,7 +285,8 @@
     "players_one": "Players ({{count}})",
     "reveal_timed": "Reveal for 5 s",
     "night_number": "Night {{count}}",
-    "day_number": "Day {{count}}"
+    "day_number": "Day {{count}}",
+    "use_suggestion": "Use the suggested composition"
   },
   "actions": {
     "join_game": "Join",
@@ -517,5 +518,144 @@
     "help": "Fix the table after a mistake. Every correction is logged and can be undone.",
     "player": "Player",
     "role": "New role"
+  },
+  "balance": {
+    "label": "Composition balance",
+    "village": "Village favored",
+    "balanced": "Balanced",
+    "wolves": "Wolves favored"
+  },
+  "options": {
+    "title": "Options",
+    "save": "Save the options",
+    "groups": {
+      "table": "Table",
+      "votes": "Votes",
+      "night": "Night",
+      "reveal": "Reveals",
+      "timers": "Timers"
+    },
+    "play_mode": {
+      "label": "Where do you play?",
+      "help": "Around a table, or each at home on a voice call.",
+      "values": {
+        "in_person": "In person",
+        "remote": "Remote"
+      }
+    },
+    "pilot_mode": {
+      "label": "Night pace",
+      "help": "Assisted: steps follow one another as soon as the player has acted. Manual: you move every step.",
+      "values": {
+        "assisted": "Assisted",
+        "manual": "Manual"
+      }
+    },
+    "deal_mode": {
+      "label": "Dealing the roles",
+      "help": "Everyone at once, or one by one in seat order.",
+      "values": {
+        "simultaneous": "All at once",
+        "ceremony": "One by one (ceremony)"
+      }
+    },
+    "mayor": {
+      "label": "Mayor",
+      "help": "A Mayor is elected on the first day; their vote counts twice."
+    },
+    "mayor_succession": {
+      "label": "Mayor succession",
+      "help": "When the Mayor dies, they choose a successor, or the village elects a new one.",
+      "values": {
+        "designate": "They choose a successor",
+        "reelect": "The village re-elects"
+      }
+    },
+    "vote_visibility": {
+      "label": "Village vote",
+      "help": "Public: everyone sees who votes for whom. Secret: only the result is announced.",
+      "values": {
+        "public": "Public",
+        "secret": "Secret"
+      }
+    },
+    "allow_spare": {
+      "label": "Spare",
+      "help": "The ballot offers to execute nobody."
+    },
+    "allow_abstain": {
+      "label": "Abstention",
+      "help": "A player may cast a blank vote."
+    },
+    "tie_break": {
+      "label": "On a tie",
+      "help": "Who decides when two players have as many votes.",
+      "values": {
+        "mayor": "The Mayor chooses",
+        "revote": "Second vote",
+        "nobody": "Nobody dies"
+      }
+    },
+    "wolf_vote_mode": {
+      "label": "Wolves’ vote",
+      "help": "Unanimous: every wolf must name the same victim. Majority: the most votes win.",
+      "values": {
+        "unanimous": "Unanimous",
+        "majority": "Majority"
+      }
+    },
+    "wolves_win_on_parity": {
+      "label": "Wolves win on parity",
+      "help": "The wolves win as soon as they are as many as the others."
+    },
+    "seer_mode": {
+      "label": "What the Seer sees",
+      "help": "The exact role of the probed player, or only their team.",
+      "values": {
+        "role": "The role",
+        "team": "The team"
+      }
+    },
+    "witch_self_save": {
+      "label": "Can the Witch save herself?",
+      "help": "With her life potion, when the wolves attack her.",
+      "values": {
+        "never": "Never",
+        "first_night_only": "On the first night only",
+        "always": "Always"
+      }
+    },
+    "fake_wake_for_dead_roles": {
+      "label": "Call dead roles",
+      "help": "In person, you still call a dead role, so as not to reveal their death."
+    },
+    "little_girl_risk": {
+      "help": "The Little Girl’s risk of being spotted while spying: it starts at the base and rises with every night she spies.",
+      "base": "Base risk (%)",
+      "increase": "Increase per night (points)"
+    },
+    "reveal_role_on_death": {
+      "label": "Reveal the role of the dead",
+      "help": "A dead player’s role is shown to everyone."
+    },
+    "dead_see_roles": {
+      "label": "The dead see everything",
+      "help": "A dead player sees everyone’s role."
+    },
+    "timers": {
+      "help": "In seconds. Leave empty for no timer: you move on yourself.",
+      "none": "none",
+      "role_reveal": "Seeing one’s role",
+      "ceremony_card": "Ceremony, per player",
+      "night_action": "Night action",
+      "wolf_vote": "Wolves’ vote",
+      "hunter_shot": "Hunter’s shot",
+      "mayor_successor": "Mayor’s successor",
+      "tie_break": "Tie broken by the Mayor",
+      "mayor_candidacy": "Running for Mayor",
+      "mayor_vote": "Mayor vote",
+      "debate": "Debate",
+      "day_vote": "Village vote"
+    }
   }
 }

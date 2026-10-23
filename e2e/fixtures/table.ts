@@ -136,7 +136,7 @@ export async function startNight(
 
   for (const [role, count] of Object.entries(composition)) {
     for (let index = 0; index < count; index += 1) {
-      await narrator.getByRole('button', { name: `Ajouter un ${role}` }).click();
+      await narrator.getByRole('button', { name: `Ajouter : ${role}` }).click();
     }
   }
 

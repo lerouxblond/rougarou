@@ -266,8 +266,8 @@
     "waiting_config": "Le meneur prépare la partie…",
     "composition": "Composition",
     "composition_count": "{{count}} rôles pour {{players}} joueurs",
-    "decrease": "Retirer un {{role}}",
-    "increase": "Ajouter un {{role}}",
+    "decrease": "Retirer : {{role}}",
+    "increase": "Ajouter : {{role}}",
     "save_composition": "Enregistrer la composition",
     "deal": "Distribuer",
     "your_role": "Votre rôle",
@@ -285,7 +285,8 @@
     "players_one": "Joueurs ({{count}})",
     "reveal_timed": "Révéler 5 s",
     "night_number": "Nuit {{count}}",
-    "day_number": "Jour {{count}}"
+    "day_number": "Jour {{count}}",
+    "use_suggestion": "Utiliser la composition suggérée"
   },
   "actions": {
     "join_game": "Rejoindre",
@@ -517,5 +518,144 @@
     "help": "Corrigez la table après une erreur. Chaque correction est notée au journal et peut être annulée.",
     "player": "Joueur",
     "role": "Nouveau rôle"
+  },
+  "balance": {
+    "label": "Équilibre de la composition",
+    "village": "Avantage village",
+    "balanced": "Équilibré",
+    "wolves": "Avantage loups"
+  },
+  "options": {
+    "title": "Options",
+    "save": "Enregistrer les options",
+    "groups": {
+      "table": "Table",
+      "votes": "Votes",
+      "night": "Nuit",
+      "reveal": "Révélations",
+      "timers": "Minuteurs"
+    },
+    "play_mode": {
+      "label": "Où joue-t-on ?",
+      "help": "Autour d’une table, ou chacun chez soi en appel vocal.",
+      "values": {
+        "in_person": "En présentiel",
+        "remote": "À distance"
+      }
+    },
+    "pilot_mode": {
+      "label": "Pilotage de la nuit",
+      "help": "Assisté : les étapes s’enchaînent dès que le joueur a agi. Manuel : vous passez chaque étape.",
+      "values": {
+        "assisted": "Assisté",
+        "manual": "Manuel"
+      }
+    },
+    "deal_mode": {
+      "label": "Distribution des rôles",
+      "help": "Tous en même temps, ou un par un dans l’ordre des places.",
+      "values": {
+        "simultaneous": "Simultanée",
+        "ceremony": "Un par un (cérémonie)"
+      }
+    },
+    "mayor": {
+      "label": "Maire",
+      "help": "Un Maire est élu le premier jour ; sa voix compte double."
+    },
+    "mayor_succession": {
+      "label": "Succession du Maire",
+      "help": "À sa mort, il désigne son successeur, ou le village en réélit un.",
+      "values": {
+        "designate": "Il désigne son successeur",
+        "reelect": "Le village réélit"
+      }
+    },
+    "vote_visibility": {
+      "label": "Vote du village",
+      "help": "Public : chacun voit qui vote pour qui. Secret : seul le résultat est annoncé.",
+      "values": {
+        "public": "Public",
+        "secret": "Secret"
+      }
+    },
+    "allow_spare": {
+      "label": "Épargner",
+      "help": "Le bulletin propose de n’exécuter personne."
+    },
+    "allow_abstain": {
+      "label": "Abstention",
+      "help": "Un joueur peut voter blanc."
+    },
+    "tie_break": {
+      "label": "En cas d’égalité",
+      "help": "Qui tranche quand deux joueurs ont autant de voix.",
+      "values": {
+        "mayor": "Le Maire choisit",
+        "revote": "Second vote",
+        "nobody": "Personne ne meurt"
+      }
+    },
+    "wolf_vote_mode": {
+      "label": "Vote des loups",
+      "help": "Unanimité : tous les loups doivent désigner la même victime. Majorité : le plus de voix l’emporte.",
+      "values": {
+        "unanimous": "Unanimité",
+        "majority": "Majorité"
+      }
+    },
+    "wolves_win_on_parity": {
+      "label": "Victoire des loups à égalité",
+      "help": "Les loups gagnent dès qu’ils sont aussi nombreux que les autres."
+    },
+    "seer_mode": {
+      "label": "Ce que voit la Voyante",
+      "help": "Le rôle exact du joueur sondé, ou seulement son camp.",
+      "values": {
+        "role": "Le rôle",
+        "team": "Le camp"
+      }
+    },
+    "witch_self_save": {
+      "label": "La Sorcière peut-elle se sauver ?",
+      "help": "Avec sa potion de vie, quand c’est elle que les loups attaquent.",
+      "values": {
+        "never": "Jamais",
+        "first_night_only": "La première nuit seulement",
+        "always": "Toujours"
+      }
+    },
+    "fake_wake_for_dead_roles": {
+      "label": "Appeler les rôles morts",
+      "help": "En présentiel, vous appelez quand même un rôle mort, pour ne pas trahir sa mort."
+    },
+    "little_girl_risk": {
+      "help": "Le risque, pour la Petite fille, d’être repérée en espionnant : il part de la base et monte à chaque nuit espionnée.",
+      "base": "Risque de base (%)",
+      "increase": "Hausse par nuit (points)"
+    },
+    "reveal_role_on_death": {
+      "label": "Révéler le rôle des morts",
+      "help": "Le rôle d’un joueur mort est montré à tous."
+    },
+    "dead_see_roles": {
+      "label": "Les morts voient tout",
+      "help": "Un joueur mort voit les rôles de tous."
+    },
+    "timers": {
+      "help": "En secondes. Laissez vide pour ne pas mettre de minuteur : c’est vous qui avancez.",
+      "none": "aucun",
+      "role_reveal": "Voir son rôle",
+      "ceremony_card": "Cérémonie, par joueur",
+      "night_action": "Action de nuit",
+      "wolf_vote": "Vote des loups",
+      "hunter_shot": "Tir du Chasseur",
+      "mayor_successor": "Successeur du Maire",
+      "tie_break": "Égalité tranchée par le Maire",
+      "mayor_candidacy": "Candidatures au poste de Maire",
+      "mayor_vote": "Vote du Maire",
+      "debate": "Débat",
+      "day_vote": "Vote du village"
+    }
   }
 }
