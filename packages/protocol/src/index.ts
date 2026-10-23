@@ -1,3 +1,5 @@
+import './jitless.ts';
+
 export { assertNever } from './assert-never.ts';
 export {
   actorSchema,
