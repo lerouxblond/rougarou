@@ -1,6 +1,6 @@
 import { catalogs } from '@rougarou/i18n';
 import type { NarratorView } from '@rougarou/protocol';
-import { cleanup, screen } from '@testing-library/react';
+import { cleanup, fireEvent, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { NarratorScreen } from '../src/game/NarratorScreen.tsx';
@@ -93,13 +93,14 @@ describe('Tableau du meneur (US-41, docs/12 §1)', () => {
     vi.unstubAllGlobals();
   });
 
-  it('sur telephone, des onglets : Script, ordre de la nuit, joueurs (docs/06)', () => {
+  it('sur telephone, des onglets : Script, ordre de la nuit, joueurs, journal (docs/06)', () => {
     renderWithProviders(<NarratorScreen view={narrator()} />);
 
     expect(screen.getAllByRole('tab').map((tab) => tab.textContent)).toEqual([
       fr.narrator.script,
       fr.narrator.steps,
       fr.players.label,
+      fr.journal.title,
     ]);
   });
 
@@ -161,6 +162,103 @@ describe('Tableau du meneur (US-41, docs/12 §1)', () => {
     expect(screen.getByRole('button', { name: fr.actions.extend_timer })).toBeDefined();
     expect(screen.queryByRole('button', { name: fr.actions.resume_timer })).toBeNull();
     expect(screen.getByRole('button', { name: fr.actions.undo })).toBeDefined();
+  });
+
+  it('montre en direct les votes des loups, le choix de la Sorciere et la Petite fille', () => {
+    renderWithProviders(
+      <NarratorScreen
+        view={narrator({
+          night: {
+            number: 1,
+            steps: ['wolves', 'witch'],
+            current: 1,
+            stepResolved: false,
+            wolfVotes: { p1: 'p2' },
+            wolfTie: null,
+            wolfVictim: 'p2',
+            witch: { save: true, kill: null },
+            spy: { playerId: 'p2', caught: true },
+          },
+        })}
+      />,
+    );
+
+    expect(screen.getByText('Alice → Bob')).toBeDefined();
+    expect(screen.getByText('Les loups ont choisi Bob.')).toBeDefined();
+    expect(screen.getByText(fr.journal.witch_save)).toBeDefined();
+    expect(screen.getByText('Bob a espionné la meute et s’est fait repérer.')).toBeDefined();
+  });
+
+  it('a l aube, le meneur seul voit la cause des morts', () => {
+    renderWithProviders(
+      <NarratorScreen
+        view={narrator({
+          phase: 'DAWN',
+          night: null,
+          dawn: { deaths: [{ playerId: 'p2', cause: 'witch' }], announced: false },
+        })}
+      />,
+    );
+
+    expect(screen.getByText('Bob est mort (la potion de mort).')).toBeDefined();
+  });
+
+  it('le journal horodate porte un badge sur chaque correction (R-18, R-19)', async () => {
+    renderWithProviders(
+      <NarratorScreen
+        view={narrator({
+          journal: [
+            {
+              at: 0,
+              night: 1,
+              phase: 'NIGHT',
+              fact: { kind: 'seerProbed', seer: 'p2', target: 'p1' },
+            },
+            {
+              at: 0,
+              night: 1,
+              phase: 'DAY_DEBATE',
+              fact: { kind: 'playerRevived', playerId: 'p1' },
+            },
+          ],
+        })}
+      />,
+    );
+
+    fireEvent.mouseDown(screen.getByRole('tab', { name: fr.journal.title }));
+    const journal = await screen.findByRole('list', { name: fr.journal.title });
+
+    expect(journal.textContent).toContain('Bob a sondé Alice.');
+    expect(journal.querySelectorAll('li')[1]?.textContent).toContain(fr.journal.correction);
+    expect(journal.querySelectorAll('li')[0]?.textContent).not.toContain(fr.journal.correction);
+  });
+
+  it('le mode correction n apparait que si le serveur le propose, et ouvre ses outils', () => {
+    const { unmount } = renderWithProviders(<NarratorScreen view={narrator()} />);
+
+    expect(screen.queryByRole('button', { name: fr.correction.open })).toBeNull();
+    unmount();
+    renderWithProviders(
+      <NarratorScreen
+        view={narrator({
+          phase: 'DAY_DEBATE',
+          night: null,
+          actions: [
+            { type: 'CorrectKill', targets: ['p1'] },
+            { type: 'CorrectRevive', targets: [] },
+            { type: 'CorrectRole', targets: ['p1', 'p2'], roles: ['villager', 'seer'] },
+          ],
+        })}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: fr.correction.open }));
+    const dialog = screen.getByRole('dialog', { name: fr.correction.title });
+
+    expect(dialog.textContent).toContain(fr.actions.correct_kill);
+    // Personne a ressusciter : pas de choix vide.
+    expect(dialog.textContent).not.toContain(fr.actions.correct_revive);
+    expect(screen.getByLabelText(fr.correction.role)).toBeDefined();
   });
 
   it('sans violation axe', async () => {

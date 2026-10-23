@@ -477,5 +477,45 @@
       "tie": "En attente : le Maire départage les ex æquo.",
       "generic": "Des actions sont en attente."
     }
+  },
+  "journal": {
+    "title": "Journal",
+    "correction": "Correction",
+    "night_started": "La nuit tombe.",
+    "wolves_chose": "Les loups ont choisi {{name}}.",
+    "wolves_none": "Les loups n’ont choisi personne.",
+    "seer_probed": "{{seer}} a sondé {{target}}.",
+    "witch_acted": "{{witch}} : {{choice}}.",
+    "witch_save": "potion de vie sur la victime",
+    "witch_kill": "potion de mort sur {{name}}",
+    "witch_nothing": "aucune potion",
+    "lovers_linked": "{{cupid}} a uni {{first}} et {{second}}.",
+    "spied": "{{name}} a espionné la meute.",
+    "spied_caught": "{{name}} a espionné la meute et s’est fait repérer.",
+    "player_killed": "{{name}} est mort ({{cause}}).",
+    "hunter_shot": "{{hunter}} a tiré sur {{target}}.",
+    "mayor_elected": "{{name}} est élu Maire.",
+    "mayor_drawn": "{{name}} est Maire, tiré au sort.",
+    "successor": "{{from}} a désigné {{to}} pour lui succéder.",
+    "successor_drawn": "{{to}} succède à {{from}}, tiré au sort.",
+    "player_revived": "{{name}} est ressuscité.",
+    "role_corrected": "{{name}} est maintenant {{role}}.",
+    "phase_forced": "Le meneur a forcé : {{phase}}.",
+    "timer_expired": "Temps écoulé : {{phase}}."
+  },
+  "death_cause": {
+    "wolves": "les loups",
+    "witch": "la potion de mort",
+    "vote": "le vote du village",
+    "hunter": "le tir du Chasseur",
+    "grief": "le chagrin",
+    "correction": "correction du meneur"
+  },
+  "correction": {
+    "open": "Mode correction",
+    "title": "Mode correction",
+    "help": "Corrigez la table après une erreur. Chaque correction est notée au journal et peut être annulée.",
+    "player": "Joueur",
+    "role": "Nouveau rôle"
   }
 }

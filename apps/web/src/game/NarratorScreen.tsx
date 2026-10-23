@@ -6,14 +6,26 @@ import { useTranslation } from 'react-i18next';
 import { FormError } from '../components/Field.tsx';
 import { ActionPanel } from './ActionPanel.tsx';
 import { Config } from './Config.tsx';
+import { CorrectionDialog } from './CorrectionDialog.tsx';
 import { useSendCommand } from './hooks.ts';
 import { NarratorLobby } from './Lobby.tsx';
 import { blockerOf, primaryLabel, scriptOf, stepTexts, type Line } from './narrator-script.ts';
+import { JournalPanel } from './JournalPanel.tsx';
+import { NightIntents } from './NightIntents.tsx';
 import { PlayersList } from './PlayersPanel.tsx';
 import { VotePanel } from './VotePanel.tsx';
 
 /** Les actions que le bouton principal et la barre d'outils presentent deja. */
-const HANDLED = ['AdvancePhase', 'PauseTimer', 'ResumeTimer', 'ExtendTimer', 'KickPlayer'] as const;
+const HANDLED = [
+  'AdvancePhase',
+  'PauseTimer',
+  'ResumeTimer',
+  'ExtendTimer',
+  'KickPlayer',
+  'CorrectKill',
+  'CorrectRevive',
+  'CorrectRole',
+] as const;
 
 /** Ecran large (`docs/06` : trois colonnes a partir de 1024 px). */
 const WIDE = '(min-width: 1024px)';
@@ -140,6 +152,7 @@ function Toolbar({ view }: { readonly view: NarratorView }) {
         >
           {t('actions.undo')}
         </Button>
+        <CorrectionDialog view={view} />
       </div>
       <FormError message={error === null ? null : t(error)} />
     </div>
@@ -190,6 +203,7 @@ export function NarratorScreen({ view }: { readonly view: NarratorView }) {
       }}
     />
   );
+  const journal = <JournalPanel view={view} entries={view.journal} />;
   const main = (
     <div className="flex flex-col gap-6">
       <NarratorScript
@@ -205,6 +219,7 @@ export function NarratorScreen({ view }: { readonly view: NarratorView }) {
           {t('game.confirmations', { count: confirmed, total: view.players.length })}
         </p>
       ) : null}
+      <NightIntents view={view} />
       {PHASE_PANELS[view.phase]?.(view)}
       <ActionPanel actions={view.actions} names={names} skip={[...HANDLED]} />
       <PrimaryAction view={view} />
@@ -217,8 +232,12 @@ export function NarratorScreen({ view }: { readonly view: NarratorView }) {
       <div className="grid grid-cols-[14rem_1fr_18rem] gap-6">
         <aside>{stepList}</aside>
         {main}
-        <aside>
+        <aside className="flex flex-col gap-6">
           <PlayersList players={view.players} />
+          <section className="flex flex-col gap-2">
+            <h2 className="font-display text-xl text-text">{t('journal.title')}</h2>
+            {journal}
+          </section>
         </aside>
       </div>
     );
@@ -235,6 +254,7 @@ export function NarratorScreen({ view }: { readonly view: NarratorView }) {
           label: t('players.label'),
           content: <PlayersList players={view.players} />,
         },
+        { value: 'journal', label: t('journal.title'), content: journal },
       ]}
     />
   );
