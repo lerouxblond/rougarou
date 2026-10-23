@@ -602,8 +602,8 @@ au moment de les ajouter) : Radix UI Primitives (dialog, tabs, toast, switch), M
 
 ### Tâches
 
-Huit PR de moins de 400 lignes de code non généré : **A** (T1), **B** (T2–T5, moteur),
-**C** (T6–T7, design system), **D** (T8, joueur), **E** (T9, meneur), **F** (T10–T11, salon,
+Neuf PR de moins de 400 lignes de code non généré : **A** (T1, #17), **B1** (T2–T3, #18) et **B2** (T4–T5, #19) pour le moteur, la B ayant été coupée en deux pour tenir la limite,
+**C1**, **C2** (T6) et **C3** (T7) pour le design system, **D** (T8, joueur), **E** (T9, meneur), **F** (T10–T11, salon,
 configuration, fin), **G** (T12, ambiance), **H** (T13), puis T14.
 
 - [x] **T1 — Docs, règles, ADR 0011** *(PR A)*
@@ -630,9 +630,10 @@ configuration, fin), **G** (T12, ambiance), **H** (T13), puis T14.
   - Tests attendus : P29 (une suggestion valide pour chaque taille de 5 à 24, aucun rôle d'extension, `R-07` respecté ; poids et paliers de l'indicateur)
   - Fait : `packages/protocol/src/composition.ts` (`ROLE_WEIGHTS`, `balanceOf`, 8 tests). **Écart à P29** : la suggestion reste une fonction du mode dans le moteur (`suggestComposition`, `docs/11`), qui dépend du registre des rôles ; le moteur l'envoie au meneur en `CONFIG` (`suggestion` dans sa vue). Seuls les poids sont dans `protocol`, ce qui suffit pour que l'indicateur suive les + et − sans aller-retour. `docs/02` et `docs/04` corrigés. Couverture du moteur après PR B : 96,7 % des lignes, 93,4 % des branches
 
-- [ ] **T6 — Design system : fondations** *(PR C)*
+- [x] **T6 — Design system : fondations** *(PR C)*
   - Fichiers : `packages/ui/src/{IconButton,Badge,Avatar,Stepper,Switch,Tabs,Dialog,Sheet,Toast,EmptyState,Skeleton}.tsx` (Radix), polices `@fontsource` dans `styles.css`, histoires Ladle en nuit et en jour, `test/*.test.tsx`
   - Tests attendus : axe sans violation sur chaque histoire, nuit et jour ; `IconButton` sans `aria-label` refusé par le typage ; contraste (test existant) ; clavier (Tabs, Dialog, Stepper)
+  - Fait en deux PR pour tenir la limite de 400 lignes : **C1** (polices, `IconButton`, `Badge`, `Avatar`, `Stepper`, `EmptyState`, `Skeleton` ; `test/foundations.test.tsx`, 5 tests) et **C2** (contrôles Radix `Switch`, `Tabs`, `Dialog`, `Sheet`, `Toast` ; `test/controls.test.tsx`, 7 tests), chacune avec ses histoires Ladle. Versions (catalogue pnpm, vérifiées le 2026-10-23) : `@radix-ui/react-dialog` 1.3.1, `react-tabs` 1.2.1, `react-switch` 1.4.1, `react-toast` 1.3.1, `@fontsource/cormorant-garamond`, `dm-sans` et `pixelify-sans` 5.3.0 (sous-ensemble latin seulement, environ 196 ko pour les huit graisses). Budget du bundle : 163 ko de JS et 5,4 ko de CSS au premier rendu. **Écart à l'ADR 0011** : `@dnd-kit/core` n'a rien publié depuis décembre 2024, plus de 12 mois (`docs/05`) ; T10 prendra `@dnd-kit/react` (0.5.1, octobre 2026), et l'ADR est corrigé avant sa fusion
 
 - [ ] **T7 — Design system : composants de jeu** *(PR C)*
   - Fichiers : `packages/ui/src/{RoleCard,PlayerChip,MayorBadge,PlayerCircle,TargetPicker,VoteBoard,PhaseBanner,Timer,NarratorScript,NightStepList,BalanceMeter}.tsx`, histoires, tests
