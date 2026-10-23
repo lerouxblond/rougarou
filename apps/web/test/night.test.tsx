@@ -92,7 +92,9 @@ describe('Etape de nuit (NightPanel)', () => {
       fr.night.spy.prompt,
     ],
   ])('%s', async (_label, night, text) => {
-    const { container } = renderWithProviders(<NightPanel night={night} names={NAMES} />);
+    const { container } = renderWithProviders(
+      <NightPanel night={night} names={NAMES} knowledge={[]} nightNumber={1} />,
+    );
 
     expect(screen.getByText(text)).toBeDefined();
     expect(await axeViolations(container)).toEqual([]);
@@ -103,6 +105,8 @@ describe('Etape de nuit (NightPanel)', () => {
       <NightPanel
         night={{ step: 'wolves', resolved: false, wolfVotes: { p1: 'p3' } }}
         names={NAMES}
+        knowledge={[]}
+        nightNumber={1}
       />,
     );
 
@@ -118,6 +122,8 @@ describe('Etape de nuit (NightPanel)', () => {
           pack: [{ mask: ['A', null, ' ', null], target: 'p4' }],
         }}
         names={NAMES}
+        knowledge={[]}
+        nightNumber={1}
       />,
     );
 

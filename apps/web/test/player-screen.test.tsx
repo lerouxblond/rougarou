@@ -73,6 +73,62 @@ describe('Vue joueur (US-40, docs/06)', () => {
     expect(screen.getByRole('heading', { name: fr.night.seer.title })).toBeDefined();
   });
 
+  it('apres sa sonde, la Voyante voit le role du joueur sonde (docs/03, US-40)', async () => {
+    const view = seated({ night: { step: 'seer', resolved: true } }, 'seer');
+
+    const { container } = renderWithProviders(
+      <PlayerScreen
+        view={{
+          ...view,
+          me: {
+            ...view.me!,
+            knowledge: [{ kind: 'seerRole', night: 1, playerId: 'p2', role: 'werewolf' }],
+          },
+        }}
+        me={ME}
+      />,
+    );
+
+    const result = screen.getByRole('status', { name: fr.night.seer.result_title });
+
+    expect(result.textContent).toContain('Bob');
+    expect(result.textContent).toContain(fr.roles.werewolf.name);
+    expect(screen.queryByText(fr.night.seer.prompt)).toBeNull();
+    expect(await axeViolations(container)).toEqual([]);
+  });
+
+  it('en mode camp, elle ne voit que le camp ; sans sonde, elle le sait', () => {
+    const view = seated({ night: { step: 'seer', resolved: true }, nightNumber: 2 }, 'seer');
+
+    renderWithProviders(
+      <PlayerScreen
+        view={{
+          ...view,
+          me: {
+            ...view.me!,
+            knowledge: [
+              { kind: 'seerRole', night: 1, playerId: 'p3', role: 'seer' },
+              { kind: 'seerTeam', night: 2, playerId: 'p2', team: 'wolves' },
+            ],
+          },
+        }}
+        me={ME}
+      />,
+    );
+
+    const result = screen.getByRole('status', { name: fr.night.seer.result_title });
+
+    expect(result.textContent).toContain(fr.teams.wolves);
+    expect(result.textContent).not.toContain('Chloe');
+
+    cleanup();
+    renderWithProviders(
+      <PlayerScreen view={seated({ night: { step: 'seer', resolved: true } }, 'seer')} me={ME} />,
+    );
+
+    expect(screen.getByText(fr.night.seer.no_probe)).toBeDefined();
+  });
+
   it('en ceremonie, sans la main, on ne voit que qui decouvre son role (R-17)', () => {
     renderWithProviders(
       <PlayerScreen view={seated({ phase: 'DEAL', ceremony: { turn: 'p2' } }, null)} me={ME} />,

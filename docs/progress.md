@@ -714,10 +714,15 @@ que `availableActions` propose et ce que l'écran affiche.
     `availableActions`. Il a trouvé G1 du premier coup (contre-exemple à 9 joueurs). Correction :
     l'égalité se traite avant le test « vote clos » ; le robot tranche désormais les égalités, donc
     les 1 000 parties de `random-games` passent aussi par `BreakTie`
-- [ ] **GL2 — Résultat de la Voyante à l'écran** (G2)
+- [x] **GL2 — Résultat de la Voyante à l'écran** (G2)
   - Fichiers : `apps/web/src/game/NightPanel.tsx`, i18n, `test/player-screen.test.tsx`
   - Tests : après la sonde, la Voyante voit le rôle (ou le camp) du joueur sondé cette nuit ; la nuit
     uniforme des autres ne change pas
+  - Fait : `SeerResult.tsx`. Une fois l'étape résolue, le panneau de la Voyante remplace la consigne
+    par ce qu'elle a appris cette nuit, lu dans ses infos (`me.knowledge`, entrée datée de la nuit) :
+    la carte du rôle et « Bob est Loup-garou », ou l'icône et le camp en mode `team`, ou « Vous
+    n'avez sondé personne cette nuit » après un minuteur ou un forçage. Annoncé par `role="status"`.
+    Aucun changement de protocole. 2 tests dans `test/player-screen.test.tsx`, avec axe
 - [ ] **GL3 — Égalités et « Épargner » expliqués** (G3)
   - Fichiers : `apps/web/src/game/VotePanel.tsx`, i18n, tests
   - Tests : égalité → « Le Maire tranche entre A et B » (ou « Second tour entre A et B ») chez tous ;

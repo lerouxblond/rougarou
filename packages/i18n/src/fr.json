@@ -352,7 +352,11 @@
     },
     "seer": {
       "title": "Voyante",
-      "prompt": "Choisissez le joueur dont vous voulez percer le secret."
+      "prompt": "Choisissez le joueur dont vous voulez percer le secret.",
+      "result_title": "Ce que vous avez vu",
+      "result_role": "{{name}} est {{role}}.",
+      "result_team": "{{name}} appartient au camp {{team}}.",
+      "no_probe": "Vous n’avez sondé personne cette nuit."
     },
     "witch": {
       "title": "Sorcière",

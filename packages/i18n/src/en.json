@@ -352,7 +352,11 @@
     },
     "seer": {
       "title": "Seer",
-      "prompt": "Pick the player whose secret you want to uncover."
+      "prompt": "Pick the player whose secret you want to uncover.",
+      "result_title": "What you saw",
+      "result_role": "{{name}} is {{role}}.",
+      "result_team": "{{name}} belongs to the {{team}} side.",
+      "no_probe": "You probed no one tonight."
     },
     "witch": {
       "title": "Witch",

@@ -23,7 +23,14 @@ const night: Screen = (view, _me, names) =>
     <UniformNight />
   ) : (
     <>
-      {view.night === null ? null : <NightPanel night={view.night} names={names} />}
+      {view.night === null ? null : (
+        <NightPanel
+          night={view.night}
+          names={names}
+          knowledge={view.me?.knowledge ?? []}
+          nightNumber={view.nightNumber}
+        />
+      )}
       <ActionPanel actions={view.actions} names={names} />
     </>
   );
