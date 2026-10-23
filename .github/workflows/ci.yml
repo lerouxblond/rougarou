@@ -19,6 +19,8 @@ jobs:
   quality:
     name: Lint, types et tests
     runs-on: ubuntu-latest
+    # Quelques minutes d'ordinaire : au-dela, le job est bloque, on le coupe.
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
 
@@ -57,6 +59,13 @@ jobs:
   e2e:
     name: Bout en bout
     runs-on: ubuntu-latest
+    # Deux minutes d'ordinaire. Un miroir Ubuntu lent a deja bloque l'installation
+    # des dependances systeme pendant plus de 45 minutes : on coupe a 20.
+    timeout-minutes: 20
+    env:
+      # Sur une PR, Chromium seul ; WebKit (mobile) tourne sur `main`. La plupart des
+      # paquets systeme a installer sont ceux de WebKit.
+      BROWSERS: ${{ github.event_name == 'pull_request' && 'chromium' || 'chromium webkit' }}
     steps:
       - uses: actions/checkout@v7
 
@@ -74,18 +83,19 @@ jobs:
         uses: actions/cache@v6
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          key: playwright-${{ runner.os }}-${{ env.BROWSERS }}-${{ hashFiles('pnpm-lock.yaml') }}
 
       - if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: pnpm exec playwright install --with-deps chromium webkit
+        run: pnpm exec playwright install --with-deps $BROWSERS
 
       - if: steps.playwright-cache.outputs.cache-hit == 'true'
-        run: pnpm exec playwright install-deps chromium webkit
+        run: pnpm exec playwright install-deps $BROWSERS
 
       # Playwright sert `apps/web/dist` a travers `wrangler dev`.
       - run: pnpm run build
 
-      - run: pnpm run test:e2e
+      - name: Tests de bout en bout
+        run: pnpm run test:e2e ${{ github.event_name == 'pull_request' && '--project=chromium' || '' }}
 
       - if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v7
