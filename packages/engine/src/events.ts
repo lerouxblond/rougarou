@@ -85,6 +85,14 @@ export type GameEvent =
   | { readonly type: 'EffectResolved' }
   // Le role d'un vivant devient public (tir du Chasseur, `R-45`).
   | { readonly type: 'RoleRevealed'; readonly playerId: PlayerId }
+  // Mode correction (`R-18`)
+  | { readonly type: 'PlayerRevived'; readonly playerId: PlayerId }
+  | {
+      readonly type: 'RoleCorrected';
+      readonly playerId: PlayerId;
+      readonly from: RoleId | null;
+      readonly to: RoleId;
+    }
   // Informations privees (ADR 0010)
   | { readonly type: 'KnowledgeGained'; readonly playerId: PlayerId; readonly knowledge: Knowledge }
   // Maire

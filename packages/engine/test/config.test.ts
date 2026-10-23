@@ -1,7 +1,13 @@
-import type { Composition } from '@rougarou/protocol';
+import { ROLE_WEIGHTS, type Composition, type RoleId } from '@rougarou/protocol';
 import { describe, expect, it } from 'vitest';
 
-import { compositionIssues, getMode } from '../src/index.ts';
+import {
+  compositionIssues,
+  findRole,
+  getMode,
+  projectView,
+  registeredRoles,
+} from '../src/index.ts';
 import { NARRATOR, newGame, player, setup, types } from './dsl.ts';
 
 const FIVE = ['Alice', 'Bob', 'Chloe', 'David', 'Eve'];
@@ -114,6 +120,45 @@ describe('Composition suggeree (docs/02)', () => {
 
     expect(composition.werewolf).toBe(wolves);
     expect(Object.values(composition).reduce((sum, n) => sum + n, 0)).toBe(count);
+  });
+  it.each(Array.from({ length: 20 }, (_, index) => index + 5))(
+    'a %i joueurs, la suggestion est une composition valide, sans role a venir (R-07)',
+    (count) => {
+      const names = Array.from({ length: count }, (_, index) => `p${index}`);
+      const suggestion = getMode('classic').suggestComposition(count);
+      const game = configured(names, suggestion);
+
+      expect(compositionIssues(game.state)).toEqual([]);
+      expect(Object.keys(suggestion).every((role) => findRole(role as RoleId))).toBe(true);
+    },
+  );
+
+  it('chaque role du moteur a un poids d equilibre (docs/02)', () => {
+    for (const role of registeredRoles()) {
+      expect(ROLE_WEIGHTS[role.id], role.id).toBeTypeOf('number');
+    }
+  });
+
+  it('le meneur voit la suggestion pour le nombre de joueurs, en CONFIG seulement', () => {
+    const game = configured(FIVE, {});
+    const view = projectView(game.state, { kind: 'narrator' });
+
+    expect(view.kind === 'narrator' && view.suggestion).toEqual(
+      getMode('classic').suggestComposition(5),
+    );
+
+    const dealt = setup({
+      roles: {
+        Alice: 'werewolf',
+        Bob: 'villager',
+        Chloe: 'villager',
+        David: 'villager',
+        Eve: 'villager',
+      },
+    });
+    const later = projectView(dealt.state, { kind: 'narrator' });
+
+    expect(later.kind === 'narrator' && later.suggestion).toBeNull();
   });
 });
 

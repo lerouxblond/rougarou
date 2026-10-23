@@ -85,6 +85,7 @@ const narratorView: NarratorView = {
   pending: [],
   winner: null,
   everyoneVoted: false,
+  suggestion: null,
   journal: [],
   actions: [],
 };

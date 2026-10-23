@@ -42,6 +42,7 @@
     "nothing_to_expire": "No timer is running.",
     "seats_not_permutation": "The new order must list each player exactly once.",
     "target_dead": "That player is dead.",
+    "target_alive": "That player is alive.",
     "undo_needs_record": "Undo goes through the game record.",
     "composition": {
       "count_mismatch": "There must be as many roles as players.",
@@ -316,7 +317,10 @@
     "cupid_first": "First lover",
     "cupid_second": "Second lover",
     "lovers_confirm": "I have met my lover",
-    "spy": "Spy on the pack"
+    "spy": "Spy on the pack",
+    "correct_kill": "Correct: kill",
+    "correct_revive": "Correct: revive",
+    "correct_role": "Correct: change role"
   },
   "teams": {
     "village": "Village",
@@ -331,7 +335,8 @@
     "couple": "You joined {{first}} and {{second}}.",
     "lover": "You love {{name}} ({{role}}). If one of you dies, the other follows out of grief.",
     "wolf_glimpse": "Night {{night}}: you caught a glimpse of the pack.",
-    "little_girl_suspects": "Night {{night}}: the Little Girl is watching you. She is one of these players: {{names}}."
+    "little_girl_suspects": "Night {{night}}: the Little Girl is watching you. She is one of these players: {{names}}.",
+    "role_changed": "The narrator corrected your role: you are now {{role}}."
   },
   "night": {
     "resolved": "Step over.",

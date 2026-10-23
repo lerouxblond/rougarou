@@ -262,6 +262,10 @@ function narratorView(state: GameState): NarratorView {
     pending: state.pending.map((effect) => ({ kind: effect.kind, from: effect.from })),
     winner: state.winner,
     everyoneVoted: everyoneVoted(state),
+    suggestion:
+      state.phase === 'CONFIG'
+        ? getMode(state.options.gameMode).suggestComposition(state.seats.length)
+        : null,
     journal: [...state.journal],
     actions: availableActions(state, { kind: 'narrator' }),
   };

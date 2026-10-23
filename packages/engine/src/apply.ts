@@ -1,11 +1,12 @@
 import type { Actor, Ballot, Command, CommandEnvelope } from '@rougarou/protocol';
 
 import { requireNarrator, requireSystem } from './auth.ts';
-import { designateSuccessor, hunterShoot } from './deaths.ts';
+import { designateSuccessor, hunterShoot, settlePendingEffects } from './deaths.ts';
 import type { GameEvent } from './events.ts';
 import { evolve } from './evolve.ts';
 import { advanceNight, narratorResolveWolfTie, submitNightAction } from './night/flow.ts';
 import { compositionIssues, deal, setComposition, setOptions } from './phases/config.ts';
+import { correctKill, correctRevive, correctRole } from './phases/correction.ts';
 import { advanceDawn } from './phases/dawn.ts';
 import {
   advanceExecution,
@@ -93,6 +94,12 @@ function dispatch(tx: Tx, actor: Actor, cmd: Command): EngineError | null {
       return designateSuccessor(tx, actor, cmd.playerId);
     case 'HunterShoot':
       return hunterShoot(tx, actor, cmd.playerId);
+    case 'CorrectKill':
+      return requireNarrator(actor) ?? correctKill(tx, cmd.playerId);
+    case 'CorrectRevive':
+      return requireNarrator(actor) ?? correctRevive(tx, cmd.playerId);
+    case 'CorrectRole':
+      return requireNarrator(actor) ?? correctRole(tx, cmd.playerId, cmd.role);
     case 'CastVote':
       return castVote(tx, actor, cmd.ballot);
     case 'BreakTie':
@@ -131,7 +138,7 @@ function advancePhase(tx: Tx, push: Push): EngineError | null {
     case 'MAYOR_ELECTION':
       return advanceElection(tx);
     case 'DAY_DEBATE':
-      return openVillageVote(tx);
+      return advanceDebate(tx, push);
     case 'DAY_VOTE':
       return advanceVillageVote(tx, push);
     case 'EXECUTION':
@@ -140,6 +147,20 @@ function advancePhase(tx: Tx, push: Push): EngineError | null {
       // CONFIG : on en sort par « Distribuer ». PRESENTATIONS : role play (M5).
       return engineError('WRONG_PHASE');
   }
+}
+
+/**
+ * « Ouvrir le vote ». Une correction du meneur peut avoir laisse des effets
+ * a la mort en attente (`R-18`) : ils passent d'abord, comme a l'aube.
+ */
+function advanceDebate(tx: Tx, push: Push): EngineError | null {
+  const blocked = settlePendingEffects(tx, push);
+
+  if (blocked !== null || push === 'timeout' || tx.state.phase === 'ENDED') {
+    return blocked;
+  }
+
+  return openVillageVote(tx);
 }
 
 /**

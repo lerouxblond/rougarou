@@ -36,6 +36,10 @@ export function journalFact(event: GameEvent): JournalFact | null {
       return { kind: 'mayorDesignated', from: event.from, to: event.to, drawn: event.drawn };
     case 'VoteClosed':
       return { kind: 'voteClosed', outcome: event.outcome };
+    case 'PlayerRevived':
+      return { kind: 'playerRevived', playerId: event.playerId };
+    case 'RoleCorrected':
+      return { kind: 'roleCorrected', playerId: event.playerId, from: event.from, to: event.to };
     case 'PhaseForced':
       return { kind: 'phaseForced', phase: event.phase };
     case 'TimerExpired':

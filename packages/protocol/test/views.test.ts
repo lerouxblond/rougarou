@@ -148,6 +148,7 @@ describe('Vue du meneur', () => {
       pending: [],
       winner: null,
       everyoneVoted: false,
+      suggestion: null,
       journal: [],
       actions: [],
     };

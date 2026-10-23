@@ -87,6 +87,8 @@ export const knowledgeSchema = z.discriminatedUnion('kind', [
     night: nightNumberSchema,
     masks: z.array(maskSchema),
   }),
+  /** Le meneur a corrige son role (`R-18`) : sa nouvelle carte. */
+  z.strictObject({ kind: z.literal('roleChanged'), role: roleIdSchema }),
   /** Loups : la Petite fille, reperee, est l'un de ces joueurs. */
   z.strictObject({
     kind: z.literal('littleGirlSuspects'),
@@ -162,6 +164,13 @@ export const actionDescriptorSchema = z.discriminatedUnion('type', [
     blocked: z.boolean(),
   }),
   z.strictObject({ type: z.literal('ResolveWolfTie'), targets: playerIdList }),
+  z.strictObject({ type: z.literal('CorrectKill'), targets: playerIdList }),
+  z.strictObject({ type: z.literal('CorrectRevive'), targets: playerIdList }),
+  z.strictObject({
+    type: z.literal('CorrectRole'),
+    targets: playerIdList,
+    roles: z.array(roleIdSchema),
+  }),
   z.strictObject({ type: z.literal('PauseTimer') }),
   z.strictObject({ type: z.literal('ResumeTimer') }),
   z.strictObject({ type: z.literal('ExtendTimer') }),
@@ -258,7 +267,14 @@ const playerVoteSchema = z.strictObject({
 });
 
 /** Cause d'une mort : connue du meneur seul (`docs/04` §Projection). */
-export const deathCauseSchema = z.enum(['wolves', 'witch', 'vote', 'hunter', 'grief']);
+export const deathCauseSchema = z.enum([
+  'wolves',
+  'witch',
+  'vote',
+  'hunter',
+  'grief',
+  'correction',
+]);
 
 export type DeathCause = z.infer<typeof deathCauseSchema>;
 
@@ -299,6 +315,13 @@ export const journalFactSchema = z.discriminatedUnion('kind', [
     drawn: z.boolean(),
   }),
   z.strictObject({ kind: z.literal('voteClosed'), outcome: voteOutcomeSchema }),
+  z.strictObject({ kind: z.literal('playerRevived'), playerId: playerIdSchema }),
+  z.strictObject({
+    kind: z.literal('roleCorrected'),
+    playerId: playerIdSchema,
+    from: roleIdSchema.nullable(),
+    to: roleIdSchema,
+  }),
   z.strictObject({ kind: z.literal('phaseForced'), phase: phaseSchema }),
   z.strictObject({ kind: z.literal('timerExpired'), phase: phaseSchema }),
   z.strictObject({ kind: z.literal('gameEnded'), winner: winnerSchema }),
@@ -403,6 +426,8 @@ export const narratorViewSchema = z.strictObject({
   winner: winnerSchema.nullable(),
   /** Tous les votants ont vote : le bouton de cloture le signale (`R-37`). */
   everyoneVoted: z.boolean(),
+  /** En `CONFIG` : la composition que le mode suggere pour ce nombre de joueurs (`docs/02`). */
+  suggestion: compositionSchema.nullable(),
   /** Le journal, en direct (`R-19`). */
   journal: z.array(journalEntrySchema),
   actions: z.array(actionDescriptorSchema),

@@ -42,6 +42,7 @@
     "nothing_to_expire": "Aucun minuteur n'est en cours.",
     "seats_not_permutation": "Le nouvel ordre doit reprendre chaque joueur une seule fois.",
     "target_dead": "Ce joueur est mort.",
+    "target_alive": "Ce joueur est vivant.",
     "undo_needs_record": "L'annulation passe par le journal de la partie.",
     "composition": {
       "count_mismatch": "Il faut autant de rôles que de joueurs.",
@@ -316,7 +317,10 @@
     "cupid_first": "Premier amoureux",
     "cupid_second": "Second amoureux",
     "lovers_confirm": "J'ai découvert mon amoureux",
-    "spy": "Espionner la meute"
+    "spy": "Espionner la meute",
+    "correct_kill": "Corriger : tuer",
+    "correct_revive": "Corriger : ressusciter",
+    "correct_role": "Corriger : changer le rôle"
   },
   "teams": {
     "village": "Village",
@@ -331,7 +335,8 @@
     "couple": "Vous avez uni {{first}} et {{second}}.",
     "lover": "Vous aimez {{name}} ({{role}}). Si l'un de vous meurt, l'autre le suit de chagrin.",
     "wolf_glimpse": "Nuit {{night}} : vous avez aperçu la meute.",
-    "little_girl_suspects": "Nuit {{night}} : la Petite fille vous observe. C'est l'une de ces personnes : {{names}}."
+    "little_girl_suspects": "Nuit {{night}} : la Petite fille vous observe. C'est l'une de ces personnes : {{names}}.",
+    "role_changed": "Le meneur a corrigé votre rôle : vous êtes maintenant {{role}}."
   },
   "night": {
     "resolved": "Étape terminée.",

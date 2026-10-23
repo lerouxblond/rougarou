@@ -192,7 +192,7 @@ Un **indicateur d'équilibre** s'affiche dans l'écran de configuration et suit 
 | Voyante | +7 | Petite fille | +3 |
 | Sorcière | +4 | | |
 
-Un total de −3 à +3 s'affiche « Équilibré », au-dessus « Avantage village », en dessous « Avantage loups », toujours avec un libellé et pas seulement une couleur. Chaque rôle ajouté plus tard déclare son poids. La suggestion et les poids sont des **données de configuration**, pas un résultat de jeu : ils vivent dans `packages/protocol/src/composition.ts`, à côté du schéma des options, pour que l'écran de configuration les affiche sans aller-retour avec le serveur (P29, M4).
+Un total de −3 à +3 s'affiche « Équilibré », au-dessus « Avantage village », en dessous « Avantage loups », toujours avec un libellé et pas seulement une couleur. Chaque rôle ajouté plus tard déclare son poids. Les poids sont des **données de configuration**, pas un résultat de jeu : ils vivent dans `packages/protocol/src/composition.ts`, à côté du schéma des options, pour que l'indicateur suive les + et − sans aller-retour avec le serveur. La suggestion, elle, vient du mode (`suggestComposition`, `docs/11`) : le moteur l'envoie au meneur pendant la configuration (`suggestion` dans sa vue) (P29, M4).
 
 ## Cas limites (tous doivent avoir un test)
 
