@@ -523,26 +523,35 @@ Trois PR : **A** (T1–T2, règles et points d'accroche), **B** (T3–T7, les r�
   - Fichiers : `e2e/fixtures/table.ts` (N joueurs, composition imposée), `e2e/m3-classic-roles.spec.ts`
   - Tests attendus : 1 meneur + 8 joueurs (2 loups, Voyante, Sorcière, Chasseur, Cupidon, Petite fille, Villageois) ; chaque rôle agit au moins une fois ; contrôle de non-fuite de rôle à chaque tour ; la partie va jusqu'à une victoire
 
-- [ ] **T11 — Déploiement, vérification et rapport** (vérification locale faite ; reste le déploiement)
-  - Fichiers : `docs/progress.md`
+- [x] **T11 — Déploiement, vérification et rapport**
+  - Fichiers : `docs/progress.md`, `e2e/fixtures/table.ts`, `e2e/m2-reconnect.spec.ts`
   - Tests attendus : `pnpm check` au vert, e2e M3 contre la production, définition de « terminé » vérifiée point par point
+  - Fait le 2026-10-23 : PR #11 à #13 mergées en squash dans `main`, l'une après l'autre (#12 rebasée sur `main`, `main` fusionnée dans #13, arbres vérifiés identiques aux branches relues). Production déployée au commit `04ce19c`
+  - **Écart** : contre la production, la suite e2e Chromium échouait environ une fois sur deux, sur trois specs (M2 comprises). Aucune erreur serveur : le pilote de table relisait des vues périmées (double clic du meneur, attente d'un bouton retiré par la fin de partie, forçage avant que la vue d'un joueur n'arrive, ce qui laissait les amoureux non confirmés) et attendait 5 s une reconnexion qui en prend parfois plus. Corrigé dans la PR #15 ; ensuite, 6 passages de suite sans échec
 
-### Vérification de la définition de « terminé » (locale, 2026-10-22)
+### Vérification de la définition de « terminé » (2026-10-23)
 
 | Point | État | Preuve |
 |---|---|---|
 | Chaque rôle a ses tests | ✅ | `test/roles/{seer,witch,hunter,cupid,little-girl}.test.ts` ; file d'effets dans `test/deaths.test.ts` |
-| Chaque rôle a son test de non-fuite | ✅ | `test/leaks/{seer,witch,hunter,lovers,little-girl}.test.ts` ; le test générique joue désormais tous les rôles classiques, avec un oracle de nuit uniforme par étape |
+| Chaque rôle a son test de non-fuite | ✅ | `test/leaks/{seer,witch,hunter,lovers,little-girl}.test.ts` ; le test générique joue tous les rôles classiques, avec un oracle de nuit uniforme par étape |
 | Chaque rôle a ses textes i18n | ✅ | `roles.<id>.{name,description,short,rules}` et `narrator.*` en fr et en en, vérifiés par `test/i18n-keys.test.ts` |
-| Partie e2e à 8 joueurs avec tous les rôles classiques | ✅ en local | `e2e/m3-classic-roles.spec.ts` : 1 meneur + 8 joueurs, chaque rôle agit, non-fuite à chaque tour, victoire du village. Toute la suite e2e passe (20 tests) |
-| Cas limites 1 et 3 | ✅ | `test/roles/cupid.test.ts` ; cas 2 et 9 reportés en M6 (P25) |
+| **Partie e2e à 8 joueurs avec tous les rôles classiques** | ✅ | `e2e/m3-classic-roles.spec.ts` **en production** (`E2E_BASE_URL=https://rougarou.neyteck-pro.workers.dev`) : 1 meneur + 8 joueurs dans neuf navigateurs, chaque rôle agit au moins une fois, non-fuite contrôlée à chaque tour, victoire du village. Les 12 tests Chromium passent 6 fois de suite (28 s à 1 min) |
+| Ordre de nuit calculé, actions immédiates, informations privées | ✅ | étapes déclarées par rôle (T2), Voyante immédiate (`R-21`), `me.knowledge` (ADR 0010) |
+| Cas limites 1, 2, 3, 9 | ✅ 1 et 3 | `test/roles/cupid.test.ts` ; 2 et 9 reportés en M6 avec leurs rôles (P25, `docs/10` mis à jour) |
+| Cartes de rôle en SVG de repli | ✅ | `packages/ui/src/{RoleCardArt,RoleIcon}.tsx`, 7 icônes originales, crédits |
 | 1 000 parties aléatoires avec tous les rôles | ✅ | `test/properties/random-games.test.ts`, chaque rôle y agit au moins une fois |
-| Couverture du moteur ≥ 90 % | ✅ | lignes 96,6 %, branches 92,9 % |
-| `pnpm check` | ✅ | lint, typecheck, tests |
-| e2e M3 contre la production | ⏳ | Demande le push des branches, les PR et la fusion sur `master` |
+| Couverture du moteur ≥ 90 % | ✅ | lignes 96,6 %, branches 92,9 % (mesure du 2026-10-22, code inchangé depuis) |
+| `pnpm check` | ✅ | 301 tests dans le moteur, 100 dans le protocole, 56 dans le serveur, 63 dans le web, 68 dans `ui`, 11 dans `config`, 6 dans `i18n` |
 
-Précisions prises en codant (cohérentes avec P17 à P25, à relire) :
+Précisions prises en codant, **validées le 2026-10-23** (cohérentes avec P17 à P25) :
 - `R-46` : à la fin d'un minuteur, seul l'effet en tête de file prend sa valeur par défaut, puis le suivant lance son propre minuteur ; un forçage résout toute la file.
 - Un tir de Chasseur sans aucun vivant à viser est sauté.
-- La Petite fille compte comme « lettres » tous les caractères hors espaces (un trait d'union compte). L'exemple de P21 (« A _ _ x _ _ e », 3 lettres sur 7) contredisait la règle ⌊7 / 3⌋ = 2 : l'exemple de `docs/02` montre maintenant 2 lettres.
+- La Petite fille compte comme « lettres » tous les caractères hors espaces (un trait d'union compte). L'exemple de P21 (« A _ _ x _ _ e », 3 lettres sur 7) contredisait la règle ⌊7 / 3⌋ = 2 : l'exemple de `docs/02` montre 2 lettres.
 - Quand Cupidon se choisit lui-même, il reçoit aussi l'info `lover` de son partenaire.
+
+**M3 est terminé.**
+
+**Points ouverts** : (1) en production, une reconnexion prend 0,9 à 2 s, avec de rares pics à 7,6 s qui correspondent à des premiers essais ratés puis repris (0,5 + 1 + 2 + 4 s) : la cause de ces échecs reste à examiner (US-90 tient, la vue revient) ; (2) les points ouverts de M2 tiennent toujours (e-mails sans domaine, CPU de scrypt).
+
+---
