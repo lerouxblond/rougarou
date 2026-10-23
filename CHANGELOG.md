@@ -1,5 +1,29 @@
 # Changelog
 
+## [0.4.0](https://github.com/lerouxblond/rougarou/compare/v0.3.0...v0.4.0) (2026-10-23)
+
+
+### Fonctionnalites
+
+* **engine:** add correction mode and composition balance ([#19](https://github.com/lerouxblond/rougarou/issues/19)) ([15d745c](https://github.com/lerouxblond/rougarou/commit/15d745c073538e29aef39d8fdb227ed985eb9939))
+* **engine:** add the ceremony deal and the game journal ([#18](https://github.com/lerouxblond/rougarou/issues/18)) ([2e8a5b4](https://github.com/lerouxblond/rougarou/commit/2e8a5b45bef6e80cde31559a37ada594343b587f))
+* **ui:** add Radix switch, tabs, dialog, sheet and toast ([#21](https://github.com/lerouxblond/rougarou/issues/21)) ([e19bb26](https://github.com/lerouxblond/rougarou/commit/e19bb264e2c59fcf96beb65a66f04931c284f6a5))
+* **ui:** add role card, player chip, circle and target picker ([#22](https://github.com/lerouxblond/rougarou/issues/22)) ([c1a4da6](https://github.com/lerouxblond/rougarou/commit/c1a4da68362de16fdca63094d045743cf6411f3a))
+* **ui:** add self-hosted fonts and the simple foundations ([#20](https://github.com/lerouxblond/rougarou/issues/20)) ([139e243](https://github.com/lerouxblond/rougarou/commit/139e2430693bc93fc78c5474bc8d84fc3a461b41))
+* **ui:** add timer, banner, script, steps, votes and balance ([#23](https://github.com/lerouxblond/rougarou/issues/23)) ([e9178fa](https://github.com/lerouxblond/rougarou/commit/e9178fa4c393ad7d21ffd0030e1dd75192710f52))
+* **web:** add the end screen with a night-by-night timeline ([#30](https://github.com/lerouxblond/rougarou/issues/30)) ([6989a95](https://github.com/lerouxblond/rougarou/commit/6989a952366d0a91fe99b415339b475bc479ac74))
+* **web:** compose the game with a suggestion, balance and options ([#28](https://github.com/lerouxblond/rougarou/issues/28)) ([1afb0e5](https://github.com/lerouxblond/rougarou/commit/1afb0e58920e6fb0587029b9901c38f03b2d1924))
+* **web:** follow the phase with the theme, vibrations and sounds ([#31](https://github.com/lerouxblond/rougarou/issues/31)) ([4c8b93a](https://github.com/lerouxblond/rougarou/commit/4c8b93a0e1ce443011b5fdd31bb92cd475bee760))
+* **web:** give the narrator a dashboard with the text to read ([#26](https://github.com/lerouxblond/rougarou/issues/26)) ([5180e7e](https://github.com/lerouxblond/rougarou/commit/5180e7e650434a131d9556db9a30f2456b15667d))
+* **web:** lay out the player screen with a uniform night ([#24](https://github.com/lerouxblond/rougarou/issues/24)) ([181754a](https://github.com/lerouxblond/rougarou/commit/181754af443b94f2f8cfb057fd8432c3186222d2))
+* **web:** play actions and votes through the design system ([#25](https://github.com/lerouxblond/rougarou/issues/25)) ([4fecc44](https://github.com/lerouxblond/rougarou/commit/4fecc441a056fc4ddd6af67f7b2f83417f3c8303))
+* **web:** show night intents, the journal and correction mode ([#27](https://github.com/lerouxblond/rougarou/issues/27)) ([6c20e60](https://github.com/lerouxblond/rougarou/commit/6c20e602b7e3c5c971f12f01e876a62ce4dc2673))
+
+
+### Documentation
+
+* plan milestone M4 and specify ceremony, correction and journal ([#17](https://github.com/lerouxblond/rougarou/issues/17)) ([2ed139a](https://github.com/lerouxblond/rougarou/commit/2ed139afa327f9b4af572a26ade700ad4bb9b2c8))
+
 ## [0.3.0](https://github.com/lerouxblond/rougarou/compare/v0.2.0...v0.3.0) (2026-10-23)
 
 
