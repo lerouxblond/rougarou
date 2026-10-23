@@ -23,6 +23,26 @@ export type Actor = z.infer<typeof actorSchema>;
 export const nightActionSchema = z.discriminatedUnion('kind', [
   /** Vote d'un loup pour la victime de la nuit (`R-34`). */
   z.strictObject({ kind: z.literal('wolfVote'), target: playerIdSchema }),
+  /** La Voyante sonde un joueur (`docs/02`). */
+  z.strictObject({ kind: z.literal('seerProbe'), target: playerIdSchema }),
+  /**
+   * La Sorciere repond en une fois (`docs/02`) : potion de vie sur la victime
+   * des loups, potion de mort sur `kill`. Ne rien faire : `false` et `null`.
+   */
+  z.strictObject({
+    kind: z.literal('witchPotions'),
+    save: z.boolean(),
+    kill: playerIdSchema.nullable(),
+  }),
+  /** Cupidon designe deux amoureux distincts, lui compris (`docs/02`). */
+  z.strictObject({
+    kind: z.literal('cupidLink'),
+    lovers: z.tuple([playerIdSchema, playerIdSchema]),
+  }),
+  /** Un amoureux confirme avoir decouvert l'autre. */
+  z.strictObject({ kind: z.literal('loversConfirm') }),
+  /** La Petite fille espionne la meute (`docs/02`) : elle prend le risque d'etre reperee. */
+  z.strictObject({ kind: z.literal('spy') }),
 ]);
 
 export type NightAction = z.infer<typeof nightActionSchema>;

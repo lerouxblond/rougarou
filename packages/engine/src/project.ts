@@ -207,6 +207,11 @@ function narratorView(state: GameState): NarratorView {
             wolfVotes: { ...night.wolfVotes },
             wolfTie: night.wolfTie === null ? null : [...night.wolfTie],
             wolfVictim: night.wolfVictim,
+            witch: night.witch === null ? null : { ...night.witch },
+            spy:
+              night.spy === null
+                ? null
+                : { playerId: night.spy.playerId, caught: night.spy.caught },
           },
     dawn:
       dawn === null
@@ -235,6 +240,10 @@ function narratorView(state: GameState): NarratorView {
             tally: vote.result?.tally ?? null,
             outcome: vote.result?.outcome ?? null,
           },
+    lovers: state.lovers === null ? null : [state.lovers[0], state.lovers[1]],
+    potions: Object.fromEntries(
+      Object.entries(state.potions).map(([id, potions]) => [id, { ...potions }]),
+    ),
     pending: state.pending.map((effect) => ({ kind: effect.kind, from: effect.from })),
     winner: state.winner,
     everyoneVoted: everyoneVoted(state),

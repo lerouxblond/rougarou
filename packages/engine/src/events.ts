@@ -9,7 +9,7 @@ import type {
   VoteOutcome,
 } from '@rougarou/protocol';
 
-import type { Death, NightStepId, PendingEffect, Winner } from './state.ts';
+import type { Couple, Death, GlimpsedWolf, NightStepId, PendingEffect, Winner } from './state.ts';
 
 /**
  * Les evenements : des faits, au participe passe (`docs/09`).
@@ -53,6 +53,22 @@ export type GameEvent =
   | { readonly type: 'WolvesResolved'; readonly victim: PlayerId | null }
   // Une etape de nuit autre que celle des loups est terminee.
   | { readonly type: 'NightStepResolved' }
+  | { readonly type: 'LoversLinked'; readonly cupid: PlayerId; readonly lovers: Couple }
+  | { readonly type: 'LoverConfirmed'; readonly playerId: PlayerId }
+  | {
+      readonly type: 'LittleGirlSpied';
+      readonly playerId: PlayerId;
+      // Tirages inscrits pour le rejeu : ordre et lettres de chaque loup, detection, suspects.
+      readonly pack: readonly GlimpsedWolf[];
+      readonly caught: boolean;
+      readonly suspects: readonly PlayerId[];
+    }
+  | {
+      readonly type: 'WitchActed';
+      readonly witch: PlayerId;
+      readonly save: boolean;
+      readonly kill: PlayerId | null;
+    }
   | { readonly type: 'NightEnded'; readonly deaths: readonly Death[] }
   // Morts
   | { readonly type: 'DeathsAnnounced' }
@@ -121,6 +137,7 @@ export const REVEALING_EVENTS: ReadonlySet<GameEventType> = new Set<GameEventTyp
   'RoleRevealed',
   'KnowledgeGained',
   'HunterShot',
+  'LittleGirlSpied',
   'ElectionVoteClosed',
   'MayorElected',
   'VoteClosed',

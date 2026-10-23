@@ -74,6 +74,8 @@ const narratorView: NarratorView = {
   deadline: null,
   pausedRemaining: null,
   night: null,
+  lovers: null,
+  potions: {},
   dawn: null,
   election: null,
   vote: null,

@@ -7,7 +7,7 @@ import { engineError, type Tx } from '../tx.ts';
 import type { RoleDefinition } from './types.ts';
 
 /** Les loups vivants : ceux dont le role est du camp des loups. */
-function livingWolves(state: GameState): PlayerId[] {
+export function livingWolves(state: GameState): PlayerId[] {
   return alivePlayers(state)
     .filter((player) => player.role !== null && WOLF_ROLES.has(player.role))
     .map((player) => player.id);
@@ -79,6 +79,10 @@ const wolvesStep: NightStepSpec = {
 
     if (night === null) {
       throw new Error('Vote des loups hors de la nuit.');
+    }
+
+    if (action.kind !== 'wolfVote') {
+      return engineError('INVALID_COMMAND', 'errors.night.wrong_action');
     }
 
     if (!livingWolves(tx.state).includes(actor)) {

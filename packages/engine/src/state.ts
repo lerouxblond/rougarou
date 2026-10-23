@@ -38,6 +38,12 @@ export interface GameState {
   readonly dawn: DawnState | null;
   readonly election: ElectionState | null;
   readonly vote: VoteState | null;
+  /** Nombre de nuits ou chaque Petite fille a espionne (`docs/02`, risque croissant). */
+  readonly spyNights: Readonly<Record<PlayerId, number>>;
+  /** Le couple forme par Cupidon (`docs/02`, `R-03`). */
+  readonly lovers: Couple | null;
+  /** Potions restantes de chaque Sorciere (`docs/02`). Absente : les deux. */
+  readonly potions: Readonly<Record<PlayerId, Potions>>;
   /** Effets a la mort en attente, dans l'ordre de `R-42`. */
   readonly pending: readonly PendingEffect[];
   /**
@@ -84,6 +90,41 @@ export interface NightState {
   readonly wolfTie: readonly PlayerId[] | null;
   /** Victime choisie par les loups : une intention, resolue a l'aube (`R-21`). */
   readonly wolfVictim: PlayerId | null;
+  /** Le choix de la Sorciere cette nuit, resolu a l'aube (`R-40`). */
+  readonly witch: WitchChoice | null;
+  /** Les amoureux qui ont confirme leur decouverte, la nuit 1. */
+  readonly loversConfirmed: readonly PlayerId[];
+  /** La Petite fille a espionne cette nuit : ce qu'elle a vu de la meute. */
+  readonly spy: SpyGlimpse | null;
+}
+
+/** Un loup tel que la Petite fille le voit : les positions devoilees de son pseudo. */
+export interface GlimpsedWolf {
+  readonly wolf: PlayerId;
+  readonly revealed: readonly number[];
+}
+
+/** Ce que la Petite fille a vu en espionnant, et si elle a ete reperee. */
+export interface SpyGlimpse {
+  readonly playerId: PlayerId;
+  /** Les loups, dans l'ordre tire au hasard. */
+  readonly pack: readonly GlimpsedWolf[];
+  readonly caught: boolean;
+}
+
+/** Deux amoureux. */
+export type Couple = readonly [PlayerId, PlayerId];
+
+/** Les potions d'une Sorciere : `true` tant qu'elle ne l'a pas bue. */
+export interface Potions {
+  readonly life: boolean;
+  readonly death: boolean;
+}
+
+/** Une Sorciere sauve la victime des loups (`save`) et/ou empoisonne `kill`. */
+export interface WitchChoice {
+  readonly save: boolean;
+  readonly kill: PlayerId | null;
 }
 
 /** Cause d'une mort, connue du seul meneur (`docs/04` §Projection). */
@@ -161,6 +202,9 @@ export function emptyState(): GameState {
     dawn: null,
     election: null,
     vote: null,
+    spyNights: {},
+    lovers: null,
+    potions: {},
     pending: [],
     deadline: null,
     pausedRemaining: null,
@@ -201,4 +245,11 @@ export function updatePlayer(
 /** Retire une cle d'un dictionnaire sans le muter. */
 export function omitKey<T>(record: Readonly<Record<string, T>>, key: string): Record<string, T> {
   return Object.fromEntries(Object.entries(record).filter(([entry]) => entry !== key));
+}
+
+/** Les vivants qui portent ce role, dans l'ordre des places. */
+export function livingWithRole(state: GameState, role: RoleId): PlayerId[] {
+  return alivePlayers(state)
+    .filter((player) => player.role === role)
+    .map((player) => player.id);
 }

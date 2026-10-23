@@ -70,15 +70,15 @@ describe('Purete du moteur (CLAUDE.md regle 3, ADR 0007)', () => {
 });
 
 describe('Registre des roles', () => {
-  it('contient les loups et les villageois de M1', () => {
+  it('contient les roles implementes, et seulement eux', () => {
     expect(
       registeredRoles()
         .map((role) => role.id)
         .sort(),
-    ).toEqual(['villager', 'werewolf']);
+    ).toEqual(['cupid', 'hunter', 'little-girl', 'seer', 'villager', 'werewolf', 'witch']);
     expect(findRole('werewolf')?.team).toBe('wolves');
     expect(findRole('villager')?.team).toBe('village');
-    expect(findRole('seer')).toBeUndefined();
+    expect(findRole('guardian')).toBeUndefined();
   });
 });
 

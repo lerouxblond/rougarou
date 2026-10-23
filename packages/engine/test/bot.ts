@@ -8,7 +8,7 @@ import type {
 } from '@rougarou/protocol';
 
 import { availableActions, createRng, type Rng, type Viewer } from '../src/index.ts';
-import { NARRATOR, player, setup, SYSTEM, type GameDriver } from './dsl.ts';
+import { NARRATOR, player, setup, SYSTEM, type GameDriver, type NightActionInput } from './dsl.ts';
 
 /** Un coup joue par le robot. */
 export interface Move {
@@ -27,6 +27,46 @@ function mostCommon(values: readonly string[]): string | undefined {
   return [...counts.entries()].sort((left, right) => right[1] - left[1])[0]?.[0];
 }
 
+/** Une action de nuit : chaque role joue un peu au hasard, avec quelques reflexes. */
+function nightAction(
+  game: GameDriver,
+  rng: Rng,
+  descriptor: Extract<ActionDescriptor, { type: 'SubmitNightAction' }>,
+): NightActionInput {
+  switch (descriptor.kind) {
+    case 'wolfVote': {
+      const pack = mostCommon(Object.values(game.state.night?.wolfVotes ?? {}));
+      const target = pack !== undefined && rng.next() < 0.8 ? pack : rng.pick(descriptor.targets);
+
+      return { kind: 'wolfVote', target };
+    }
+    case 'seerProbe':
+      return { kind: 'seerProbe', target: rng.pick(descriptor.targets) };
+    case 'witchPotions': {
+      const save = descriptor.canSave && rng.next() < 0.4;
+      const kill =
+        descriptor.killTargets.length > 0 && rng.next() < 0.2
+          ? rng.pick(descriptor.killTargets)
+          : null;
+
+      return { kind: 'witchPotions', save, kill };
+    }
+    case 'cupidLink': {
+      const [first, second] = rng.shuffle(descriptor.targets);
+
+      if (first === undefined || second === undefined) {
+        throw new Error('Cupidon sans deux cibles.');
+      }
+
+      return { kind: 'cupidLink', lovers: [first, second] };
+    }
+    case 'loversConfirm':
+      return { kind: 'loversConfirm' };
+    case 'spy':
+      return { kind: 'spy' };
+  }
+}
+
 /**
  * Traduit une action proposee en commande, avec un peu de strategie pour que
  * les parties avancent : les loups suivent souvent la meute, et les
@@ -41,12 +81,8 @@ function toCommand(game: GameDriver, rng: Rng, descriptor: ActionDescriptor): Co
     case 'ResumeTimer':
     case 'ExtendTimer':
       return { type: descriptor.type };
-    case 'SubmitNightAction': {
-      const pack = mostCommon(Object.values(game.state.night?.wolfVotes ?? {}));
-      const target = pack !== undefined && rng.next() < 0.8 ? pack : rng.pick(descriptor.targets);
-
-      return { type: 'SubmitNightAction', action: { kind: 'wolfVote', target } };
-    }
+    case 'SubmitNightAction':
+      return { type: 'SubmitNightAction', action: nightAction(game, rng, descriptor) };
     case 'CastVote': {
       const ballots = Object.values(game.state.vote?.ballots ?? {}).flatMap((ballot) =>
         ballot.kind === 'player' ? [ballot.playerId] : [],
@@ -168,5 +204,35 @@ export function randomRoles(count: number, wolves: number, seed: number): Record
 
   return Object.fromEntries(
     shuffled.map((role, index) => [`p${String(index).padStart(2, '0')}`, role]),
+  );
+}
+
+/** Les roles speciaux du village de M3 (`docs/02`, palier `core`). */
+const CLASSIC_SPECIALS: readonly RoleId[] = ['seer', 'witch', 'hunter', 'cupid', 'little-girl'];
+
+/**
+ * Une distribution avec les roles classiques : `wolves` loups, puis chaque
+ * role special tire au hasard (une chance sur trois d'etre absent), le reste
+ * en villageois. Il reste toujours au moins un villageois.
+ */
+export function randomClassicRoles(
+  count: number,
+  wolves: number,
+  seed: number,
+): Record<PlayerId, RoleId> {
+  const rng = createRng(seed * 31 + 7);
+  const room = count - wolves - 1;
+  const specials = rng
+    .shuffle(CLASSIC_SPECIALS)
+    .filter(() => rng.next() < 2 / 3)
+    .slice(0, Math.max(0, room));
+  const deck: RoleId[] = [
+    ...Array.from({ length: wolves }, () => 'werewolf' as const),
+    ...specials,
+    ...Array.from({ length: count - wolves - specials.length }, () => 'villager' as const),
+  ];
+
+  return Object.fromEntries(
+    rng.shuffle(deck).map((role, index) => [`p${String(index).padStart(2, '0')}`, role]),
   );
 }

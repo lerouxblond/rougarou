@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <!-- Coeur traverse d'une fleche, empennage en bas a gauche -->
+  <path d="M12 19s-6.5-3.9-6.5-8.6A3.4 3.4 0 0 1 12 8.6a3.4 3.4 0 0 1 6.5 1.8C18.5 15.1 12 19 12 19z"/>
+  <path d="M3 21 21 3"/>
+  <path d="M17 3h4v4"/>
+  <path d="M3 17v4h4"/>
+</svg>

@@ -489,23 +489,23 @@ Trois PR : **A** (T1–T2, règles et points d'accroche), **B** (T3–T7, les r�
   - Contenu : aucun changement de comportement pour les loups et les villageois ; la file d'effets accepte plusieurs genres d'effets (P24)
   - Tests attendus : les 202 tests existants passent ; ordre de la file `R-42` ; couverture ≥ 90 %
 
-- [ ] **T3 — Voyante** *(PR B)*
+- [x] **T3 — Voyante** *(PR B)*
   - Fichiers : `src/roles/seer.ts`, `test/roles/seer.test.ts`, `test/leaks/seer.test.ts`, i18n (`roles.seer.{name,short,rules,narrator.wake,narrator.sleep}`), `packages/ui/icons/icon-role-seer.svg`, `apps/web/public/assets/CREDITS.md`
   - Tests attendus : P18 (cible valide, soi-même et mort refusés, une seule fois, `seerMode` rôle et camp, minuteur → rien, camp effectif via `teamOf`) ; non-fuite : le résultat n'est visible que d'elle et du meneur, et la vue des autres reste identique toute la nuit
 
-- [ ] **T4 — Sorcière** *(PR B)*
+- [x] **T4 — Sorcière** *(PR B)*
   - Fichiers : `src/roles/witch.ts`, `test/roles/witch.test.ts`, `test/leaks/witch.test.ts`, i18n, icône, crédits
   - Tests attendus : P19 (vie sans victime refusée, potion épuisée refusée, deux potions la même nuit, `witchSelfSave` × 3, potion de vie consommée, potion de mort tue à l'aube, réveil sans potion) ; non-fuite : la victime n'est vue que d'elle (et des loups), la cause `witch` jamais par un joueur
 
-- [ ] **T5 — Chasseur** *(PR B)*
+- [x] **T5 — Chasseur** *(PR B)*
   - Fichiers : `src/roles/hunter.ts`, `test/roles/hunter.test.ts`, `test/leaks/hunter.test.ts`, i18n, icône, crédits
   - Tests attendus : P20 (tir à l'aube après une mort de nuit, tir après exécution, minuteur et forçage → pas de tir, Chasseur Maire : tir puis succession, tir sur le dernier loup → victoire du village, révélation avec `revealRoleOnDeath: false`)
 
-- [ ] **T6 — Cupidon, amoureux, `R-03`** *(PR B)*
+- [x] **T6 — Cupidon, amoureux, `R-03`** *(PR B)*
   - Fichiers : `src/roles/cupid.ts`, `src/lovers.ts`, `src/modes/classic.ts` (condition `lovers`), `test/roles/cupid.test.ts`, `test/leaks/lovers.test.ts`, i18n, icône, crédits
   - Tests attendus : P22, P23, P24, **cas limite 1** (couple loup + villageois, victoire `lovers` à deux survivants, priorité `R-06`), **cas limite 3** (le Chasseur meurt de chagrin et tire), chagrin en chaîne avec la succession du Maire ; non-fuite : seuls les amoureux (et le meneur) connaissent le couple, et Cupidon ne voit pas leurs rôles
 
-- [ ] **T7 — Petite fille** *(PR B)*
+- [x] **T7 — Petite fille** *(PR B)*
   - Fichiers : `src/roles/little-girl.ts`, `test/roles/little-girl.test.ts`, `test/leaks/little-girl.test.ts`, i18n, icône, crédits ; `test/bot.ts` et `test/properties/random-games.test.ts` (les bots jouent tous les rôles classiques)
   - Tests attendus : P21. Sans espionnage, elle ne voit rien. Masque des pseudos : longueur conservée, espaces visibles, ⌊lettres / 3⌋ lettres dévoilées (au moins 1 à partir de 3 lettres, aucune en dessous). Positions et ordre des loups retirés d'une nuit à l'autre, mais identiques au rejeu. Risque : avec base et hausse à 0, jamais repérée ; avec les défauts, 10 %, 20 %, 30 % sur les nuits espionnées successives, les nuits sans espionnage ne comptent pas, et le plafond est de 75 % ; avec des graines connues, repérée puis non repérée. Liste des suspects : 3 noms, elle comprise, aucun loup, moins s'il manque des non-loups vivants ; elle reste dans les infos des loups les nuits suivantes ; une deuxième détection ajoute une nouvelle liste, tirée à part. Elle ne bloque jamais l'étape. Non-fuite : jamais un identifiant de loup ni un pseudo complet dans sa vue (sauf si le rôle est déjà révélé), et seuls les loups voient la liste des suspects. 1 000 parties aléatoires avec tous les rôles classiques sans violer d'invariant. Couverture ≥ 90 %
 

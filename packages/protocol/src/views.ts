@@ -107,6 +107,26 @@ const nightActionDescriptorSchema = z.discriminatedUnion('kind', [
     kind: z.literal('wolfVote'),
     targets: playerIdList,
   }),
+  z.strictObject({
+    type: z.literal('SubmitNightAction'),
+    kind: z.literal('seerProbe'),
+    targets: playerIdList,
+  }),
+  z.strictObject({
+    type: z.literal('SubmitNightAction'),
+    kind: z.literal('witchPotions'),
+    /** La potion de vie peut sauver la victime des loups. */
+    canSave: z.boolean(),
+    /** Cibles de la potion de mort, vide si elle est bue. */
+    killTargets: playerIdList,
+  }),
+  z.strictObject({
+    type: z.literal('SubmitNightAction'),
+    kind: z.literal('cupidLink'),
+    targets: playerIdList,
+  }),
+  z.strictObject({ type: z.literal('SubmitNightAction'), kind: z.literal('loversConfirm') }),
+  z.strictObject({ type: z.literal('SubmitNightAction'), kind: z.literal('spy') }),
 ]);
 
 /**
@@ -170,6 +190,9 @@ const selfSchema = z.strictObject({
   knowledge: z.array(knowledgeSchema),
 });
 
+/** Les potions qui restent a une Sorciere. */
+const potionsSchema = z.strictObject({ life: z.boolean(), death: z.boolean() });
+
 /**
  * L'etape de nuit, vue seulement par ceux qui y agissent ou la regardent.
  * Chaque etape a sa forme.
@@ -180,6 +203,36 @@ const playerNightSchema = z.discriminatedUnion('step', [
     resolved: z.boolean(),
     /** Votes de la meute, visibles des seuls loups (`docs/12` #7). */
     wolfVotes: z.record(playerIdSchema, playerIdSchema),
+  }),
+  /** La Voyante : son resultat entre dans ses infos. */
+  z.strictObject({ step: z.literal('seer'), resolved: z.boolean() }),
+  /** La Sorciere : la victime des loups (ou personne) et ses potions restantes. */
+  z.strictObject({
+    step: z.literal('witch'),
+    resolved: z.boolean(),
+    victim: playerIdSchema.nullable(),
+    potions: potionsSchema,
+  }),
+  /** Cupidon : le couple entre dans ses infos. */
+  z.strictObject({ step: z.literal('cupid'), resolved: z.boolean() }),
+  /** Un amoureux decouvre l'autre et confirme. */
+  z.strictObject({
+    step: z.literal('lovers'),
+    resolved: z.boolean(),
+    partner: playerIdSchema,
+    confirmed: z.boolean(),
+  }),
+  /**
+   * La Petite fille regarde l'etape des loups. Tant qu'elle n'espionne pas,
+   * elle ne voit rien (`pack: null`) ; ensuite, chaque loup sous un pseudo
+   * partiel, dans un ordre tire au hasard, et sa cible en direct.
+   */
+  z.strictObject({
+    step: z.literal('spy'),
+    resolved: z.boolean(),
+    pack: z
+      .array(z.strictObject({ mask: maskSchema, target: playerIdSchema.nullable() }))
+      .nullable(),
   }),
 ]);
 
@@ -252,6 +305,10 @@ const narratorNightSchema = z.strictObject({
   wolfVotes: z.record(playerIdSchema, playerIdSchema),
   wolfTie: playerIdList.nullable(),
   wolfVictim: playerIdSchema.nullable(),
+  /** Le choix de la Sorciere cette nuit, une fois fait. */
+  witch: z.strictObject({ save: z.boolean(), kill: playerIdSchema.nullable() }).nullable(),
+  /** La Petite fille a espionne cette nuit, et a-t-elle ete reperee. */
+  spy: z.strictObject({ playerId: playerIdSchema, caught: z.boolean() }).nullable(),
 });
 
 const deathSchema = z.strictObject({
@@ -270,6 +327,10 @@ export const narratorViewSchema = z.strictObject({
   deadline: z.int().nullable(),
   pausedRemaining: z.int().min(0).nullable(),
   night: narratorNightSchema.nullable(),
+  /** Le couple forme par Cupidon (`R-03`). */
+  lovers: z.tuple([playerIdSchema, playerIdSchema]).nullable(),
+  /** Potions restantes de chaque Sorciere. */
+  potions: z.record(playerIdSchema, potionsSchema),
   dawn: z.strictObject({ deaths: z.array(deathSchema), announced: z.boolean() }).nullable(),
   election: playerElectionSchema.nullable(),
   vote: playerVoteSchema.nullable(),

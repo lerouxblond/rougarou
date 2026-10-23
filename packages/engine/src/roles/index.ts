@@ -2,12 +2,17 @@ import type { PlayerId, RoleId, TeamId } from '@rougarou/protocol';
 
 import { getPlayer, type GameState } from '../state.ts';
 import type { RoleDefinition } from './types.ts';
+import { cupid } from './cupid.ts';
+import { hunter } from './hunter.ts';
+import { littleGirl } from './little-girl.ts';
+import { seer } from './seer.ts';
 import { villager } from './villager.ts';
+import { witch } from './witch.ts';
 import { werewolf } from './werewolf.ts';
 
 /** Registre des roles implementes. Un role absent d'ici est refuse a la distribution. */
 const ROLES: ReadonlyMap<RoleId, RoleDefinition> = new Map(
-  [werewolf, villager].map((role) => [role.id, role]),
+  [werewolf, villager, seer, witch, hunter, cupid, littleGirl].map((role) => [role.id, role]),
 );
 
 /** La definition d'un role, ou `undefined` s'il n'est pas encore implemente. */

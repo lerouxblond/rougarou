@@ -81,11 +81,16 @@ describe('Cles i18n du moteur (CLAUDE.md regle 6)', () => {
     );
   });
 
-  it('chaque role implemente a un nom et une description', () => {
+  it('chaque role implemente a ses textes, et ceux du meneur s il se reveille', () => {
     const keys = registeredRoles().flatMap((role) => {
       const id = role.id.replaceAll('-', '_');
+      const texts = ['name', 'description', 'short', 'rules'].map((key) => `roles.${id}.${key}`);
+      const narrator =
+        role.nightSteps === undefined
+          ? []
+          : [`roles.${id}.narrator.wake`, `roles.${id}.narrator.sleep`];
 
-      return [`roles.${id}.name`, `roles.${id}.description`];
+      return [...texts, ...narrator];
     });
 
     expect(missing(keys)).toEqual([]);

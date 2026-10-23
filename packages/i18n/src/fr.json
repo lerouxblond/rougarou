@@ -85,16 +85,97 @@
     "rate_limited": "Trop d'actions d'un coup. Patientez un instant.",
     "not_a_member": "Vous ne faites pas partie de cette partie.",
     "unauthenticated": "Connectez-vous pour continuer.",
-    "conflict": "Cette action n'est plus possible."
+    "conflict": "Cette action n'est plus possible.",
+    "night": {
+      "wrong_action": "Cette action ne correspond pas à l'étape en cours."
+    },
+    "seer": {
+      "already_probed": "Vous avez déjà sondé un joueur cette nuit.",
+      "self": "Vous ne pouvez pas vous sonder vous-même."
+    },
+    "witch": {
+      "already_chosen": "Vous avez déjà fait votre choix cette nuit.",
+      "cannot_save": "La potion de vie ne peut sauver personne cette nuit.",
+      "no_death_potion": "Vous avez déjà utilisé la potion de mort.",
+      "self_poison": "Vous ne pouvez pas vous empoisonner vous-même."
+    },
+    "cupid": {
+      "already_linked": "Le couple est déjà formé.",
+      "same_player": "Choisissez deux joueurs différents."
+    },
+    "lovers": {
+      "already_confirmed": "Vous avez déjà confirmé."
+    },
+    "little_girl": {
+      "already_spied": "Vous espionnez déjà cette nuit."
+    }
   },
   "roles": {
     "werewolf": {
       "name": "Loup-garou",
-      "description": "Chaque nuit, la meute se réunit et choisit une victime. Le jour, il se cache parmi les villageois."
+      "description": "Chaque nuit, la meute se réunit et choisit une victime. Le jour, il se cache parmi les villageois.",
+      "short": "Chaque nuit, la meute choisit une victime.",
+      "rules": "La nuit, vous vous réveillez avec les autres loups et votez ensemble pour une victime parmi les non-loups. Le jour, cachez-vous parmi les villageois. Vous gagnez quand il ne reste plus que des loups.",
+      "narrator": {
+        "wake": "Les loups-garous se réveillent, se reconnaissent et choisissent leur victime.",
+        "sleep": "Les loups-garous, repus, se rendorment."
+      }
     },
     "villager": {
       "name": "Villageois",
-      "description": "Aucun pouvoir, seulement son flair et sa voix. Il débat et vote pour démasquer les loups."
+      "description": "Aucun pouvoir, seulement son flair et sa voix. Il débat et vote pour démasquer les loups.",
+      "short": "Aucun pouvoir, mais une voix.",
+      "rules": "Vous n'avez aucun pouvoir de nuit. Le jour, observez, débattez et votez pour éliminer les loups. Vous gagnez avec le village quand tous les loups sont morts."
+    },
+    "seer": {
+      "name": "Voyante",
+      "short": "Chaque nuit, elle perce le secret d'un joueur.",
+      "description": "Chaque nuit, elle sonde un joueur et découvre son rôle. Elle doit guider le village sans se trahir.",
+      "rules": "Chaque nuit, désignez un joueur vivant autre que vous : son rôle (ou seulement son camp, selon les options de la partie) s'ajoute aussitôt à vos infos. Une seule fois par nuit.",
+      "narrator": {
+        "wake": "La Voyante se réveille et désigne le joueur dont elle veut connaître le secret.",
+        "sleep": "La Voyante a vu ce qu'elle voulait voir. Elle se rendort."
+      }
+    },
+    "witch": {
+      "name": "Sorcière",
+      "short": "Une potion pour sauver, une potion pour tuer.",
+      "description": "Elle connaît la victime de la nuit et garde deux potions : l'une rend la vie, l'autre l'ôte. Chacune ne sert qu'une fois.",
+      "rules": "Chaque nuit, après les loups, vous voyez leur victime (ou personne). Vous pouvez la sauver avec votre potion de vie, empoisonner un autre joueur avec votre potion de mort, utiliser les deux, ou ne rien faire. Chaque potion ne sert qu'une fois dans la partie. Vous sauver vous-même dépend des options.",
+      "narrator": {
+        "wake": "La Sorcière se réveille. Je lui montre la victime de la nuit : veut-elle la sauver, ou empoisonner quelqu'un ?",
+        "sleep": "La Sorcière range ses fioles et se rendort."
+      }
+    },
+    "hunter": {
+      "name": "Chasseur",
+      "short": "S'il tombe, il n'emporte pas son dernier coup de feu au tombeau.",
+      "description": "Un villageois au doigt sur la détente. Quoi qu'il lui arrive, il emporte quelqu'un avec lui.",
+      "rules": "Vous n'agissez pas la nuit. Quand vous mourez, quelle qu'en soit la cause, vous désignez aussitôt un joueur vivant, qui meurt à son tour. Si vous mourez la nuit, vous tirez à l'aube. Sans choix avant la fin du minuteur, vous ne tirez pas. Votre rôle est révélé dès que votre tir est attendu.",
+      "narrator": {
+        "shot": "Le Chasseur, dans un dernier souffle, épaule son fusil. Qui emporte-t-il avec lui ?"
+      }
+    },
+    "cupid": {
+      "name": "Cupidon",
+      "short": "La première nuit, il lie deux cœurs pour la vie… et pour la mort.",
+      "description": "D'une flèche, il unit deux joueurs. Si l'un meurt, l'autre le suit de chagrin.",
+      "rules": "La première nuit seulement, désignez deux joueurs vivants (vous pouvez vous choisir) : ils deviennent amoureux et découvrent le rôle l'un de l'autre. Si l'un meurt, l'autre meurt de chagrin. Un couple formé d'un loup et d'un non-loup gagne s'il est le dernier en vie. Vous, vous jouez ensuite avec le village.",
+      "narrator": {
+        "wake": "Cupidon se réveille et décoche sa flèche : il désigne deux amoureux.",
+        "sleep": "Cupidon se rendort.",
+        "lovers_wake": "Je touche l'épaule des deux amoureux. Ouvrez les yeux et découvrez-vous.",
+        "lovers_sleep": "Les amoureux se rendorment, le cœur battant."
+      }
+    },
+    "little_girl": {
+      "name": "Petite fille",
+      "short": "Elle entrouvre les yeux pendant que les loups chassent.",
+      "description": "Curieuse et téméraire, elle épie la meute. Plus elle ose, plus elle risque d'être repérée.",
+      "rules": "Pendant le tour des loups, vous pouvez choisir d'espionner. Vous voyez alors leurs votes en direct, chaque loup sous un pseudo dont seules quelques lettres apparaissent. Chaque nuit d'espionnage augmente le risque d'être repérée : les loups reçoivent alors une liste de trois suspects, dont vous. Vous gagnez avec le village.",
+      "narrator": {
+        "spy": "La Petite fille peut entrouvrir les yeux… à ses risques et périls."
+      }
     }
   },
   "phase": {
@@ -226,6 +307,16 @@
     "undo": "Annuler la dernière action",
     "spare": "Épargner : n'exécuter personne",
     "abstain": "S'abstenir",
-    "hunter_shoot": "Tirer"
+    "hunter_shoot": "Tirer",
+    "seer_probe": "Sonder un joueur",
+    "witch_potions": "Vos potions",
+    "witch_save": "Sauver la victime avec la potion de vie",
+    "witch_kill": "Potion de mort",
+    "witch_kill_none": "Personne",
+    "cupid_link": "Former le couple",
+    "cupid_first": "Premier amoureux",
+    "cupid_second": "Second amoureux",
+    "lovers_confirm": "J'ai découvert mon amoureux",
+    "spy": "Espionner la meute"
   }
 }

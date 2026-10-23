@@ -94,6 +94,9 @@ export function evolve(state: GameState, event: GameEvent): GameState {
           wolfVotes: {},
           wolfTie: null,
           wolfVictim: null,
+          witch: null,
+          loversConfirmed: [],
+          spy: null,
         },
       };
 
@@ -123,6 +126,48 @@ export function evolve(state: GameState, event: GameEvent): GameState {
 
     case 'NightStepResolved':
       return withNight(state, (night) => ({ ...night, stepResolved: true }));
+
+    case 'LoversLinked':
+      return { ...state, lovers: event.lovers };
+
+    case 'LittleGirlSpied':
+      return withNight(
+        {
+          ...state,
+          spyNights: {
+            ...state.spyNights,
+            [event.playerId]: (state.spyNights[event.playerId] ?? 0) + 1,
+          },
+        },
+        (night) => ({
+          ...night,
+          spy: { playerId: event.playerId, pack: event.pack, caught: event.caught },
+        }),
+      );
+
+    case 'LoverConfirmed':
+      return withNight(state, (night) => ({
+        ...night,
+        loversConfirmed: [...night.loversConfirmed, event.playerId],
+      }));
+
+    case 'WitchActed': {
+      const left = state.potions[event.witch] ?? { life: true, death: true };
+
+      return withNight(
+        {
+          ...state,
+          potions: {
+            ...state.potions,
+            [event.witch]: {
+              life: left.life && !event.save,
+              death: left.death && event.kill === null,
+            },
+          },
+        },
+        (night) => ({ ...night, witch: { save: event.save, kill: event.kill } }),
+      );
+    }
 
     case 'NightEnded':
       return { ...state, dawn: { deaths: [...event.deaths], announced: false } };

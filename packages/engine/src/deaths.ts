@@ -1,6 +1,7 @@
 import type { Actor, PlayerId, TimerKey } from '@rougarou/protocol';
 
 import { isError, requireAliveTarget, requirePlayer } from './auth.ts';
+import { griefDeaths } from './lovers.ts';
 import type { EngineError } from './result.ts';
 import { getRole } from './roles/index.ts';
 import {
@@ -24,8 +25,10 @@ import { checkVictory } from './victory.ts';
  */
 export function killPlayers(tx: Tx, deaths: readonly Death[]): void {
   const wave: PlayerId[] = [];
+  const queue = [...deaths];
 
-  for (const death of deaths) {
+  // Les chagrins s'ajoutent a la vague, de proche en proche (`R-42`, P24).
+  for (let death = queue.shift(); death !== undefined; death = queue.shift()) {
     if (tx.state.players[death.playerId]?.alive !== true) {
       continue;
     }
@@ -37,6 +40,7 @@ export function killPlayers(tx: Tx, deaths: readonly Death[]): void {
       roleRevealed: tx.state.options.revealRoleOnDeath,
     });
     wave.push(death.playerId);
+    queue.push(...griefDeaths(tx.state, death.playerId));
   }
 
   for (const playerId of wave) {
