@@ -281,7 +281,8 @@
     "target": "Target",
     "unknown_game": "This game cannot be found.",
     "composition_count_one": "{{count}} role for {{players}} players",
-    "players_one": "Players ({{count}})"
+    "players_one": "Players ({{count}})",
+    "reveal_timed": "Reveal for 5 s"
   },
   "actions": {
     "join_game": "Join",

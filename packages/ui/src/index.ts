@@ -12,3 +12,8 @@ export { Dialog, Sheet, type DialogProps } from './Dialog.tsx';
 export { Switch, type SwitchProps } from './Switch.tsx';
 export { Tabs, type TabItem } from './Tabs.tsx';
 export { Toast, ToastRegion, type ToastProps } from './Toast.tsx';
+export { MayorBadge } from './MayorBadge.tsx';
+export { PlayerChip, type PlayerChipProps } from './PlayerChip.tsx';
+export { PlayerCircle, type CircleItem } from './PlayerCircle.tsx';
+export { RoleCard, type RoleCardProps } from './RoleCard.tsx';
+export { TargetPicker, type TargetOption, type TargetPickerProps } from './TargetPicker.tsx';

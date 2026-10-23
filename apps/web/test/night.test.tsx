@@ -167,7 +167,7 @@ describe('Carte de role illustree (T8)', () => {
   it('une fois retournee, la carte de repli porte le nom du role', async () => {
     const { container } = renderWithProviders(<RoleCard role="little-girl" />);
 
-    fireEvent.pointerDown(screen.getByRole('button'));
+    fireEvent.pointerDown(screen.getByRole('button', { pressed: false }));
     expect(screen.getByRole('figure', { name: fr.roles.little_girl.name })).toBeDefined();
     expect(await axeViolations(container)).toEqual([]);
   });

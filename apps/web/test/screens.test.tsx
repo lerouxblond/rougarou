@@ -179,7 +179,7 @@ describe('Carte de role (US-30)', () => {
 
   it('au clavier : Espace maintenu revele, relacher cache', async () => {
     const { container } = renderWithProviders(<RoleCard role="villager" />);
-    const card = screen.getByRole('button');
+    const card = screen.getByRole('button', { pressed: false });
 
     fireEvent.keyDown(card, { key: ' ' });
     expect(screen.getByText(fr.roles.villager.name)).toBeDefined();

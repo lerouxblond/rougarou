@@ -281,7 +281,8 @@
     "target": "Cible",
     "unknown_game": "Cette partie est introuvable.",
     "composition_count_one": "{{count}} rôle pour {{players}} joueurs",
-    "players_one": "Joueurs ({{count}})"
+    "players_one": "Joueurs ({{count}})",
+    "reveal_timed": "Révéler 5 s"
   },
   "actions": {
     "join_game": "Rejoindre",
