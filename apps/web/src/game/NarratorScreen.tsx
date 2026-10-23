@@ -14,6 +14,7 @@ import { FormError } from '../components/Field.tsx';
 import { ActionPanel } from './ActionPanel.tsx';
 import { Config } from './Config.tsx';
 import { CorrectionDialog } from './CorrectionDialog.tsx';
+import { EndScreen } from './EndScreen.tsx';
 import { useSendCommand } from './hooks.ts';
 import { blockerOf, primaryLabel, scriptOf, stepTexts, type Line } from './narrator-script.ts';
 import { JournalPanel } from './JournalPanel.tsx';
@@ -74,6 +75,7 @@ const PHASE_PANELS: Partial<Record<Phase, (view: NarratorView) => ReactNode>> = 
   ),
   MAYOR_ELECTION: (view) => <VotePanel view={view} />,
   DAY_VOTE: (view) => <VotePanel view={view} />,
+  ENDED: (view) => <EndScreen view={view} />,
 };
 
 function useLine(): (line: Line) => string {

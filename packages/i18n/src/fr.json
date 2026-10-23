@@ -662,5 +662,10 @@
     "qr": "QR du code de la partie {{code}}",
     "invite": "Pour rejoindre, scannez le QR ou entrez ce code :",
     "drag": "Glisser pour déplacer {{name}}"
+  },
+  "end": {
+    "roles": "Tous les rôles",
+    "timeline": "Chronologie",
+    "new_game": "Nouvelle partie"
   }
 }

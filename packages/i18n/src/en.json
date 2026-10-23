@@ -662,5 +662,10 @@
     "qr": "QR code for game {{code}}",
     "invite": "To join, scan the QR code or enter this code:",
     "drag": "Drag to move {{name}}"
+  },
+  "end": {
+    "roles": "Every role",
+    "timeline": "Timeline",
+    "new_game": "New game"
   }
 }

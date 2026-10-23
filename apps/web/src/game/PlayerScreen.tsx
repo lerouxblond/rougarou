@@ -11,6 +11,7 @@ import { PlayersCircle, PlayersList } from './PlayersPanel.tsx';
 import { RoleCard } from './RoleCard.tsx';
 import { BottomBar } from './BottomBar.tsx';
 import { DealScreen } from './DealScreen.tsx';
+import { EndScreen } from './EndScreen.tsx';
 import { UniformNight } from './UniformNight.tsx';
 import { VotePanel } from './VotePanel.tsx';
 
@@ -42,7 +43,7 @@ const SCREENS: Record<Phase, Screen> = {
   DAY_DEBATE: day,
   DAY_VOTE: day,
   EXECUTION: day,
-  ENDED: day,
+  ENDED: (view) => <EndScreen view={view} />,
 };
 
 function DayScreen({
