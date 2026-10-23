@@ -9,6 +9,8 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'prompt',
+      // `registerSW.js` en `defer` : il ne bloque plus le premier rendu (P30).
+      injectRegister: 'script-defer',
       includeAssets: ['favicon.svg', 'apple-touch-icon-180.png'],
       manifest: {
         name: 'Rougarou',
