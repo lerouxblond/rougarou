@@ -657,5 +657,10 @@
       "debate": "Debate",
       "day_vote": "Village vote"
     }
+  },
+  "lobby": {
+    "qr": "QR code for game {{code}}",
+    "invite": "To join, scan the QR code or enter this code:",
+    "drag": "Drag to move {{name}}"
   }
 }

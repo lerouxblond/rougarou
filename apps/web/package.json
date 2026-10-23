@@ -11,6 +11,8 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@dnd-kit/helpers": "catalog:",
+    "@dnd-kit/react": "catalog:",
     "@rougarou/i18n": "workspace:*",
     "@rougarou/protocol": "workspace:*",
     "@rougarou/ui": "workspace:*",
@@ -20,6 +22,7 @@
     "react": "catalog:",
     "react-dom": "catalog:",
     "react-i18next": "catalog:",
+    "uqr": "catalog:",
     "zustand": "catalog:"
   },
   "devDependencies": {
