@@ -2,7 +2,7 @@ import type { MeResponse, NarratorView, PlayerView } from '@rougarou/protocol';
 import { PhaseBanner, Skeleton, Switch, Timer } from '@rougarou/ui';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from '@tanstack/react-router';
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { usePref, writePref } from '../ambience/prefs.ts';
@@ -12,14 +12,31 @@ import { AuthGate } from '../components/AuthGate.tsx';
 import { ConnectionIndicator } from '../components/ConnectionIndicator.tsx';
 import { FormError } from '../components/Field.tsx';
 import { useGameConnection, useGameView } from '../game/hooks.ts';
-import { NarratorScreen } from '../game/NarratorScreen.tsx';
+import { loadNarratorLobby, NarratorScreen } from '../game/NarratorScreen.tsx';
 import { PlayerScreen } from '../game/PlayerScreen.tsx';
 import { useGameStore } from '../game/store.ts';
 
 /** Le code et son QR ne servent qu'au meneur, au salon : charges a la demande (ADR 0011). */
-const JoinCard = lazy(() =>
-  import('../game/JoinCard.tsx').then((module) => ({ default: module.JoinCard })),
-);
+const loadJoinCard = () => import('../game/JoinCard.tsx');
+
+const JoinCard = lazy(() => loadJoinCard().then((module) => ({ default: module.JoinCard })));
+
+/**
+ * La place de la carte d'invitation pendant son chargement : meme structure
+ * (QR, puis trois lignes), pour que le salon ne saute pas a son arrivee (CLS).
+ */
+function JoinCardSkeleton() {
+  return (
+    <div className="flex flex-wrap items-center gap-6 rounded-card border border-border p-4">
+      <Skeleton className="size-36 shrink-0" />
+      <div className="flex w-56 flex-col gap-2">
+        <Skeleton className="h-6 w-full" />
+        <Skeleton className="h-9 w-full" />
+        <Skeleton className="h-5 w-full" />
+      </div>
+    </div>
+  );
+}
 
 /** `/game/:gameId` : un seul composant routeur selon (phase × lecteur) (`docs/03`, `docs/04`). */
 export function Game() {
@@ -54,6 +71,17 @@ function Table({ gameId, me }: { readonly gameId: string; readonly me: MeRespons
   useGameConnection(gameId);
   useAmbience(view);
 
+  // Le meneur arrive au salon : ses morceaux se chargent pendant que la
+  // WebSocket s'ouvre, au lieu d'attendre la premiere vue (P30).
+  const narrator = summary.data?.narrator === true;
+
+  useEffect(() => {
+    if (narrator) {
+      void loadJoinCard();
+      void loadNarratorLobby();
+    }
+  }, [narrator]);
+
   const counter = view === null ? null : counterOf(view);
 
   if (summary.isError) {
@@ -84,7 +112,7 @@ function Table({ gameId, me }: { readonly gameId: string; readonly me: MeRespons
         </div>
         {summary.data?.narrator !== true ? null : view?.phase === 'LOBBY' ||
           view?.phase === 'CONFIG' ? (
-          <Suspense fallback={<Skeleton className="h-36 w-full" />}>
+          <Suspense fallback={<JoinCardSkeleton />}>
             <JoinCard code={summary.data.code} />
           </Suspense>
         ) : (

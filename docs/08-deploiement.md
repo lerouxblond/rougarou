@@ -30,7 +30,7 @@ Les migrations D1 s'appliquent **avant** le déploiement du Worker, et elles doi
 3. En parallèle : `lint`, `typecheck`, `test` (Vitest, y compris le pool Workers).
 4. `build` (web + server).
 5. `test:e2e` (Playwright) contre `wrangler dev` : Chromium seul sur une PR, Chromium et WebKit mobile sur `main`. La plupart des dépendances système à installer sont celles de WebKit, et un miroir Ubuntu lent les a déjà bloquées. Chaque job a un `timeout-minutes` (15 pour la qualité, 20 pour le bout en bout) : un job bloqué échoue au lieu d'attendre six heures.
-6. Rapport de taille du bundle commenté sur la PR (échec si le JS initial dépasse 250 ko gzip).
+6. Rapport de taille du bundle commenté sur la PR (échec si le JS initial dépasse 250 ko gzip). Le JS initial compte le point d'entrée **et** les morceaux en `modulepreload`, chargés eux aussi au premier rendu.
 
 ### `deploy.yml` : sur un push sur `main` (après le passage de `ci`), et en preview sur une PR
 - Utilise `cloudflare/wrangler-action`.
