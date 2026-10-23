@@ -2,6 +2,7 @@ import type { TimerKey } from '@rougarou/protocol';
 
 import type { GameEvent } from './events.ts';
 import { evolve } from './evolve.ts';
+import { journalFact } from './journal.ts';
 import type { EngineError, EngineErrorCode } from './result.ts';
 import type { Rng } from './rng.ts';
 import type { GameState } from './state.ts';
@@ -44,6 +45,19 @@ export function createTx(initial: GameState, ctx: Context): Tx {
     emit(event) {
       state = evolve(state, event);
       events.push(event);
+
+      // Le journal suit le fait, dans le meme groupe : `Undo` retire les deux (`R-11`, `R-19`).
+      const fact = journalFact(event);
+
+      if (fact !== null) {
+        const journaled: GameEvent = {
+          type: 'Journaled',
+          entry: { at: ctx.now, night: state.nightNumber, phase: state.phase, fact },
+        };
+
+        state = evolve(state, journaled);
+        events.push(journaled);
+      }
     },
   };
 }

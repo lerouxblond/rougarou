@@ -3,6 +3,7 @@ import type { ActionDescriptor, PlayerId } from '@rougarou/protocol';
 import { CLASSIC_MAX_PLAYERS } from './modes/classic.ts';
 import { currentStep, observerSpecOf } from './night/flow.ts';
 import { compositionIssues } from './phases/config.ts';
+import { cardReached } from './phases/deal.ts';
 import { alivePlayers, seatedPlayers, type GameState } from './state.ts';
 
 /** Qui regarde la partie : le meneur, ou un joueur (membre ou non). */
@@ -51,10 +52,17 @@ function narratorActions(state: GameState): ActionDescriptor[] {
         { type: 'SetComposition' },
         { type: 'Deal', issues: compositionIssues(state) },
       ];
-    case 'DEAL':
+    case 'DEAL': {
+      // En ceremonie, « Suivant » passe la main tant qu'un joueur l'a (`R-17`).
+      const passing = state.ceremonyTurn !== null && state.ceremonyTurn < state.seats.length;
+
       return [
-        { type: 'AdvancePhase', blocked: !seatedPlayers(state).every((player) => player.roleSeen) },
+        {
+          type: 'AdvancePhase',
+          blocked: !passing && !seatedPlayers(state).every((player) => player.roleSeen),
+        },
       ];
+    }
     case 'NIGHT': {
       const tie = state.night?.wolfTie ?? null;
       const advance: ActionDescriptor = {
@@ -106,7 +114,7 @@ function playerActions(state: GameState, playerId: PlayerId): ActionDescriptor[]
   }
 
   if (state.phase === 'DEAL') {
-    return player.roleSeen ? [] : [{ type: 'ConfirmRoleSeen' }];
+    return player.roleSeen || !cardReached(state, playerId) ? [] : [{ type: 'ConfirmRoleSeen' }];
   }
 
   return player.alive ? livingPlayerActions(state, playerId) : [];

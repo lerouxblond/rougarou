@@ -241,9 +241,12 @@ export function setup({ roles, options = {}, seed = 1 }: SetupOptions): GameDriv
   return driver;
 }
 
-/** Les types des evenements, pour des assertions lisibles. */
+/**
+ * Les types des evenements, pour des assertions lisibles. Les entrees du
+ * journal, qui doublent les faits (`R-19`), sont laissees de cote.
+ */
 export function types(events: readonly GameEvent[]): string[] {
-  return events.map((event) => event.type);
+  return events.filter((event) => event.type !== 'Journaled').map((event) => event.type);
 }
 
 /** Cinq joueurs : Alice est le loup. */

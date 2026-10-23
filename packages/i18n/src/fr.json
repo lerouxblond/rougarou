@@ -59,7 +59,6 @@
       "vote_closed": "Le vote n'est pas ouvert."
     },
     "options": {
-      "ceremony_unavailable": "La distribution un par un n'est pas encore disponible.",
       "mode_unavailable": "Ce mode de jeu n'est pas encore disponible.",
       "parallel_night_unavailable": "La nuit en parallèle n'est pas encore disponible.",
       "roleplay_unavailable": "Le role play n'est pas encore disponible."

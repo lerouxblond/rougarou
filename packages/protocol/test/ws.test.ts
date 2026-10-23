@@ -23,12 +23,14 @@ const playerView = {
   nightNumber: 0,
   deadline: null,
   pausedRemaining: null,
+  ceremony: null,
   night: null,
   deaths: null,
   election: null,
   vote: null,
   pending: [],
   winner: null,
+  journal: null,
   actions: [{ type: 'JoinGame' }],
 };
 

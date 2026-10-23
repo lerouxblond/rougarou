@@ -2,6 +2,7 @@ import type {
   Ballot,
   Composition,
   GameOptions,
+  JournalEntry,
   Knowledge,
   Phase,
   PlayerId,
@@ -33,6 +34,8 @@ export type GameEvent =
       readonly assignments: Readonly<Record<PlayerId, RoleId>>;
     }
   | { readonly type: 'RoleSeen'; readonly playerId: PlayerId }
+  /** Distribution en ceremonie : la main passe a la place `turn` (`R-17`). */
+  | { readonly type: 'CeremonyTurnPassed'; readonly turn: number }
   // Pilotage
   | { readonly type: 'PhaseChanged'; readonly phase: Phase }
   | { readonly type: 'PhaseForced'; readonly phase: Phase }
@@ -121,7 +124,9 @@ export type GameEvent =
   | { readonly type: 'TieBroken'; readonly playerId: PlayerId | null }
   | { readonly type: 'ExecutionStarted'; readonly target: PlayerId | null }
   // Fin
-  | { readonly type: 'GameEnded'; readonly winner: Winner };
+  | { readonly type: 'GameEnded'; readonly winner: Winner }
+  // Journal (`R-19`) : emis par la transaction juste apres le fait qu'il decrit.
+  | { readonly type: 'Journaled'; readonly entry: JournalEntry };
 
 /** Le type d'un evenement. */
 export type GameEventType = GameEvent['type'];

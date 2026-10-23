@@ -38,7 +38,6 @@ describe('Options (R-15)', () => {
 
   it.each([
     [{ roleplay: true }, 'errors.options.roleplay_unavailable'],
-    [{ dealMode: 'ceremony' as const }, 'errors.options.ceremony_unavailable'],
     [{ parallelNight: true }, 'errors.options.parallel_night_unavailable'],
     [{ gameMode: 'vampire' as const }, 'errors.options.mode_unavailable'],
   ])('refuse une option pas encore prise en charge : %j', (options, messageKey) => {

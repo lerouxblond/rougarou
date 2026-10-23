@@ -33,12 +33,14 @@ const playerView: PlayerView = {
   nightNumber: 0,
   deadline: null,
   pausedRemaining: null,
+  ceremony: null,
   night: null,
   deaths: null,
   election: null,
   vote: null,
   pending: [],
   winner: null,
+  journal: null,
   actions: [{ type: 'JoinGame' }],
 };
 
@@ -73,6 +75,7 @@ const narratorView: NarratorView = {
   nightNumber: 0,
   deadline: null,
   pausedRemaining: null,
+  ceremony: null,
   night: null,
   lovers: null,
   potions: {},
@@ -82,6 +85,7 @@ const narratorView: NarratorView = {
   pending: [],
   winner: null,
   everyoneVoted: false,
+  journal: [],
   actions: [],
 };
 

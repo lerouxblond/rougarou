@@ -33,6 +33,7 @@ describe('gameOptionsSchema (docs/01 §8)', () => {
 
     expect(timers).toEqual({
       roleReveal: null,
+      ceremonyCard: 8,
       characterSheet: null,
       presentation: null,
       nightAction: 45,

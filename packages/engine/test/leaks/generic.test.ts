@@ -125,6 +125,13 @@ function checkPlayerView(state: GameState, viewerId: string, view: PlayerView): 
 
   checkKnowledge(state, viewerId, view);
 
+  // Le journal ne part vers un joueur qu'a la fin, en entier (`R-19`).
+  if (state.phase === 'ENDED') {
+    expect(view.journal).toEqual(state.journal);
+  } else {
+    expect(view.journal, `${viewerId} recoit le journal avant la fin`).toBeNull();
+  }
+
   // Seuls ceux qui prennent part a l'etape la voient ; personne ne voit la victime avant l'annonce.
   if (!acting) {
     expect(view.night, `${viewerId} voit l etape de nuit`).toBeNull();

@@ -19,12 +19,14 @@ const playerView = {
   nightNumber: 1,
   deadline: null,
   pausedRemaining: null,
+  ceremony: null,
   night: null,
   deaths: null,
   election: null,
   vote: null,
   pending: [],
   winner: null,
+  journal: null,
   actions: [],
 };
 
@@ -130,6 +132,7 @@ describe('Vue du meneur', () => {
       nightNumber: 1,
       deadline: null,
       pausedRemaining: null,
+      ceremony: null,
       night: null,
       lovers: null,
       potions: {},
@@ -145,6 +148,7 @@ describe('Vue du meneur', () => {
       pending: [],
       winner: null,
       everyoneVoted: false,
+      journal: [],
       actions: [],
     };
 

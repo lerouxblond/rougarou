@@ -82,6 +82,9 @@ export {
 export { PROTOCOL_VERSION } from './version.ts';
 export {
   actionDescriptorSchema,
+  deathCauseSchema,
+  journalEntrySchema,
+  journalFactSchema,
   narratorViewSchema,
   playerViewSchema,
   knowledgeSchema,
@@ -89,6 +92,9 @@ export {
   voteOutcomeSchema,
   winnerSchema,
   type ActionDescriptor,
+  type DeathCause,
+  type JournalEntry,
+  type JournalFact,
   type NarratorView,
   type PlayerView,
   type Knowledge,
