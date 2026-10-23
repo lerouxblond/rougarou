@@ -555,3 +555,106 @@ Précisions prises en codant, **validées le 2026-10-23** (cohérentes avec P17 
 **Points ouverts** : (1) en production, une reconnexion prend 0,9 à 2 s, avec de rares pics à 7,6 s qui correspondent à des premiers essais ratés puis repris (0,5 + 1 + 2 + 4 s) : la cause de ces échecs reste à examiner (US-90 tient, la vue revient) ; (2) les points ouverts de M2 tiennent toujours (e-mails sans domaine, CPU de scrypt).
 
 ---
+
+## M4 — Interface complète (présentiel jouable)
+
+**But** : remplacer les écrans bruts par l'interface « Lanterne » (`docs/06`), côté joueur et
+côté meneur, pour jouer en présentiel sans papier.
+
+**Terminé quand** : une vraie partie en présentiel à 8 ou plus est jouée sans papier, le score
+Lighthouse (PWA, accessibilité) est d'au moins 90 et axe ne signale aucune violation sérieuse.
+
+### Décisions bloquantes (`docs/12` §7)
+
+| ID | Décision | État |
+|---|---|---|
+| D-03 | Sons et vibrations : aucun ne trahit le jeu | ✅ |
+| D-23 | Distribution `simultaneous` par défaut, `ceremony` en option | ✅ |
+| D-24 | Direction Lanterne + pixel art | ✅ |
+| D-22 | Synthèse vocale du texte à lire : optionnelle, voix du navigateur | 🟡 **à valider** |
+
+### Précisions de règles (règle 5 de `CLAUDE.md`) — 🟡 à valider
+
+| # | Sujet | Proposition |
+|---|---|---|
+| P26 | **Distribution `ceremony`** (`docs/12` §3, refusée par `R-15` jusqu'ici) | Un joueur à la fois, dans l'ordre des places. Celui dont c'est le tour voit sa carte et confirme « J'ai vu mon rôle » ; les autres voient « X découvre son rôle… », sans rien de plus. Le tour passe à la confirmation, sur « Suivant » du meneur, ou au bout de 8 s (minuteur `timers.ceremonyCard`, défaut 8, `null` possible). Le meneur lance la nuit après le dernier joueur. Une carte revue plus tard (« Ma carte ») ne rejoue rien |
+| P27 | **Journal du meneur et chronologie de fin** (US-41, US-60, US-80) | Chaque fait journalisé (actions de nuit, votes, morts et causes, forçages, minuteurs expirés, corrections) entre dans `state.journal` avec l'heure de la commande (`now` injecté) et une clé i18n à paramètres. Le meneur le voit en direct ; les joueurs le reçoivent **seulement à `ENDED`**, comme chronologie nuit par nuit (`docs/01` §2). Test de non-fuite : aucune entrée dans une vue de joueur avant la fin |
+| P28 | **Mode correction** (US-80) | Trois commandes du meneur, entre la distribution et la fin : `CorrectKill` (mort de cause `correction`, avec la chaîne normale des effets à la mort et la vérification de victoire), `CorrectRevive` (le joueur revient vivant, sans rien rejouer : un amoureux ressuscité ne ressuscite pas l'autre), `CorrectRole` (nouveau rôle, pouvoirs remis à neuf, info privée « Ton rôle a changé »). Chacune est annulable (`R-11`), marquée d'un badge dans le journal, et sa cause n'est jamais montrée aux joueurs (morts sans cause, `docs/04`) |
+| P29 | **Composition suggérée et indicateur d'équilibre** (US-20) | La table de `docs/02` §Compositions, limitée aux rôles disponibles (M3 : `core`). Équilibre = somme de poids par rôle (Villageois +1, Loup −6, Voyante +7, Sorcière +4, Chasseur +3, Cupidon −2, Petite fille +3), affiché « Avantage village / Équilibré (−3 à +3) / Avantage loups », jamais par la couleur seule. Ce sont des **données de configuration**, pas un résultat de jeu : elles vivent dans `packages/protocol` (comme le schéma des options), pour que l'indicateur suive les + et − du meneur sans aller-retour |
+| P30 | **« PWA ≥ 90 » de Lighthouse** : la catégorie PWA a disparu de Lighthouse (v12, 2024) | On vise **accessibilité ≥ 90, bonnes pratiques ≥ 90, performance ≥ 90** (profil mobile) sur l'accueil et sur une partie ; l'installabilité reste vérifiée par nos tests (manifest, service worker, icônes : `apps/web/test/build-artifacts.test.ts`). `docs/10` est mis à jour |
+| P31 | **Sons en M4** (`docs/12` §5) : la synchronisation par le serveur et les profils audio sont en M4b | En M4, les sons publics sont **synthétisés** par la Web Audio API (création originale, aucun fichier ni licence) et joués **sur l'appareil du meneur seulement**, avec une option « Sons » désactivable. Les vibrations suivent `docs/12` §5 (jamais la nuit en présentiel). Les fichiers OGG de `docs/07` et les sons des joueurs arrivent en M4b |
+| P32 | **« Rejouer avec les mêmes joueurs »** (US-60) | Reporté en **M5**, avec l'historique et les presets : il crée une nouvelle partie côté serveur (D1, Durable Object). En M4, l'écran de fin a un bouton « Nouvelle partie » qui ramène à l'accueil |
+
+**Reports de M2 traités ici** : QR du code de partie (US-10), glisser-déposer des places
+(US-12 ; les boutons monter/descendre restent pour le clavier). **L'avatar et sa galerie**
+passent en M4b, avec `PixelSprite`.
+
+**Nouvelles dépendances** (imposées par `docs/05` ou citées par `docs/06`, versions vérifiées
+au moment de les ajouter) : Radix UI Primitives (dialog, tabs, toast, switch), Motion,
+`@fontsource` (Cormorant Garamond, DM Sans, Pixelify Sans), `lucide-react` ; et, hors liste,
+`@dnd-kit` (glisser-déposer accessible au clavier) et `uqr` (QR sans dépendance). ADR 0011.
+
+**Hors M4** : `PixelSprite` et les six moments vivants (M4b), chat (M5), role play (M5),
+écran de choix de mode (M7).
+
+### Tâches
+
+Huit PR de moins de 400 lignes de code non généré : **A** (T1), **B** (T2–T5, moteur),
+**C** (T6–T7, design system), **D** (T8, joueur), **E** (T9, meneur), **F** (T10–T11, salon,
+configuration, fin), **G** (T12, ambiance), **H** (T13), puis T14.
+
+- [ ] **T1 — Docs, règles, ADR 0011** *(PR A)*
+  - Fichiers : `docs/01` (P26, P28, `timers.ceremonyCard`, `R-15` sans `ceremony`), `docs/02` (P29), `docs/03` (P27, P32), `docs/04` (journal dans la vue), `docs/06` (`Stepper`, `BalanceMeter`), `docs/07` (P31), `docs/10` (P30, P32), `docs/12` (D-22 → ✅), `docs/05` (versions), `docs/adr/0011-briques-ui.md`
+  - Tests attendus : aucun (document)
+
+- [ ] **T2 — Distribution `ceremony`** *(PR B)*
+  - Fichiers : `packages/engine/src/phases/{config,deal}.ts`, `state.ts`, `events.ts`, `evolve.ts`, `project.ts`, `actions.ts`, `packages/protocol/src/{options,commands,views}.ts`, `test/deal.test.ts`, `test/leaks/ceremony.test.ts`, i18n
+  - Tests attendus : P26 (ordre des places ; tour suivant à la confirmation, sur « Suivant », au minuteur ; confirmation hors tour refusée ; `simultaneous` inchangé) ; non-fuite : un joueur qui n'a pas la main ne voit que le nom de celui qui l'a
+
+- [ ] **T3 — Journal et chronologie** *(PR B)*
+  - Fichiers : `packages/engine/src/{journal,state,evolve,project}.ts`, `packages/protocol/src/views.ts`, `test/journal.test.ts`, `test/leaks/generic.test.ts`, i18n (`journal.*`)
+  - Tests attendus : P27 (une entrée par fait, heure de la commande, `Undo` retire l'entrée) ; non-fuite : aucune entrée dans une vue de joueur avant `ENDED`, la chronologie complète après
+
+- [ ] **T4 — Mode correction** *(PR B)*
+  - Fichiers : `packages/engine/src/phases/correction.ts`, `apply.ts`, `deaths.ts`, `packages/protocol/src/commands.ts`, `test/correction.test.ts`, `test/leaks/correction.test.ts`, i18n
+  - Tests attendus : P28 (tuer déclenche chagrin, Chasseur et victoire ; ressusciter ; changer de rôle remet les potions ; refus avant la distribution et après la fin ; annulable) ; non-fuite : la cause `correction` n'apparaît jamais chez un joueur
+
+- [ ] **T5 — Composition suggérée et équilibre** *(PR B)*
+  - Fichiers : `packages/protocol/src/composition.ts`, `test/composition.test.ts`, `packages/engine/src/modes/classic.ts` (réutilise la suggestion)
+  - Tests attendus : P29 (une suggestion valide pour chaque taille de 5 à 24, aucun rôle d'extension, `R-07` respecté ; poids et paliers de l'indicateur)
+
+- [ ] **T6 — Design system : fondations** *(PR C)*
+  - Fichiers : `packages/ui/src/{IconButton,Badge,Avatar,Stepper,Switch,Tabs,Dialog,Sheet,Toast,EmptyState,Skeleton}.tsx` (Radix), polices `@fontsource` dans `styles.css`, histoires Ladle en nuit et en jour, `test/*.test.tsx`
+  - Tests attendus : axe sans violation sur chaque histoire, nuit et jour ; `IconButton` sans `aria-label` refusé par le typage ; contraste (test existant) ; clavier (Tabs, Dialog, Stepper)
+
+- [ ] **T7 — Design system : composants de jeu** *(PR C)*
+  - Fichiers : `packages/ui/src/{RoleCard,PlayerChip,MayorBadge,PlayerCircle,TargetPicker,VoteBoard,PhaseBanner,Timer,NarratorScript,NightStepList,BalanceMeter}.tsx`, histoires, tests
+  - Tests attendus : `RoleCard` maintenir pour révéler (souris, toucher, Espace, « Révéler 5 s ») ; `PlayerCircle` en grille sous 640 px ; `TargetPicker` ne propose que les cibles reçues et demande une confirmation ; `Timer` annonce 30 s, 10 s et 0 s par `aria-live` ; `VoteBoard` public (badges) et secret (compteur) ; axe sur tout
+
+- [ ] **T8 — Vue joueur** *(PR D)*
+  - Fichiers : `apps/web/src/game/player/*.tsx` (mise en page par taille, barre basse « Ma carte », « Infos », « Joueurs », nuit uniforme, action, vote, élection, aube, cimetière), `routes/Game.tsx` (table `(phase, lecteur) → écran`), i18n, tests
+  - Tests attendus : nuit uniforme (un joueur sans action rend exactement le même DOM toute la nuit) ; un contrôle par action reçue ; « Mes informations » annoncé ; axe sur chaque écran, nuit et jour, 375 px et 1280 px
+
+- [ ] **T9 — Vue meneur** *(PR E)*
+  - Fichiers : `apps/web/src/game/narrator/*.tsx` (trois colonnes ou onglets, `NightStepList`, `NarratorScript` avec synthèse vocale selon D-22, bouton principal et ligne « ce qui bloque », cercle avec les rôles, journal, annuler, forcer, pause, +30 s, mode correction), i18n, tests
+  - Tests attendus : le libellé du bouton principal suit l'action reçue ; « ce qui bloque » ; la synthèse vocale ne parle que si l'option est active ; axe ; raccourcis clavier
+
+- [ ] **T10 — Salon et configuration** *(PR F)*
+  - Fichiers : `apps/web/src/game/{Lobby,Config}.tsx` (QR, glisser-déposer, suggestion, compteurs, `BalanceMeter`, options groupées avec aide), i18n, tests
+  - Tests attendus : la suggestion remplit les compteurs ; l'équilibre suit chaque + et − ; options groupées (Votes, Nuit, Révélations, Minuteurs) ; glisser-déposer et boutons clavier envoient le même ordre ; le QR encode `/join/:code`
+
+- [ ] **T11 — Écran de fin et chronologie** *(PR F)*
+  - Fichiers : `apps/web/src/game/End.tsx`, i18n, tests
+  - Tests attendus : camp vainqueur, rôles révélés en cascade (sans animation en mouvement réduit), chronologie nuit par nuit lue depuis la vue ; axe
+
+- [ ] **T12 — Ambiance : phase, haptique, sons** *(PR G)*
+  - Fichiers : `apps/web/src/ambience/{phase-theme,haptics,sounds}.ts`, `data-phase` sur `<html>`, fondu de 1,2 s (Motion), i18n (options « Sons », « Vibrations »), tests
+  - Tests attendus : le thème suit la phase (l'aube masquée reste « nuit » chez le joueur, `R-12`) ; mouvement réduit → aucune animation ; vibrations selon la matrice de `docs/12` §5, jamais la nuit en présentiel ; sons seulement chez le meneur et si l'option est active
+
+- [ ] **T13 — Vérification : e2e, axe, Lighthouse** *(PR H)*
+  - Fichiers : `e2e/fixtures/table.ts` (nouveaux contrôles), `e2e/m4-*.spec.ts` (partie à 8 par la nouvelle interface, axe sur chaque écran, nuit et jour), `scripts/lighthouse.mjs`, `.github/workflows/ci.yml`
+  - Tests attendus : partie à 8 jusqu'à la victoire par l'interface (la vue de débogage ne sert plus qu'à lire) ; axe sans violation `serious` ni `critical` ; Lighthouse ≥ 90 selon P30
+
+- [ ] **T14 — Déploiement, partie réelle et rapport**
+  - Fichiers : `docs/progress.md`
+  - Tests attendus : `pnpm check` et e2e contre la production ; **une partie en présentiel à 8 ou plus, sans papier, jouée par l'utilisateur et sa table** (je fournis une liste de contrôle et j'attends le retour) ; définition de « terminé » vérifiée point par point
