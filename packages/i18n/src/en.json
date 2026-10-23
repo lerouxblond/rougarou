@@ -430,5 +430,52 @@
   "pending": {
     "hunter_shot": "{{name}}, the Hunter, is about to shoot.",
     "mayor_succession": "{{name}} is choosing a successor."
+  },
+  "script": {
+    "lobby": "Wait for everyone to join the table, then set up the game.",
+    "config": "Choose the composition and the options, then deal the roles.",
+    "deal": "Everyone looks at their role in secret, without giving anything away.",
+    "presentations": "Everyone introduces their character, in turn.",
+    "nightfall": "Night falls on the village. Everyone closes their eyes.",
+    "night_over": "Every step of the night is done.",
+    "step_unknown": "Call this role.",
+    "dawn": "Day breaks over the village… Announce who was found dead last night.",
+    "dawn_effects": "Let the dead make their last move, if any.",
+    "election": "The village chooses a Mayor: who wants to run?",
+    "debate": "The village debates. Whom do you suspect?",
+    "vote": "The village votes. Everyone names the one they want to eliminate.",
+    "execution": "The village has passed its sentence.",
+    "ended": "The game is over. Reveal every role."
+  },
+  "narrator": {
+    "script": "Text to read",
+    "steps": "Night order",
+    "tabs": "Narrator board",
+    "previous": "Before",
+    "next": "Next",
+    "step_state": {
+      "upcoming": "upcoming",
+      "current": "in progress",
+      "done": "done",
+      "skipped": "skipped"
+    },
+    "primary": {
+      "configure": "Set up",
+      "next_player": "Next player",
+      "start_night": "Start the night",
+      "next_step": "Next step",
+      "daybreak": "Break the day",
+      "to_day": "Go to the day",
+      "open_vote": "Open the vote",
+      "close_vote": "Close the vote",
+      "force": "Force: {{action}}"
+    },
+    "blocked": {
+      "deal": "Waiting: {{count}} players have not seen their role.",
+      "deal_one": "Waiting: {{count}} player has not seen their role.",
+      "step": "Waiting: {{step}}.",
+      "tie": "Waiting: the Mayor breaks the tie.",
+      "generic": "Actions are pending."
+    }
   }
 }

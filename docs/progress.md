@@ -603,7 +603,7 @@ au moment de les ajouter) : Radix UI Primitives (dialog, tabs, toast, switch), M
 ### Tâches
 
 Neuf PR de moins de 400 lignes de code non généré : **A** (T1, #17), **B1** (T2–T3, #18) et **B2** (T4–T5, #19) pour le moteur, la B ayant été coupée en deux pour tenir la limite,
-**C1**, **C2** (T6), **C3** et **C4** (T7) pour le design system, **D1** et **D2** (T8, joueur), **E** (T9, meneur), **F** (T10–T11, salon,
+**C1**, **C2** (T6), **C3** et **C4** (T7) pour le design system, **D1** et **D2** (T8, joueur), **E1** et **E2** (T9, meneur), **F** (T10–T11, salon,
 configuration, fin), **G** (T12, ambiance), **H** (T13), puis T14.
 
 - [x] **T1 — Docs, règles, ADR 0011** *(PR A)*
@@ -649,6 +649,7 @@ configuration, fin), **G** (T12, ambiance), **H** (T13), puis T14.
   - Fichiers : `apps/web/src/game/narrator/*.tsx` (trois colonnes ou onglets, `NightStepList`, `NarratorScript` (sans synthèse vocale, D-22), bouton principal et ligne « ce qui bloque », cercle avec les rôles, journal, annuler, forcer, pause, +30 s, mode correction), i18n, tests
   - Tests attendus : le libellé du bouton principal suit l'action reçue ; « ce qui bloque » ; axe ; raccourcis clavier
 
+  - **E1 fait** : tableau en trois colonnes sur ordinateur (ordre de la nuit, texte à lire et actions, joueurs avec leurs rôles), en onglets sur téléphone et tablette ; une seule mise en page rendue à la fois (média `min-width: 1024px`), pour que le bouton principal n'existe qu'une fois. Le texte à lire suit l'étape (réveil, puis coucher une fois résolue) avec le texte d'avant et celui d'après ; le bouton principal change de libellé selon le moment (« Lever le jour », « Ouvrir le vote »…) et, en attente, dit ce qu'il attend et propose de forcer en bouton secondaire. Barre d'outils : pause, reprise, +30 s, annuler. `test/narrator-screen.test.tsx` (10 tests). Le pilote e2e trouve le bouton principal par `data-testid="primary-action"`. Reste **E2** : intentions de nuit en direct, morts et causes à l'aube, journal, mode correction
 - [ ] **T10 — Salon et configuration** *(PR F)*
   - Fichiers : `apps/web/src/game/{Lobby,Config}.tsx` (QR, glisser-déposer, suggestion, compteurs, `BalanceMeter`, options groupées avec aide), i18n, tests
   - Tests attendus : la suggestion remplit les compteurs ; l'équilibre suit chaque + et − ; options groupées (Votes, Nuit, Révélations, Minuteurs) ; glisser-déposer et boutons clavier envoient le même ordre ; le QR encode `/join/:code`

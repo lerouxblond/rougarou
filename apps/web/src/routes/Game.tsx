@@ -1,18 +1,15 @@
-import type { MeResponse, NarratorView, Phase, PlayerView } from '@rougarou/protocol';
-import { Button, PhaseBanner, Timer } from '@rougarou/ui';
+import type { MeResponse, NarratorView, PlayerView } from '@rougarou/protocol';
+import { PhaseBanner, Timer } from '@rougarou/ui';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from '@tanstack/react-router';
-import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { api } from '../api.ts';
 import { AuthGate } from '../components/AuthGate.tsx';
 import { ConnectionIndicator } from '../components/ConnectionIndicator.tsx';
 import { FormError } from '../components/Field.tsx';
-import { ActionPanel } from '../game/ActionPanel.tsx';
-import { useGameConnection, useGameView, useSendCommand } from '../game/hooks.ts';
-import { Config } from '../game/Config.tsx';
-import { NarratorLobby } from '../game/Lobby.tsx';
+import { useGameConnection, useGameView } from '../game/hooks.ts';
+import { NarratorScreen } from '../game/NarratorScreen.tsx';
 import { PlayerScreen } from '../game/PlayerScreen.tsx';
 import { useGameStore } from '../game/store.ts';
 
@@ -26,21 +23,6 @@ export function Game() {
     </main>
   );
 }
-
-/**
- * Les ecrans du meneur par phase, sans cascade de `if` (`docs/04` §Client
- * web). Ceux du joueur sont dans `PlayerScreen`. Les phases absentes n'ont
- * encore que les actions brutes (M4, T9).
- */
-const NARRATOR_SCREENS: Partial<Record<Phase, (view: NarratorView) => ReactNode>> = {
-  LOBBY: (view) => <NarratorLobby view={view} />,
-  CONFIG: (view) => (
-    <>
-      <NarratorLobby view={view} />
-      <Config view={view} />
-    </>
-  ),
-};
 
 /** Le numero sous le titre : la nuit en cours, ou le jour qui la suit. */
 function counterOf(view: PlayerView | NarratorView): { key: string; count: number } | null {
@@ -97,44 +79,12 @@ function Table({ gameId, me }: { readonly gameId: string; readonly me: MeRespons
       </header>
 
       {view === null ? null : view.kind === 'narrator' ? (
-        <NarratorTable view={view} />
+        <NarratorScreen view={view} />
       ) : (
         <PlayerScreen view={view} me={me} />
       )}
 
       {view === null ? null : <DebugView view={view} />}
-    </>
-  );
-}
-
-function namesOf(view: PlayerView | NarratorView): Map<string, string> {
-  return new Map(view.players.map((player) => [player.id, player.name]));
-}
-
-function NarratorTable({ view }: { readonly view: NarratorView }) {
-  const { t } = useTranslation();
-  const { send, busy, error } = useSendCommand();
-  const confirmed = view.players.filter((player) => player.roleSeen).length;
-
-  return (
-    <>
-      {NARRATOR_SCREENS[view.phase]?.(view)}
-      {view.phase === 'DEAL' ? (
-        <p className="text-text-muted">
-          {t('game.confirmations', { count: confirmed, total: view.players.length })}
-        </p>
-      ) : null}
-      <ActionPanel actions={view.actions} names={namesOf(view)} skip={['KickPlayer']} />
-      <Button
-        variant="ghost"
-        disabled={busy}
-        onClick={() => {
-          void send({ type: 'Undo' });
-        }}
-      >
-        {t('actions.undo')}
-      </Button>
-      <FormError message={error === null ? null : t(error)} />
     </>
   );
 }

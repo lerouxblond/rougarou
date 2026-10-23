@@ -1,0 +1,241 @@
+import type { NarratorView, Phase } from '@rougarou/protocol';
+import { Button, NarratorScript, NightStepList, Tabs, type StepState } from '@rougarou/ui';
+import { useSyncExternalStore, type ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
+
+import { FormError } from '../components/Field.tsx';
+import { ActionPanel } from './ActionPanel.tsx';
+import { Config } from './Config.tsx';
+import { useSendCommand } from './hooks.ts';
+import { NarratorLobby } from './Lobby.tsx';
+import { blockerOf, primaryLabel, scriptOf, stepTexts, type Line } from './narrator-script.ts';
+import { PlayersList } from './PlayersPanel.tsx';
+import { VotePanel } from './VotePanel.tsx';
+
+/** Les actions que le bouton principal et la barre d'outils presentent deja. */
+const HANDLED = ['AdvancePhase', 'PauseTimer', 'ResumeTimer', 'ExtendTimer', 'KickPlayer'] as const;
+
+/** Ecran large (`docs/06` : trois colonnes a partir de 1024 px). */
+const WIDE = '(min-width: 1024px)';
+
+function subscribe(onChange: () => void): () => void {
+  const query = typeof window.matchMedia === 'function' ? window.matchMedia(WIDE) : null;
+
+  query?.addEventListener('change', onChange);
+  return () => query?.removeEventListener('change', onChange);
+}
+
+/** Une seule mise en page a la fois : le bouton principal n'existe qu'une fois. */
+function useWide(): boolean {
+  return useSyncExternalStore(
+    subscribe,
+    () => typeof window.matchMedia === 'function' && window.matchMedia(WIDE).matches,
+    () => false,
+  );
+}
+
+/** Ce que le meneur voit de la phase en cours, sous le texte a lire. */
+const PHASE_PANELS: Partial<Record<Phase, (view: NarratorView) => ReactNode>> = {
+  LOBBY: (view) => <NarratorLobby view={view} />,
+  CONFIG: (view) => (
+    <>
+      <NarratorLobby view={view} />
+      <Config view={view} />
+    </>
+  ),
+  MAYOR_ELECTION: (view) => <VotePanel view={view} />,
+  DAY_VOTE: (view) => <VotePanel view={view} />,
+};
+
+function useLine(): (line: Line) => string {
+  const { t } = useTranslation();
+
+  return (line) => {
+    // Le nom d'une etape de nuit est lui-meme une cle i18n.
+    const step = line.params?.step;
+
+    return t(line.key, {
+      ...line.params,
+      ...(typeof step === 'string' ? { step: t(stepTexts(step).title) } : {}),
+    });
+  };
+}
+
+/** Le bouton principal unique (`docs/12` §1), et ce qui le bloque juste au-dessus. */
+function PrimaryAction({ view }: { readonly view: NarratorView }) {
+  const { t } = useTranslation();
+  const line = useLine();
+  const { send, busy, error } = useSendCommand();
+  const advance = view.actions.find((action) => action.type === 'AdvancePhase');
+
+  if (advance?.type !== 'AdvancePhase') {
+    return null;
+  }
+
+  const label = t(primaryLabel(view));
+
+  return (
+    <div className="flex flex-col gap-2">
+      {advance.blocked ? (
+        <p aria-live="polite" className="text-sm text-text-muted">
+          {line(blockerOf(view))}
+        </p>
+      ) : null}
+      <Button
+        data-testid="primary-action"
+        // En attente, forcer reste possible mais discret : on attend d'ordinaire (`R-10`).
+        variant={advance.blocked ? 'secondary' : 'primary'}
+        loading={busy}
+        onClick={() => {
+          void send({ type: 'AdvancePhase', force: advance.blocked });
+        }}
+      >
+        {advance.blocked ? t('narrator.primary.force', { action: label }) : label}
+      </Button>
+      <FormError message={error === null ? null : t(error)} />
+    </div>
+  );
+}
+
+/** Libelle des commandes du minuteur (`R-16`). */
+const TIMER_LABELS = {
+  PauseTimer: 'actions.pause_timer',
+  ResumeTimer: 'actions.resume_timer',
+  ExtendTimer: 'actions.extend_timer',
+} as const;
+
+/** Annuler, pause, reprise et +30 s (`R-11`, `R-16`). */
+function Toolbar({ view }: { readonly view: NarratorView }) {
+  const { t } = useTranslation();
+  const { send, busy, error } = useSendCommand();
+  const timers = view.actions.flatMap((action) =>
+    action.type === 'PauseTimer' || action.type === 'ResumeTimer' || action.type === 'ExtendTimer'
+      ? [action.type]
+      : [],
+  );
+
+  return (
+    <div className="flex flex-col gap-1">
+      <div className="flex flex-wrap gap-2">
+        {timers.map((type) => (
+          <Button
+            key={type}
+            variant="secondary"
+            size="md"
+            disabled={busy}
+            onClick={() => {
+              void send({ type });
+            }}
+          >
+            {t(TIMER_LABELS[type])}
+          </Button>
+        ))}
+        <Button
+          variant="ghost"
+          size="md"
+          disabled={busy}
+          onClick={() => {
+            void send({ type: 'Undo' });
+          }}
+        >
+          {t('actions.undo')}
+        </Button>
+      </div>
+      <FormError message={error === null ? null : t(error)} />
+    </div>
+  );
+}
+
+function steps(view: NarratorView) {
+  const { night } = view;
+
+  return (night?.steps ?? []).map((step, index) => {
+    let state: StepState = 'upcoming';
+
+    if (
+      night !== null &&
+      (index < night.current || (index === night.current && night.stepResolved))
+    ) {
+      state = 'done';
+    } else if (night?.current === index) {
+      state = 'current';
+    }
+
+    return { id: step, label: stepTexts(step).title, state };
+  });
+}
+
+/**
+ * Le tableau de bord du meneur (`docs/06` §Mises en page) : etapes, texte a
+ * lire et actions, joueurs avec leurs roles. Trois colonnes sur ordinateur,
+ * des onglets sur telephone et tablette, avec l'action principale en bas.
+ */
+export function NarratorScreen({ view }: { readonly view: NarratorView }) {
+  const { t } = useTranslation();
+  const line = useLine();
+  const wide = useWide();
+  const names = new Map(view.players.map((player) => [player.id, player.name]));
+  const script = scriptOf(view);
+  const confirmed = view.players.filter((player) => player.roleSeen).length;
+
+  const stepList = (
+    <NightStepList
+      label={t('narrator.steps')}
+      steps={steps(view).map((step) => ({ ...step, label: t(step.label) }))}
+      stateLabels={{
+        upcoming: t('narrator.step_state.upcoming'),
+        current: t('narrator.step_state.current'),
+        done: t('narrator.step_state.done'),
+        skipped: t('narrator.step_state.skipped'),
+      }}
+    />
+  );
+  const main = (
+    <div className="flex flex-col gap-6">
+      <NarratorScript
+        label={t('narrator.script')}
+        current={line(script.current)}
+        {...(script.previous === undefined ? {} : { previous: line(script.previous) })}
+        {...(script.next === undefined ? {} : { next: line(script.next) })}
+        previousLabel={t('narrator.previous')}
+        nextLabel={t('narrator.next')}
+      />
+      {view.phase === 'DEAL' ? (
+        <p className="text-text-muted">
+          {t('game.confirmations', { count: confirmed, total: view.players.length })}
+        </p>
+      ) : null}
+      {PHASE_PANELS[view.phase]?.(view)}
+      <ActionPanel actions={view.actions} names={names} skip={[...HANDLED]} />
+      <PrimaryAction view={view} />
+      <Toolbar view={view} />
+    </div>
+  );
+
+  if (wide) {
+    return (
+      <div className="grid grid-cols-[14rem_1fr_18rem] gap-6">
+        <aside>{stepList}</aside>
+        {main}
+        <aside>
+          <PlayersList players={view.players} />
+        </aside>
+      </div>
+    );
+  }
+
+  return (
+    <Tabs
+      label={t('narrator.tabs')}
+      items={[
+        { value: 'script', label: t('narrator.script'), content: main },
+        { value: 'steps', label: t('narrator.steps'), content: stepList },
+        {
+          value: 'players',
+          label: t('players.label'),
+          content: <PlayersList players={view.players} />,
+        },
+      ]}
+    />
+  );
+}
