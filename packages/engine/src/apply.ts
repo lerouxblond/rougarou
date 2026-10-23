@@ -1,7 +1,7 @@
 import type { Actor, Ballot, Command, CommandEnvelope } from '@rougarou/protocol';
 
 import { requireNarrator, requireSystem } from './auth.ts';
-import { designateSuccessor } from './deaths.ts';
+import { designateSuccessor, hunterShoot } from './deaths.ts';
 import type { GameEvent } from './events.ts';
 import { evolve } from './evolve.ts';
 import { advanceNight, narratorResolveWolfTie, submitNightAction } from './night/flow.ts';
@@ -91,6 +91,8 @@ function dispatch(tx: Tx, actor: Actor, cmd: Command): EngineError | null {
       return inPhase(tx, 'MAYOR_ELECTION') ?? setCandidacy(tx, actor, false);
     case 'DesignateSuccessor':
       return designateSuccessor(tx, actor, cmd.playerId);
+    case 'HunterShoot':
+      return hunterShoot(tx, actor, cmd.playerId);
     case 'CastVote':
       return castVote(tx, actor, cmd.ballot);
     case 'BreakTie':

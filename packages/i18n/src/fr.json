@@ -143,7 +143,8 @@
     "wolves": "Les loups l'emportent.",
     "solo": "Un joueur l'emporte seul.",
     "vampires": "Les vampires l'emportent.",
-    "nobody": "Personne ne gagne."
+    "nobody": "Personne ne gagne.",
+    "lovers": "Les amoureux l'emportent."
   },
   "connection": {
     "connecting": "Connexion…",
@@ -224,6 +225,7 @@
     "extend_timer": "+30 s",
     "undo": "Annuler la dernière action",
     "spare": "Épargner : n'exécuter personne",
-    "abstain": "S'abstenir"
+    "abstain": "S'abstenir",
+    "hunter_shoot": "Tirer"
   }
 }

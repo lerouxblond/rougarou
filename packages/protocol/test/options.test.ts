@@ -85,3 +85,25 @@ describe('resolveFakeWake (R-20)', () => {
     expect(resolveFakeWake(options)).toBe(false);
   });
 });
+
+describe('littleGirlRisk (docs/02, Petite fille)', () => {
+  it('vaut 10 % de base et +10 points par nuit espionnee par defaut', () => {
+    expect(gameOptionsSchema.parse({}).littleGirlRisk).toEqual({ base: 10, increase: 10 });
+  });
+
+  it('garde la hausse par defaut quand seule la base change', () => {
+    expect(gameOptionsSchema.parse({ littleGirlRisk: { base: 0 } }).littleGirlRisk).toEqual({
+      base: 0,
+      increase: 10,
+    });
+  });
+
+  it('borne la base a 50 et la hausse a 25 points', () => {
+    expect(gameOptionsSchema.safeParse({ littleGirlRisk: { base: 51 } }).success).toBe(false);
+    expect(gameOptionsSchema.safeParse({ littleGirlRisk: { increase: 26 } }).success).toBe(false);
+    expect(gameOptionsSchema.safeParse({ littleGirlRisk: { base: -1 } }).success).toBe(false);
+    expect(
+      gameOptionsSchema.safeParse({ littleGirlRisk: { base: 50, increase: 25 } }).success,
+    ).toBe(true);
+  });
+});

@@ -14,16 +14,16 @@ interface RoleDefinition {
   unique: boolean;               // ne peut être présent qu'une fois
   minPlayers?: number;
   wakes: 'never' | 'firstNight' | 'everyNight' | 'everyOtherNight';
-  nightOrder?: number;           // plus petit = plus tôt
-  nightAction?: ActionSpec;      // cibles possibles, contraintes, défaut
-  dayAction?: ActionSpec;        // ex. Corbeau, Servante
-  hooks?: {                      // réactions aux événements du moteur
-    onDeath?: …; onTargeted?: …; onVoteResolved?: …; onDawn?: …;
-  };
-  winCondition?: (state) => boolean;   // rôles solo uniquement
-  visibility?: …;                // ce que ce rôle voit en plus (ex. loups entre eux)
+  nightSteps?: NightStepSpec[];  // ses étapes de nuit : ordre, acteurs, action, défaut, morts de l'aube
+  nightObservers?: NightObserverSpec[]; // regarde l'étape d'un autre rôle sans la bloquer (Petite fille)
+  onDeath?: (tx, playerId) => void;    // met en file ses effets à la mort (tir du Chasseur)
+  dayAction?: ActionSpec;        // ex. Corbeau, Servante (M6)
+  winCondition?: (state) => boolean;   // rôles solo uniquement (M6)
+  knowsTeammates: boolean;       // ce que ce rôle voit en plus (les loups entre eux)
 }
 ```
+
+Les informations privées qu'un rôle obtient (résultat de la Voyante, partenaire d'un amoureux…) sont rangées dans l'état, dans les infos du joueur, et sortent par la vue projetée (`me.knowledge`, ADR 0010).
 
 Un **registre** (`roles/index.ts`) assemble les définitions. Ajouter un rôle revient à ajouter un fichier, l'inscrire au registre, écrire ses tests et ajouter ses textes i18n. On ne touche jamais au cœur du moteur pour un rôle. C'est ce qui permettra les rôles personnalisés en V2.
 
@@ -59,25 +59,40 @@ Un **registre** (`roles/index.ts`) assemble les définitions. Ajouter un rôle r
 - Aucun pouvoir. Il débat et vote.
 
 ### Voyante · `seer` · Village · unique
-- Chaque nuit, elle sonde un joueur vivant autre qu'elle. Selon l'option `seerMode`, elle découvre son **rôle exact** ou seulement son **camp**. Le résultat est immédiat et privé.
-- Un joueur infecté apparaît comme loup (`team` effectif = loups).
+- Chaque nuit, elle sonde **un** joueur vivant autre qu'elle. Selon l'option `seerMode`, elle découvre son **rôle exact** ou seulement son **camp**.
+- Le résultat est **immédiat** (`R-21`) et privé : il entre aussitôt dans ses infos (« Mes infos ») et l'étape se résout. Avec `seerMode: 'role'`, le rôle sondé s'affiche aussi sur ce joueur dans sa liste des joueurs.
+- Minuteur ou forçage : elle ne sonde personne.
+- Elle lit le camp **effectif** du joueur (`teamOf`) : un joueur infecté (M6) apparaît comme loup.
 
 ### Sorcière · `witch` · Village · unique
 - Elle possède **1 potion de vie** et **1 potion de mort**, chacune utilisable une fois par partie, et elle peut utiliser les deux la même nuit.
-- Elle voit la victime désignée par les loups, même si le Salvateur la protège (elle ne le sait pas). Si elle utilise sa potion de vie sur un joueur déjà protégé, la potion est quand même consommée.
-- Elle ne peut se sauver elle-même que selon l'option `witchSelfSave`.
-- La cible de la potion de mort meurt à l'aube, même si le Salvateur la protège.
+- Elle voit la victime désignée par les loups (ou « personne »), même si le Salvateur la protège (elle ne le sait pas). Si elle utilise sa potion de vie sur un joueur déjà protégé, la potion est quand même consommée : une potion est consommée dès qu'elle est bue.
+- Elle répond en **une seule fois** par nuit : `{ save, kill }`, où « ne rien faire » vaut `false` et `null`. Aucun aller-retour ne trahit ainsi un choix.
+- Potion de vie : seulement s'il y a une victime et que la potion reste. Sur elle-même, selon l'option `witchSelfSave` (`never`, `firstNightOnly`, `always`).
+- Potion de mort : un joueur vivant autre qu'elle. Sa cible meurt à l'aube (cause `witch`, connue du seul meneur), même si le Salvateur la protège.
+- Elle se réveille chaque nuit, **même sans potion** : sinon, le meneur trahirait leur usage.
+- Minuteur ou forçage : elle ne fait rien.
 
 ### Chasseur · `hunter` · Village · unique
-- Quand il meurt, quelle qu'en soit la cause, il désigne immédiatement un joueur vivant qui meurt avec lui (minuteur de 30 s, sinon pas de tir). S'il meurt la nuit, il tire à l'aube.
+- Quand il meurt, quelle qu'en soit la cause (chagrin compris), un tir entre dans la file des effets à la mort, après le chagrin et avant la succession du Maire (`R-42`). Il désigne un joueur vivant, qui meurt avec la cause `hunter` et déclenche à son tour ses effets. S'il meurt la nuit, il tire à l'aube.
+- Minuteur `hunterShot` (30 s) ou forçage : pas de tir.
+- Son rôle est révélé dès que le tir est attendu, même avec `revealRoleOnDeath: false` (`R-45`).
 
 ### Cupidon · `cupid` · Village · unique
-- La nuit 1, il désigne 2 joueurs (il peut se choisir lui-même), qui deviennent **amoureux**. Les amoureux apprennent l'identité et le rôle l'un de l'autre.
-- Si un amoureux meurt, l'autre meurt de chagrin aussitôt (`R-41`). Si les deux amoureux sont de camps différents, voir `R-03`.
+- La nuit 1 (ordre 10), il désigne 2 joueurs vivants distincts (il peut se choisir lui-même), qui deviennent **amoureux**. Il connaît le couple, mais pas les rôles des amoureux. Minuteur ou forçage : pas d'amoureux.
+- Étape « Amoureux » (nuit 1, ordre 12) : chaque amoureux découvre l'autre, son pseudo et son rôle (dans ses infos et dans la liste des joueurs), puis confirme. Minuteur ou forçage : confirmé.
+- Si un amoureux meurt, l'autre meurt de chagrin aussitôt (`R-41`, cause `grief`). Si le couple réunit un loup et un non-loup, voir `R-03`.
 
 ### Petite fille · `little-girl` · Village · unique
-- **Adaptation numérique** : pendant le tour des loups, elle voit en lecture seule leur canal et leur vote en cours, **avec les pseudos masqués** (« Loup A », « Loup B »…).
-- Option `littleGirlRisk` (0 à 50 %, défaut 0) : chaque nuit où elle espionne, les loups ont cette probabilité de recevoir l'indice « vous vous sentez observés ». Cet indice ne révèle jamais son identité. Elle peut choisir de ne pas espionner.
+- **Elle choisit de prendre le risque.** Pendant l'étape des loups, elle a l'action « Espionner ». Par défaut, elle n'espionne pas. Elle n'est pas un acteur de l'étape et ne la bloque jamais.
+- **Ce qu'elle voit.** Dès qu'elle espionne, elle voit en direct les votes de la meute (les cibles sont nommées). Chaque loup vivant y apparaît sous un **pseudo partiellement dévoilé** :
+  - une case par caractère, donc la longueur se voit, et les espaces restent visibles ;
+  - **un tiers des lettres** (arrondi à l'inférieur, au moins une à partir de 3 lettres) apparaissent, à des positions tirées au hasard. Par exemple, `A _ _ _ _ _ e` pour « Alexane » (7 lettres, 2 dévoilées). Un pseudo de 1 ou 2 lettres ne montre que sa longueur ;
+  - le tirage est refait **chaque nuit** et pour chaque loup, et les loups sont listés dans un ordre tiré au hasard : en espionnant plusieurs nuits, elle recoupe ses indices. Les pseudos partiels de chaque nuit restent dans ses infos.
+  - Le pseudo complet et l'identifiant d'un loup ne partent jamais vers elle. Les tirages sont inscrits dans l'événement, pour le rejeu.
+- **Le risque grandit à chaque prise de risque.** La n-ième nuit où elle espionne, elle est repérée avec la probabilité `min(base + (n − 1) × increase, 75 %)`. Option `littleGirlRisk` : `base` de 0 à 50 % (défaut **10**), `increase` de 0 à 25 points (défaut **10**). Avec les défauts : 10 %, 20 %, 30 %… jusqu'à 75 %. Seules les nuits où elle espionne comptent, et le compteur ne retombe pas après qu'elle a été repérée. Un tirage par nuit espionnée, inscrit dans l'événement.
+- **Ce que reçoivent les loups** quand elle est repérée : une **liste de 3 suspects**, la Petite fille et 2 autres non-loups vivants tirés au hasard (moins s'il n'y en a pas assez), dans l'ordre des places. L'indice, « La Petite fille vous observe : c'est l'une de ces personnes », reste ensuite dans leurs infos. Si elle est repérée de nouveau, les loups reçoivent une **nouvelle** liste, tirée à part : en croisant les listes, ils resserrent l'étau.
+- Cela marche autant en présentiel qu'à distance. Le chat des loups, et sa version masquée pour elle, arrivent en M5.
 
 ### Maire (titre, pas un rôle)
 - Voir `R-50` à `R-52`. On le représente comme un **badge** sur le joueur, pas comme un `RoleDefinition`.
@@ -169,6 +184,8 @@ Le moteur propose une composition par défaut (`suggestComposition(playerCount, 
 Le reste des places est complété par des Simples villageois. Un **indicateur d'équilibre** (score heuristique du poids de chaque camp) s'affiche dans l'écran de configuration.
 
 ## Cas limites (tous doivent avoir un test)
+
+Les cas 1 et 3 sont testés en M3. Les cas 2 et 9 reposent sur le Salvateur et l'Infect père des loups : M3 pose leurs points d'accroche (la potion de vie est consommée dès qu'elle est bue, la Voyante lit le camp effectif), et leurs tests arrivent en M6 avec ces rôles.
 
 1. Cupidon unit un loup et un villageois → ils forment un camp mixte (`R-03`).
 2. La Sorcière sauve la cible alors que le Salvateur l'avait déjà protégée → personne ne meurt et la potion est consommée.

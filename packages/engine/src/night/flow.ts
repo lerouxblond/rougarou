@@ -7,7 +7,7 @@ import { resolveWolfTie } from '../roles/werewolf.ts';
 import type { EngineError } from '../result.ts';
 import { seatedPlayers, type Death, type GameState, type NightStepId } from '../state.ts';
 import { clearTimer, engineError, startTimer, type Push, type Tx } from '../tx.ts';
-import { wakesOnNight, type NightStepSpec } from './types.ts';
+import { wakesOnNight, type NightObserverSpec, type NightStepSpec } from './types.ts';
 
 /**
  * Le plan de la nuit `nightNumber` (`R-20`) : les etapes des roles distribues
@@ -20,13 +20,15 @@ export function nightPlan(state: GameState, nightNumber: number): NightStepSpec[
   const steps = new Map<NightStepId, NightStepSpec>();
 
   for (const player of seatedPlayers(state)) {
-    const step = player.role === null ? undefined : getRole(player.role).nightStep;
+    const declared = player.role === null ? [] : (getRole(player.role).nightSteps ?? []);
 
-    if (step !== undefined && wakesOnNight(step.wakes, nightNumber)) {
-      const awake = step.actors(state).length > 0;
+    for (const step of declared) {
+      if (wakesOnNight(step.wakes, nightNumber)) {
+        const awake = step.scheduled?.(state) ?? step.actors(state).length > 0;
 
-      if (awake || fakeWake) {
-        steps.set(step.id, step);
+        if (awake || fakeWake) {
+          steps.set(step.id, step);
+        }
       }
     }
   }
@@ -43,7 +45,7 @@ export function nightPlan(state: GameState, nightNumber: number): NightStepSpec[
 /** La specification d'une etape, declaree par un role ou par le mode. */
 function findStep(state: GameState, id: NightStepId): NightStepSpec {
   const declared = [
-    ...registeredRoles().flatMap((role) => (role.nightStep === undefined ? [] : [role.nightStep])),
+    ...registeredRoles().flatMap((role) => role.nightSteps ?? []),
     ...getMode(state.options.gameMode).nightSteps,
   ];
   const spec = declared.find((step) => step.id === id);
@@ -67,6 +69,25 @@ export function currentStep(state: GameState): NightStepSpec {
   }
 
   return findStep(state, id);
+}
+
+/** Ceux qui regardent l'etape en cours sans y agir, avec la specification de leur role. */
+export function currentObservers(
+  state: GameState,
+): { readonly spec: NightObserverSpec; readonly players: PlayerId[] }[] {
+  const id = state.night?.steps[state.night.current];
+  const present = new Set(seatedPlayers(state).map((player) => player.role));
+
+  return registeredRoles()
+    .filter((role) => present.has(role.id))
+    .flatMap((role) => role.nightObservers ?? [])
+    .filter((spec) => spec.step === id)
+    .map((spec) => ({ spec, players: spec.observers(state) }));
+}
+
+/** La specification par laquelle `playerId` regarde l'etape en cours, s'il la regarde. */
+export function observerSpecOf(state: GameState, playerId: PlayerId): NightObserverSpec | null {
+  return currentObservers(state).find(({ players }) => players.includes(playerId))?.spec ?? null;
 }
 
 /** La nuit tombe : on calcule le plan et on lance la premiere etape. */
@@ -99,6 +120,8 @@ function enterStep(tx: Tx, index: number): void {
   tx.emit({ type: 'NightStepStarted', index });
 
   const step = currentStep(tx.state);
+
+  step.onEnter?.(tx);
 
   if (step.actors(tx.state).length === 0) {
     step.resolveByDefault(tx);
@@ -135,12 +158,10 @@ function goToNextStep(tx: Tx): void {
  * « Lever le jour » (`R-12`).
  */
 function endNight(tx: Tx): void {
-  const deaths: Death[] = [];
-  const victim = tx.state.night?.wolfVictim ?? null;
-
-  if (victim !== null && tx.state.players[victim]?.alive === true) {
-    deaths.push({ playerId: victim, cause: 'wolves' });
-  }
+  const state = tx.state;
+  const deaths = (state.night?.steps ?? [])
+    .map((id) => findStep(state, id))
+    .reduce<Death[]>((planned, step) => step.dawn?.(state, planned) ?? planned, []);
 
   clearTimer(tx);
   tx.emit({ type: 'NightEnded', deaths });
@@ -159,7 +180,12 @@ export function submitNightAction(tx: Tx, actor: Actor, action: NightAction): En
     return engineError('WRONG_PHASE');
   }
 
-  const error = currentStep(tx.state).submit(tx, player.id, action);
+  const step = currentStep(tx.state);
+  const observer = step.actors(tx.state).includes(player.id)
+    ? null
+    : observerSpecOf(tx.state, player.id);
+  const error =
+    observer === null ? step.submit(tx, player.id, action) : observer.submit(tx, player.id, action);
 
   if (error === null && tx.state.night?.stepResolved === true) {
     afterResolution(tx);

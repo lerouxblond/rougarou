@@ -3,11 +3,12 @@ import {
   type Ballot,
   type Composition,
   type GameOptions,
+  type Knowledge,
   type Phase,
   type PlayerId,
   type RoleId,
-  type TeamId,
   type VoteOutcome,
+  type Winner,
 } from '@rougarou/protocol';
 
 /**
@@ -61,6 +62,8 @@ export interface PlayerState {
   readonly roleSeen: boolean;
   /** Le role est connu de tous (mort avec `revealRoleOnDeath`, `R-43`). */
   readonly roleRevealed: boolean;
+  /** Ses infos privees, dans l'ordre ou il les a apprises (ADR 0010). */
+  readonly knowledge: readonly Knowledge[];
 }
 
 /**
@@ -83,8 +86,8 @@ export interface NightState {
   readonly wolfVictim: PlayerId | null;
 }
 
-/** Cause d'une mort. */
-export type DeathCause = 'wolves' | 'vote';
+/** Cause d'une mort, connue du seul meneur (`docs/04` §Projection). */
+export type DeathCause = 'wolves' | 'witch' | 'vote' | 'hunter' | 'grief';
 
 export interface Death {
   readonly playerId: PlayerId;
@@ -129,11 +132,17 @@ export interface MayorSuccessionEffect {
   readonly from: PlayerId;
 }
 
-/** Un effet a la mort qui attend une resolution (`R-41`). Le Chasseur s'ajoute en M3. */
-export type PendingEffect = MayorSuccessionEffect;
+/** Le Chasseur mort doit tirer (`R-42`, `R-45`). */
+export interface HunterShotEffect {
+  readonly kind: 'hunterShot';
+  readonly from: PlayerId;
+}
 
-/** Issue de la partie (`docs/01` §1). */
-export type Winner = TeamId | 'nobody';
+/** Un effet a la mort qui attend une resolution (`R-41`, `R-42`). */
+export type PendingEffect = HunterShotEffect | MayorSuccessionEffect;
+
+/** Issue de la partie (`docs/01` §1, `R-03`). */
+export type { Winner };
 
 /** Etat vide, avant l'evenement `GameCreated`. */
 export function emptyState(): GameState {

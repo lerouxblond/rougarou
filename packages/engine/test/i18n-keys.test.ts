@@ -105,6 +105,8 @@ describe('Cles i18n du moteur (CLAUDE.md regle 6)', () => {
   });
 
   it('chaque issue de partie a son annonce', () => {
-    expect(missing([...TEAM_IDS, 'nobody'].map((winner) => `winner.${winner}`))).toEqual([]);
+    expect(missing([...TEAM_IDS, 'lovers', 'nobody'].map((winner) => `winner.${winner}`))).toEqual(
+      [],
+    );
   });
 });

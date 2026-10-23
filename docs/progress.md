@@ -438,3 +438,91 @@ Quatre PR : **A** (T1–T3, règles et protocole), **B** (T4–T6, base et compt
 **M2 est terminé.**
 
 **Points ouverts** : (1) les e-mails attendent un domaine (D-17, ADR 0009) ; (2) le coût CPU de scrypt est à surveiller dans le tableau de bord Cloudflare (aucune erreur 1102 constatée) ; (3) GitHub a deux fois signalé un run de CI terminé alors que son job e2e tournait encore, et une fois renvoyé une erreur interne à release-please : il faut vérifier les jobs eux-mêmes avant de merger.
+
+---
+
+## M3 — Rôles classiques
+
+**But** : la Voyante, la Sorcière, le Chasseur, Cupidon (et les amoureux) et la Petite fille
+rejoignent les loups et les villageois.
+
+**Terminé quand** : chaque rôle a ses tests, son test de non-fuite et ses textes i18n, et une
+partie e2e à 8 joueurs utilise tous les rôles classiques.
+
+### Décisions bloquantes (`docs/12` §7)
+
+| ID | Décision | État |
+|---|---|---|
+| D-11 | Petite fille : **modifiée** le 2026-10-22. Elle voit des pseudos de loups partiellement dévoilés ; quand elle se fait repérer, les loups reçoivent une courte liste de suspects qui la contient ; risque croissant à chaque espionnage (P21) | ✅ validé le 2026-10-22 |
+
+### Précisions de règles (règle 5 de `CLAUDE.md`)
+
+P17 à P25 sont ✅ validées le 2026-10-22. P21 a été **revue** à la demande de
+l'utilisateur (pseudos partiels, liste de 3 suspects, risque croissant) avant d'être validée.
+
+| # | Sujet | Proposition |
+|---|---|---|
+| P17 | **Où vit une information privée** : `docs/04` prévoit un message WS `private`, mais il serait perdu au rechargement et échapperait au test de non-fuite | Les infos privées vivent dans `GameState` (`knowledge` par joueur) et sortent par la vue projetée : `me.knowledge[]` (« Mes infos »). Le message `private` est retiré de `docs/04`. ADR 0010 |
+| P18 | **Voyante** | Une cible vivante autre qu'elle, une fois par nuit. Le résultat (rôle, ou camp avec `seerMode: 'team'`) entre aussitôt dans ses infos (immédiat, `R-21`) et l'étape se résout. Minuteur ou forçage : pas de sondage |
+| P19 | **Sorcière** | Une seule soumission par nuit `{ save, kill }` (« ne rien faire » = `false` / `null`), pour qu'aucun aller-retour ne trahisse un choix. Elle voit la victime des loups (ou « personne »). Vie : seulement s'il y a une victime et que la potion reste ; sur elle-même selon `witchSelfSave`. Mort : un vivant autre qu'elle. Elle se réveille même sans potion, sinon le meneur trahirait leur usage. Minuteur ou forçage : rien. Ordre `R-40` : victime des loups sauf potion de vie, puis cible de la potion de mort (cause `witch`, connue du seul meneur) |
+| P20 | **Chasseur** | À sa mort (toute cause), un effet `hunterShot` entre dans la file, après le chagrin et avant la succession du Maire (`R-42`). Cible : un vivant. Minuteur `hunterShot` ou forçage : pas de tir (`R-13`). Comme l'attente est publique, **son rôle est révélé dès que le tir est attendu**, même avec `revealRoleOnDeath: false`. Sa victime meurt avec la cause `hunter` et déclenche à son tour ses effets |
+| P21 | **Petite fille (D-11), version revue** | **Choix de prendre le risque** : pendant l'étape des loups, elle a l'action « Espionner », et par défaut elle n'espionne pas. Elle n'est pas un acteur de l'étape et ne bloque jamais les loups. **Ce qu'elle voit** : dès qu'elle espionne, elle voit en direct les votes de la meute (les cibles sont nommées). Chaque loup y apparaît sous un **pseudo partiellement dévoilé** : une case par caractère (donc la longueur se voit), les espaces restent visibles, et **un tiers des lettres** (arrondi à l'inférieur, au moins une à partir de 3 lettres) apparaissent, à des positions tirées au hasard. Exemple : `A _ _ x _ _ e` pour « Alexane ». Le tirage est refait **chaque nuit** et pour chaque loup, et les loups sont listés dans un ordre tiré au hasard : en espionnant plusieurs nuits, elle recoupe ses indices. Les tirages sont inscrits dans l'événement, pour le rejeu. Le pseudo complet et l'identifiant d'un loup ne partent jamais vers elle. Un pseudo de 1 ou 2 lettres ne montre que sa longueur. **Le risque grandit à chaque prise de risque** : la n-ième nuit où elle espionne, elle est repérée avec la probabilité `min(base + (n − 1) × hausse, 75 %)`. Deux options : `littleGirlRisk.base` (0 à 50 %, défaut **10 %**) et `littleGirlRisk.increase` (0 à 25 points, défaut **10**). Avec les défauts : 10 %, 20 %, 30 %… jusqu'à 75 %. Seules les nuits où elle espionne comptent. Le compteur ne retombe pas après qu'elle a été repérée. Un tirage par nuit espionnée, inscrit dans l'événement. **Ce que reçoivent les loups** : pas de pseudo partiel, qu'ils pourraient trop facilement recouper à plusieurs. Ils reçoivent une **liste de 3 suspects** : la Petite fille et 2 autres non-loups vivants tirés au hasard (moins s'il n'y en a pas assez), affichés dans l'ordre des places. L'indice, « La Petite fille vous observe : c'est l'une de ces personnes », reste ensuite dans leurs infos. Si elle est repérée de nouveau, les loups reçoivent une **nouvelle** liste, tirée à part : en croisant les listes, ils resserrent l'étau. Il marche autant en présentiel qu'à distance. Le chat des loups, et sa version masquée pour elle, arrivent en M5 |
+| P22 | **Cupidon et amoureux** | Nuit 1, ordre 10 : Cupidon désigne 2 vivants distincts (lui compris). Minuteur ou forçage : pas d'amoureux. Ordre 12 : étape « Amoureux », où chacun découvre l'autre (pseudo et rôle, dans ses infos et dans la liste des joueurs) et confirme ; minuteur ou forçage : confirmé. Le chagrin (`R-41`) est immédiat, cause `grief` |
+| P23 | **Amoureux mixtes (`R-03`)** | Un couple loup + non-loup ajoute le vainqueur `lovers` (nouvelle valeur de `Winner`, pas un `TeamId`) : il gagne quand les deux amoureux sont les deux seuls vivants. Priorité `R-06` : au-dessus des loups et du village. Chacun garde son camp pour le reste (le loup amoureux vote toujours avec la meute) |
+| P24 | **Morts en chaîne (`R-42`)** | Pour une même vague de morts : on tue d'abord tous les chagrins (récursivement), puis on met en file les tirs de Chasseur, puis les successions du Maire. Une mort causée par un effet de la file ajoute ses effets à la fin de la file |
+| P25 | **Cas limites 2 et 9** : M3 doit les tester, mais ils reposent sur le Salvateur et l'Infect père des loups (M6) | En M3 : la potion de vie est consommée dès qu'elle est bue, et la Voyante lit le camp **effectif** (`teamOf`), point d'accroche de l'infection. Les tests des cas 2 et 9 tels qu'écrits passent en **M6**, avec leurs rôles. `docs/10` est mis à jour |
+
+**Hors M3** : chat des loups et de la Petite fille (M5), sprites pixel art dans l'UI (M4 ;
+en M3, cartes SVG de repli), écrans soignés (M4 ; en M3, contrôles bruts comme en M2).
+
+### Tâches
+
+Trois PR : **A** (T1–T2, règles et points d'accroche), **B** (T3–T7, les rôles),
+**C** (T8–T10, client, cartes, e2e), puis T11.
+
+- [x] **T1 — Docs, règles, ADR 0010** *(PR A)*
+  - Fichiers : `docs/01-regles-du-jeu.md` (`R-03` et `R-42` précisés par P23 et P24, `R-45` révélation du Chasseur, option `littleGirlRisk` au §8 : `{ base: 10, increase: 10 }`, plafond 75 %), `docs/02-roles.md` (fiches précisées par P18 à P22 ; la fiche de la Petite fille est réécrite selon P21 revue), `docs/04-architecture.md` (P17, points d'accroche des rôles), `docs/10-roadmap.md` (P25), `docs/12-deroulement-partie.md` (D-11 réécrite, puis → ✅ ; la ligne #7 du §2 est mise à jour), `docs/07-assets.md` (la police d'affichage est Cormorant Garamond dans `tokens.css`, pas Cinzel), `docs/adr/0010-infos-privees-dans-la-vue.md`
+  - Tests attendus : aucun (document)
+
+- [x] **T2 — Points d'accroche génériques du moteur** *(PR A)*
+  - Fichiers : `packages/engine/src/{state,events,evolve,deaths,project,actions,victory}.ts`, `roles/types.ts` (`nightSteps[]`, `onDeath`), `night/{types,flow}.ts` (`observers` d'une étape, morts de l'aube déclarées par chaque étape), `packages/protocol/src/{commands,views,options}.ts` (`me.knowledge`, genres d'effets en attente, causes de mort, `littleGirlRisk`), `test/deaths.test.ts`
+  - Contenu : aucun changement de comportement pour les loups et les villageois ; la file d'effets accepte plusieurs genres d'effets (P24)
+  - Tests attendus : les 202 tests existants passent ; ordre de la file `R-42` ; couverture ≥ 90 %
+
+- [ ] **T3 — Voyante** *(PR B)*
+  - Fichiers : `src/roles/seer.ts`, `test/roles/seer.test.ts`, `test/leaks/seer.test.ts`, i18n (`roles.seer.{name,short,rules,narrator.wake,narrator.sleep}`), `packages/ui/icons/icon-role-seer.svg`, `apps/web/public/assets/CREDITS.md`
+  - Tests attendus : P18 (cible valide, soi-même et mort refusés, une seule fois, `seerMode` rôle et camp, minuteur → rien, camp effectif via `teamOf`) ; non-fuite : le résultat n'est visible que d'elle et du meneur, et la vue des autres reste identique toute la nuit
+
+- [ ] **T4 — Sorcière** *(PR B)*
+  - Fichiers : `src/roles/witch.ts`, `test/roles/witch.test.ts`, `test/leaks/witch.test.ts`, i18n, icône, crédits
+  - Tests attendus : P19 (vie sans victime refusée, potion épuisée refusée, deux potions la même nuit, `witchSelfSave` × 3, potion de vie consommée, potion de mort tue à l'aube, réveil sans potion) ; non-fuite : la victime n'est vue que d'elle (et des loups), la cause `witch` jamais par un joueur
+
+- [ ] **T5 — Chasseur** *(PR B)*
+  - Fichiers : `src/roles/hunter.ts`, `test/roles/hunter.test.ts`, `test/leaks/hunter.test.ts`, i18n, icône, crédits
+  - Tests attendus : P20 (tir à l'aube après une mort de nuit, tir après exécution, minuteur et forçage → pas de tir, Chasseur Maire : tir puis succession, tir sur le dernier loup → victoire du village, révélation avec `revealRoleOnDeath: false`)
+
+- [ ] **T6 — Cupidon, amoureux, `R-03`** *(PR B)*
+  - Fichiers : `src/roles/cupid.ts`, `src/lovers.ts`, `src/modes/classic.ts` (condition `lovers`), `test/roles/cupid.test.ts`, `test/leaks/lovers.test.ts`, i18n, icône, crédits
+  - Tests attendus : P22, P23, P24, **cas limite 1** (couple loup + villageois, victoire `lovers` à deux survivants, priorité `R-06`), **cas limite 3** (le Chasseur meurt de chagrin et tire), chagrin en chaîne avec la succession du Maire ; non-fuite : seuls les amoureux (et le meneur) connaissent le couple, et Cupidon ne voit pas leurs rôles
+
+- [ ] **T7 — Petite fille** *(PR B)*
+  - Fichiers : `src/roles/little-girl.ts`, `test/roles/little-girl.test.ts`, `test/leaks/little-girl.test.ts`, i18n, icône, crédits ; `test/bot.ts` et `test/properties/random-games.test.ts` (les bots jouent tous les rôles classiques)
+  - Tests attendus : P21. Sans espionnage, elle ne voit rien. Masque des pseudos : longueur conservée, espaces visibles, ⌊lettres / 3⌋ lettres dévoilées (au moins 1 à partir de 3 lettres, aucune en dessous). Positions et ordre des loups retirés d'une nuit à l'autre, mais identiques au rejeu. Risque : avec base et hausse à 0, jamais repérée ; avec les défauts, 10 %, 20 %, 30 % sur les nuits espionnées successives, les nuits sans espionnage ne comptent pas, et le plafond est de 75 % ; avec des graines connues, repérée puis non repérée. Liste des suspects : 3 noms, elle comprise, aucun loup, moins s'il manque des non-loups vivants ; elle reste dans les infos des loups les nuits suivantes ; une deuxième détection ajoute une nouvelle liste, tirée à part. Elle ne bloque jamais l'étape. Non-fuite : jamais un identifiant de loup ni un pseudo complet dans sa vue (sauf si le rôle est déjà révélé), et seuls les loups voient la liste des suspects. 1 000 parties aléatoires avec tous les rôles classiques sans violer d'invariant. Couverture ≥ 90 %
+
+- [ ] **T8 — Cartes de rôle en SVG de repli** *(PR C)*
+  - Fichiers : `packages/ui/src/{RoleCardArt,RoleIcon}.tsx`, `packages/ui/icons/*.svg` (les 7 rôles de M3, dessins originaux), `RoleCardArt.stories.tsx`, `test/role-card-art.test.tsx`
+  - Contenu : carte 3:4, fond texturé en SVG, accent du camp (tokens), icône centrée, nom du rôle en police d'affichage, dans les deux thèmes ; texte alternatif traduit
+  - Tests attendus : une carte par rôle de M3, nom lu par les lecteurs d'écran, axe sans violation
+
+- [ ] **T9 — Client : actions et « Mes infos »** *(PR C)*
+  - Fichiers : `apps/web/src/game/{ActionPanel,RoleCard,MyInfo,NightPanel}.tsx`, i18n, `test/*.test.tsx`
+  - Contenu : contrôles bruts pour sonder, les potions, désigner deux amoureux, confirmer, espionner, tirer ; « Mes infos » ; la carte de rôle utilise `RoleCardArt`
+  - Tests attendus : un contrôle par action reçue, aucun sans action, « Mes infos » annoncé par `aria-live`, axe sur chaque écran
+
+- [ ] **T10 — E2E à 8 joueurs avec tous les rôles classiques** *(PR C)*
+  - Fichiers : `e2e/fixtures/table.ts` (N joueurs, composition imposée), `e2e/m3-classic-roles.spec.ts`
+  - Tests attendus : 1 meneur + 8 joueurs (2 loups, Voyante, Sorcière, Chasseur, Cupidon, Petite fille, Villageois) ; chaque rôle agit au moins une fois ; contrôle de non-fuite de rôle à chaque tour ; la partie va jusqu'à une victoire
+
+- [ ] **T11 — Déploiement, vérification et rapport**
+  - Fichiers : `docs/progress.md`
+  - Tests attendus : `pnpm check` au vert, e2e M3 contre la production, définition de « terminé » vérifiée point par point

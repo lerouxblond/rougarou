@@ -2,6 +2,7 @@ import type {
   Ballot,
   Composition,
   GameOptions,
+  Knowledge,
   Phase,
   PlayerId,
   RoleId,
@@ -50,6 +51,8 @@ export type GameEvent =
   | { readonly type: 'WolfVoteCast'; readonly wolf: PlayerId; readonly target: PlayerId }
   | { readonly type: 'WolfTieDetected'; readonly tied: readonly PlayerId[] }
   | { readonly type: 'WolvesResolved'; readonly victim: PlayerId | null }
+  // Une etape de nuit autre que celle des loups est terminee.
+  | { readonly type: 'NightStepResolved' }
   | { readonly type: 'NightEnded'; readonly deaths: readonly Death[] }
   // Morts
   | { readonly type: 'DeathsAnnounced' }
@@ -61,6 +64,10 @@ export type GameEvent =
     }
   | { readonly type: 'EffectQueued'; readonly effect: PendingEffect }
   | { readonly type: 'EffectResolved' }
+  // Le role d'un vivant devient public (tir du Chasseur, `R-45`).
+  | { readonly type: 'RoleRevealed'; readonly playerId: PlayerId }
+  // Informations privees (ADR 0010)
+  | { readonly type: 'KnowledgeGained'; readonly playerId: PlayerId; readonly knowledge: Knowledge }
   // Maire
   | {
       readonly type: 'MayorDesignated';
@@ -69,6 +76,7 @@ export type GameEvent =
       readonly drawn: boolean;
     }
   | { readonly type: 'MayorRemoved'; readonly playerId: PlayerId }
+  | { readonly type: 'HunterShot'; readonly from: PlayerId; readonly target: PlayerId }
   | { readonly type: 'ElectionStarted' }
   | { readonly type: 'CandidacyDeclared'; readonly playerId: PlayerId }
   | { readonly type: 'CandidacyWithdrawn'; readonly playerId: PlayerId }
@@ -110,6 +118,9 @@ export const REVEALING_EVENTS: ReadonlySet<GameEventType> = new Set<GameEventTyp
   'GameCreated',
   'RolesDealt',
   'DeathsAnnounced',
+  'RoleRevealed',
+  'KnowledgeGained',
+  'HunterShot',
   'ElectionVoteClosed',
   'MayorElected',
   'VoteClosed',

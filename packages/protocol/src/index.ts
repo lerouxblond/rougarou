@@ -51,10 +51,12 @@ export {
 } from './ids.ts';
 export {
   gameOptionsSchema,
+  littleGirlRiskSchema,
   resolveFakeWake,
   timersSchema,
   type GameOptions,
   type GameOptionsInput,
+  type LittleGirlRisk,
   type TimerKey,
   type Timers,
 } from './options.ts';
@@ -82,11 +84,16 @@ export {
   actionDescriptorSchema,
   narratorViewSchema,
   playerViewSchema,
+  knowledgeSchema,
+  maskSchema,
   voteOutcomeSchema,
+  winnerSchema,
   type ActionDescriptor,
   type NarratorView,
   type PlayerView,
+  type Knowledge,
   type VoteOutcome,
+  type Winner,
 } from './views.ts';
 export {
   clientMessageSchema,

@@ -77,13 +77,19 @@ function checkVictory(state: GameState): Victory | null;
 - **Déterminisme** : l'aléa passe par un `Rng` à graine, stockée dans l'événement `RolesDealt`. Rejouer les mêmes événements donne le même état. Les tests en dépendent.
 - **Modes de jeu en plugins** : `modes/<id>.ts` exporte une `GameModeDefinition` (`docs/11`). Le mode est choisi en `CONFIG`, puis figé dans l'événement `GameConfigured` avec la composition et les options. Le moteur combine le mode et les rôles : l'ordre de nuit = les étapes des rôles + les étapes du mode, et les conditions de victoire = celles du mode.
 - **Modificateurs en plugins** : `modifiers/<id>.ts` (`docs/11` §Modificateurs), par exemple Role play. Ils sont actifs dans `GameConfigured.modifiers[]`, et le moteur consulte leurs points d'accroche (`extraPhases`, `disabledNightEffects`).
-- **Rôles en plugins** : voir `docs/02` §Modèle. Le cœur expose des points d'accroche (`onDeath`, `onDawn`, `onVoteResolved`, `onTargeted`) et un pipeline de résolution des morts (`R-40` à `R-42`).
+- **Rôles en plugins** : voir `docs/02` §Modèle. Le cœur expose des points d'accroche et un pipeline de résolution des morts (`R-40` à `R-46`). Ceux de M3 :
+  - `nightSteps[]` : chaque étape déclare son ordre, ses acteurs, l'action reçue, sa valeur par défaut, ce que voit l'acteur et, avec `dawn`, ses **morts de l'aube**. À la fin de la nuit, le moteur passe la liste des morts d'étape en étape dans l'ordre de nuit (`R-40`). Une étape peut aussi agir à son entrée (`onEnter` : les amoureux se découvrent) et dire si elle se joue cette nuit (`scheduled` : l'étape des amoureux existe avant que Cupidon ait choisi).
+  - `nightObservers[]` : un rôle peut **regarder** l'étape d'un autre rôle sans en être acteur ni la bloquer, avec ses propres actions et sa propre vue (la Petite fille et l'étape des loups).
+  - `onDeath` : un rôle met en file ses effets à la mort (le tir du Chasseur). La file accepte plusieurs genres d'effets (`hunterShot`, `mayorSuccession`), publics, résolus dans l'ordre de `R-42`.
+  - `onDawn`, `onVoteResolved` et `onTargeted` arrivent avec les rôles qui en ont besoin (M6).
+- **Informations privées** (ADR 0010) : ce qu'un joueur apprend en secret (résultat de la Voyante, partenaire d'un amoureux, pseudos partiels vus par la Petite fille, suspects reçus par les loups) est rangé dans `GameState`, dans les infos (`knowledge`) de ce joueur. Elles sortent par sa vue projetée (`me.knowledge`, « Mes infos »), survivent au rechargement et passent par les tests de non-fuite comme le reste.
 - **Projection et modes déguisés** : pour un mode `disguised` (Nuit blanche), `projectView` construit la vue d'un joueur **comme si** la partie était du mode `disguiseAs` avec la composition leurre. Le vrai mode n'existe que dans `NarratorView`. Le test `W-33` compare la forme des messages envoyés dans les deux cas.
 - **Ce qui vit où** (ADR 0008) : les schémas Zod des **options**, des **commandes** et des **vues projetées** sont dans `packages/protocol`, parce qu'ils traversent le réseau. Le moteur importe ces types. `GameState` et les **événements** restent internes au moteur : ils ne quittent jamais le serveur, seule la vue projetée en sort.
 - **Projection** : `projectView` est la **seule** fonction autorisée à produire ce qui part vers un client. Elle part d'une vue vide et **ajoute** ce que le viewer a le droit de voir (liste blanche, jamais liste noire).
   - **Nuit uniforme** : un joueur qui n'agit pas dans l'étape en cours ne voit ni l'étape, ni son minuteur, ni aucune action. Sa vue reste identique du début de la nuit jusqu'à « Lever le jour », pour qu'aucun changement ne trahisse le moment où une étape se résout. Le test de non-fuite le vérifie.
   - **Aube masquée** (`R-12`) : tant que les morts ne sont pas annoncées, la vue d'un joueur indique encore `NIGHT`.
   - **Morts sans cause** : les joueurs voient la liste des morts de la nuit, jamais leur cause. Une cause « potion » trahirait la Sorcière.
+  - **Observateurs** : un joueur qui regarde l'étape en cours (`nightObservers`) la voit comme un acteur, minuteur compris. Sa vue ne change qu'à ce moment-là.
   - **Actions** : chaque vue porte les actions possibles pour son lecteur (`availableActions`). Le client en tire ses boutons, sans rien recalculer (règle 1).
   - Les vues sont validées par des schémas stricts (`packages/protocol/src/views.ts`, ADR 0008).
 
@@ -118,14 +124,13 @@ type ServerMessage =
   | { t: 'ack'; id: string }
   | { t: 'error'; id?: string; code: ErrorCode; messageKey: string }  // clé i18n, jamais un texte
   | { t: 'chat'; channel: ChannelId; msg: ChatMessage }
-  | { t: 'private'; info: PrivateInfo }              // résultat Voyante, Renard…
   | { t: 'presence'; connected: PlayerId[] }         // au meneur seul (R-61)
   | { t: 'pong' };
 ```
 
 - Chaque message porte un `v` (version du protocole). Si le client a une version trop ancienne, le serveur renvoie `error: 'PROTOCOL_OUTDATED'`, et l'app invite l'utilisateur à se mettre à jour.
 - Le `seq` est la **révision** de la partie : il croît à chaque commande acceptée, `Undo` compris (le nombre d'événements, lui, diminue). Si le client détecte un trou dans la séquence, il demande un `state` complet.
-- Les schémas sont dans `packages/protocol/src/ws.ts` (WebSocket) et `rest.ts` (REST). Le chat (`t: 'chat'`) et `private` arrivent avec leurs jalons (M5, M3). Une réponse REST en erreur a la forme `{ code, messageKey }`.
+- Les schémas sont dans `packages/protocol/src/ws.ts` (WebSocket) et `rest.ts` (REST). Le chat (`t: 'chat'`) arrive en M5. Il n'y a pas de message `private` : une information privée fait partie de la vue projetée de son destinataire (ADR 0010). Une réponse REST en erreur a la forme `{ code, messageKey }`.
 
 ## Authentification
 

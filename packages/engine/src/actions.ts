@@ -1,7 +1,7 @@
 import type { ActionDescriptor, PlayerId } from '@rougarou/protocol';
 
 import { CLASSIC_MAX_PLAYERS } from './modes/classic.ts';
-import { currentStep } from './night/flow.ts';
+import { currentStep, observerSpecOf } from './night/flow.ts';
 import { compositionIssues } from './phases/config.ts';
 import { alivePlayers, seatedPlayers, type GameState } from './state.ts';
 
@@ -94,9 +94,15 @@ function playerActions(state: GameState, playerId: PlayerId): ActionDescriptor[]
 
   const [effect] = state.pending;
 
-  // Le Maire mort designe son successeur : la seule action d'un mort (`R-52`).
+  // Le Chasseur tire, le Maire designe son successeur : les seules actions d'un mort (`R-42`).
   if (effect?.from === playerId) {
-    return [{ type: 'DesignateSuccessor', targets: alivePlayers(state).map((alive) => alive.id) }];
+    const targets = alivePlayers(state).map((alive) => alive.id);
+
+    return [
+      effect.kind === 'hunterShot'
+        ? { type: 'HunterShoot', targets }
+        : { type: 'DesignateSuccessor', targets },
+    ];
   }
 
   if (state.phase === 'DEAL') {
@@ -112,7 +118,11 @@ function livingPlayerActions(state: GameState, playerId: PlayerId): ActionDescri
   if (state.phase === 'NIGHT' && night !== null && !night.stepResolved) {
     const step = currentStep(state);
 
-    return step.actors(state).includes(playerId) ? step.actionsFor(state, playerId) : [];
+    if (step.actors(state).includes(playerId)) {
+      return step.actionsFor(state, playerId);
+    }
+
+    return observerSpecOf(state, playerId)?.actionsFor(state, playerId) ?? [];
   }
 
   if (state.phase === 'MAYOR_ELECTION' && election !== null) {
