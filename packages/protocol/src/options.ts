@@ -14,6 +14,8 @@ const timerSchema = z.int().min(5).max(3600).nullable();
  */
 export const timersSchema = z.strictObject({
   roleReveal: timerSchema.default(null),
+  /** Distribution en ceremonie : la main passe au suivant au bout de 8 s (`R-17`). */
+  ceremonyCard: timerSchema.default(8),
   characterSheet: timerSchema.default(null),
   presentation: timerSchema.default(null),
   nightAction: timerSchema.default(45),

@@ -59,6 +59,9 @@ export function evolve(state: GameState, event: GameEvent): GameState {
     case 'RoleSeen':
       return updatePlayer(state, event.playerId, { roleSeen: true });
 
+    case 'CeremonyTurnPassed':
+      return { ...state, ceremonyTurn: event.turn };
+
     case 'PhaseChanged':
       return enterPhase(state, event.phase);
 
@@ -296,7 +299,7 @@ export function evolve(state: GameState, event: GameEvent): GameState {
 function enterPhase(state: GameState, phase: GameState['phase']): GameState {
   switch (phase) {
     case 'NIGHT':
-      return { ...state, phase, dawn: null, vote: null, election: null };
+      return { ...state, phase, dawn: null, vote: null, election: null, ceremonyTurn: null };
     case 'DAWN':
       return { ...state, phase, night: null };
     case 'DAY_DEBATE':

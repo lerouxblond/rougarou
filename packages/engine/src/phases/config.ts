@@ -6,6 +6,7 @@ import type { EngineError } from '../result.ts';
 import { createRng } from '../rng.ts';
 import type { GameState } from '../state.ts';
 import { engineError, startTimer, type Tx } from '../tx.ts';
+import { passCeremonyTurn } from './deal.ts';
 
 /** Plus grande graine tiree pour la distribution (entier positif sur 31 bits). */
 const MAX_SEED = 0x7f_ff_ff_ff;
@@ -21,10 +22,6 @@ function unsupportedOption(options: GameOptions): string | null {
 
   if (options.roleplay) {
     return 'errors.options.roleplay_unavailable';
-  }
-
-  if (options.dealMode === 'ceremony') {
-    return 'errors.options.ceremony_unavailable';
   }
 
   if (options.parallelNight) {
@@ -126,6 +123,12 @@ export function deal(tx: Tx): EngineError | null {
 
   tx.emit({ type: 'RolesDealt', seed, assignments });
   tx.emit({ type: 'PhaseChanged', phase: 'DEAL' });
-  startTimer(tx, 'roleReveal');
+
+  if (tx.state.options.dealMode === 'ceremony') {
+    passCeremonyTurn(tx, 0);
+  } else {
+    startTimer(tx, 'roleReveal');
+  }
+
   return null;
 }

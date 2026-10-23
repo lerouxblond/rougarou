@@ -23,6 +23,7 @@ const playerView = {
   nightNumber: 0,
   deadline: null,
   pausedRemaining: null,
+  ceremony: null,
   night: null,
   deaths: null,
   election: null,

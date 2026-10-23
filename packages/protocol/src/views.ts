@@ -257,6 +257,9 @@ const playerVoteSchema = z.strictObject({
   outcome: voteOutcomeSchema.nullable(),
 });
 
+/** Distribution en ceremonie (`R-17`) : qui a la main, `null` apres le dernier joueur. */
+const ceremonySchema = z.strictObject({ turn: playerIdSchema.nullable() });
+
 export const playerViewSchema = z.strictObject({
   kind: z.literal('player'),
   gameId: z.string(),
@@ -272,6 +275,8 @@ export const playerViewSchema = z.strictObject({
   deadline: z.int().nullable(),
   /** Duree restante d'un minuteur en pause, en ms, visible aux memes conditions (`R-16`). */
   pausedRemaining: z.int().min(0).nullable(),
+  /** Seulement en `DEAL`, distribution en ceremonie. */
+  ceremony: ceremonySchema.nullable(),
   night: playerNightSchema.nullable(),
   /** Morts de la nuit, une fois annoncees ; la cause n'est jamais publique. */
   deaths: playerIdList.nullable(),
@@ -326,6 +331,7 @@ export const narratorViewSchema = z.strictObject({
   nightNumber: z.int().min(0),
   deadline: z.int().nullable(),
   pausedRemaining: z.int().min(0).nullable(),
+  ceremony: ceremonySchema.nullable(),
   night: narratorNightSchema.nullable(),
   /** Le couple forme par Cupidon (`R-03`). */
   lovers: z.tuple([playerIdSchema, playerIdSchema]).nullable(),

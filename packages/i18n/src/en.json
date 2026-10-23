@@ -59,7 +59,6 @@
       "vote_closed": "The vote is not open."
     },
     "options": {
-      "ceremony_unavailable": "Dealing one by one is not available yet.",
       "mode_unavailable": "This game mode is not available yet.",
       "parallel_night_unavailable": "Parallel night is not available yet.",
       "roleplay_unavailable": "Role play is not available yet."

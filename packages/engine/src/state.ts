@@ -57,6 +57,11 @@ export interface GameState {
    */
   readonly pausedRemaining: number | null;
   readonly winner: Winner | null;
+  /**
+   * Distribution en ceremonie (`R-17`) : la place du joueur qui a la main.
+   * Egale a `seats.length` apres le dernier ; `null` hors ceremonie.
+   */
+  readonly ceremonyTurn: number | null;
 }
 
 export interface PlayerState {
@@ -209,6 +214,7 @@ export function emptyState(): GameState {
     deadline: null,
     pausedRemaining: null,
     winner: null,
+    ceremonyTurn: null,
   };
 }
 

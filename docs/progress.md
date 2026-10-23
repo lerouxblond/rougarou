@@ -610,9 +610,10 @@ configuration, fin), **G** (T12, ambiance), **H** (T13), puis T14.
   - Fichiers : `docs/01` (P26, P28, `timers.ceremonyCard`, `R-15` sans `ceremony`), `docs/02` (P29), `docs/03` (P27, P32), `docs/04` (journal dans la vue), `docs/06` (`Stepper`, `BalanceMeter`), `docs/07` (P31), `docs/10` (P30, P32), `docs/03` et `docs/06` (D-22 : pas de synthèse vocale), `docs/12` (D-22 → ✅), `docs/adr/0011-briques-ui.md`. Les versions entrent dans `docs/05` avec la tâche qui ajoute chaque dépendance. Règles nouvelles : `R-17` (cérémonie), `R-18` (correction), `R-19` (journal)
   - Tests attendus : aucun (document)
 
-- [ ] **T2 — Distribution `ceremony`** *(PR B)*
+- [x] **T2 — Distribution `ceremony`** *(PR B)*
   - Fichiers : `packages/engine/src/phases/{config,deal}.ts`, `state.ts`, `events.ts`, `evolve.ts`, `project.ts`, `actions.ts`, `packages/protocol/src/{options,commands,views}.ts`, `test/deal.test.ts`, `test/leaks/ceremony.test.ts`, i18n
   - Tests attendus : P26 (ordre des places ; tour suivant à la confirmation, sur « Suivant », au minuteur ; confirmation hors tour refusée ; `simultaneous` inchangé) ; non-fuite : un joueur qui n'a pas la main ne voit que le nom de celui qui l'a
+  - Fait : `test/ceremony.test.ts` (13 tests). Précision : forcer pendant la cérémonie lance la nuit tout de suite (ajoutée à `R-17`) ; un joueur voit sa carte (`me.role`) dès que sa main arrive, et la garde ensuite. Protocole v4 (`ceremony` dans les deux vues)
 
 - [ ] **T3 — Journal et chronologie** *(PR B)*
   - Fichiers : `packages/engine/src/{journal,state,evolve,project}.ts`, `packages/protocol/src/views.ts`, `test/journal.test.ts`, `test/leaks/generic.test.ts`, i18n (`journal.*`)

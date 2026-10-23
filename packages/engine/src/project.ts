@@ -5,6 +5,7 @@ import { getMode } from './modes/index.ts';
 import { currentStep, observerSpecOf } from './night/flow.ts';
 import type { PlayerNightView } from './night/types.ts';
 import { everyoneVoted } from './phases/day.ts';
+import { cardReached } from './phases/deal.ts';
 import { getRole, teamOf } from './roles/index.ts';
 import { getPlayer, type GameState, type PlayerState } from './state.ts';
 
@@ -41,7 +42,8 @@ function canSeeRole(
   }
 
   if (viewer.id === target.id) {
-    return true;
+    // En ceremonie, sa carte n'arrive qu'avec sa main (`R-17`).
+    return cardReached(state, viewer.id);
   }
 
   // `R-60` : un mort voit tous les roles avec `deadSeeRoles`.
@@ -92,7 +94,7 @@ function playerView(state: GameState, viewerId: PlayerId): PlayerView {
         ? null
         : {
             id: me.id,
-            role: me.role,
+            role: cardReached(state, me.id) ? me.role : null,
             alive: me.alive,
             roleSeen: me.roleSeen,
             knowledge: [...me.knowledge],
@@ -113,6 +115,7 @@ function playerView(state: GameState, viewerId: PlayerId): PlayerView {
     nightNumber: state.nightNumber,
     deadline: seesTimer ? state.deadline : null,
     pausedRemaining: seesTimer ? state.pausedRemaining : null,
+    ceremony: ceremonyOf(state),
     night,
     deaths:
       state.dawn?.announced === true ? state.dawn.deaths.map((death) => death.playerId) : null,
@@ -163,6 +166,15 @@ function nightViewOf(state: GameState, viewerId: PlayerId): PlayerNightView | nu
   return observerSpecOf(state, viewerId)?.viewFor(state, viewerId) ?? null;
 }
 
+/** Qui a la main pendant une distribution en ceremonie (`R-17`). Elle est publique. */
+function ceremonyOf(state: GameState): { turn: PlayerId | null } | null {
+  if (state.phase !== 'DEAL' || state.ceremonyTurn === null) {
+    return null;
+  }
+
+  return { turn: state.seats[state.ceremonyTurn] ?? null };
+}
+
 /** Seul le bulletin du lecteur, en vote secret (`R-30`). */
 function own<T>(ballots: Readonly<Record<PlayerId, T>>, viewerId: PlayerId): Record<PlayerId, T> {
   const ballot = ballots[viewerId];
@@ -196,6 +208,7 @@ function narratorView(state: GameState): NarratorView {
     nightNumber: state.nightNumber,
     deadline: state.deadline,
     pausedRemaining: state.pausedRemaining,
+    ceremony: ceremonyOf(state),
     night:
       night === null
         ? null
