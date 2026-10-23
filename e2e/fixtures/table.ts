@@ -131,7 +131,7 @@ export async function startNight(
 ): Promise<void> {
   const { narrator, seats } = table;
 
-  await narrator.getByRole('button', { name: 'Phase suivante' }).click();
+  await narrator.getByTestId('primary-action').click();
   await expect.poll(async () => (await readView(narrator)).phase).toBe('CONFIG');
 
   for (const [role, count] of Object.entries(composition)) {
@@ -148,8 +148,9 @@ export async function startNight(
     await page.getByRole('button', { name: "J'ai vu mon rôle" }).click();
   }
 
-  await expect(narrator.getByRole('button', { name: 'Phase suivante' })).toBeVisible();
-  await narrator.getByRole('button', { name: 'Phase suivante' }).click();
+  // Tant qu'un joueur n'a pas confirme, le bouton propose de forcer (`R-10`).
+  await expect(narrator.getByTestId('primary-action')).toHaveText('Lancer la nuit');
+  await narrator.getByTestId('primary-action').click();
   await expect.poll(async () => (await readView(narrator)).phase).toBe('NIGHT');
 
   // La vue d'un joueur peut arriver apres celle du meneur.
@@ -314,7 +315,7 @@ export async function playToTheEnd(
  * change rien : l'attente est donc bornee, sans echec.
  */
 async function advance(narrator: Page): Promise<void> {
-  const next = narrator.getByRole('button', { name: /^(Phase suivante|Forcer la suite)$/ });
+  const next = narrator.getByTestId('primary-action');
 
   if (!(await next.isVisible())) {
     return;

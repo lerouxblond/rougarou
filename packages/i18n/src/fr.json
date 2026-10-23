@@ -430,5 +430,52 @@
   "pending": {
     "hunter_shot": "{{name}}, le Chasseur, va tirer.",
     "mayor_succession": "{{name}} désigne son successeur."
+  },
+  "script": {
+    "lobby": "Attendez que tout le monde ait rejoint la table, puis configurez la partie.",
+    "config": "Choisissez la composition et les options, puis distribuez les rôles.",
+    "deal": "Chacun découvre son rôle en secret, sans rien laisser paraître.",
+    "presentations": "Chacun présente son personnage, à tour de rôle.",
+    "nightfall": "La nuit tombe sur le village. Tout le monde ferme les yeux.",
+    "night_over": "Toutes les étapes de la nuit sont passées.",
+    "step_unknown": "Appelez ce rôle.",
+    "dawn": "Le jour se lève sur le village… Annoncez qui a été retrouvé mort cette nuit.",
+    "dawn_effects": "Laissez les morts faire leur dernier geste, s’il y a lieu.",
+    "election": "Le village se choisit un Maire : qui veut se porter candidat ?",
+    "debate": "Le village débat. Qui soupçonnez-vous ?",
+    "vote": "Le village vote. Chacun désigne celui qu’il veut éliminer.",
+    "execution": "Le village a rendu sa sentence.",
+    "ended": "La partie est terminée. Révélez tous les rôles."
+  },
+  "narrator": {
+    "script": "Texte à lire",
+    "steps": "Ordre de la nuit",
+    "tabs": "Tableau du meneur",
+    "previous": "Avant",
+    "next": "Ensuite",
+    "step_state": {
+      "upcoming": "à venir",
+      "current": "en cours",
+      "done": "faite",
+      "skipped": "passée"
+    },
+    "primary": {
+      "configure": "Configurer",
+      "next_player": "Joueur suivant",
+      "start_night": "Lancer la nuit",
+      "next_step": "Étape suivante",
+      "daybreak": "Lever le jour",
+      "to_day": "Passer au jour",
+      "open_vote": "Ouvrir le vote",
+      "close_vote": "Clore le vote",
+      "force": "Forcer : {{action}}"
+    },
+    "blocked": {
+      "deal": "En attente : {{count}} joueurs n’ont pas vu leur rôle.",
+      "deal_one": "En attente : {{count}} joueur n’a pas vu son rôle.",
+      "step": "En attente : {{step}}.",
+      "tie": "En attente : le Maire départage les ex æquo.",
+      "generic": "Des actions sont en attente."
+    }
   }
 }
