@@ -3,21 +3,26 @@ import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { MaskedName } from './MaskedName.tsx';
+import { SeerResult } from './SeerResult.tsx';
 
 type Night = NonNullable<PlayerView['night']>;
+type Knowledge = NonNullable<PlayerView['me']>['knowledge'][number];
+
+interface StepProps {
+  readonly night: Night;
+  readonly names: ReadonlyMap<string, string>;
+  /** Ses infos et la nuit en cours : la Voyante y lit ce qu'elle vient d'apprendre. */
+  readonly knowledge: readonly Knowledge[];
+  readonly nightNumber: number;
+}
 
 /**
  * L'etape de nuit telle que le serveur la montre au joueur qui y prend part
  * (`docs/12` §2). Les autres n'en recoivent rien : ce panneau n'existe pas
  * pour eux.
  */
-export function NightPanel({
-  night,
-  names,
-}: {
-  readonly night: Night;
-  readonly names: ReadonlyMap<string, string>;
-}) {
+export function NightPanel(props: StepProps) {
+  const { night } = props;
   const { t } = useTranslation();
   const title = useId();
 
@@ -29,19 +34,13 @@ export function NightPanel({
       <h2 id={title} className="font-display text-xl">
         {t(`night.${night.step}.title`)}
       </h2>
-      <StepBody night={night} names={names} />
+      <StepBody {...props} />
       {night.resolved ? <p className="text-sm text-text-muted">{t('night.resolved')}</p> : null}
     </section>
   );
 }
 
-function StepBody({
-  night,
-  names,
-}: {
-  readonly night: Night;
-  readonly names: ReadonlyMap<string, string>;
-}) {
+function StepBody({ night, names, knowledge, nightNumber }: StepProps) {
   const { t } = useTranslation();
   const name = (id: string) => names.get(id) ?? id;
 
@@ -55,7 +54,11 @@ function StepBody({
         </ul>
       );
     case 'seer':
-      return <p>{t('night.seer.prompt')}</p>;
+      return night.resolved ? (
+        <SeerResult knowledge={knowledge} nightNumber={nightNumber} names={names} />
+      ) : (
+        <p>{t('night.seer.prompt')}</p>
+      );
     case 'witch':
       return (
         <>

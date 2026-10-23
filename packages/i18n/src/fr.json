@@ -296,7 +296,7 @@
     "declare_candidacy": "Se porter candidat",
     "withdraw_candidacy": "Retirer sa candidature",
     "cast_vote": "Voter",
-    "break_tie": "Départager",
+    "break_tie": "Trancher : qui est exécuté ?",
     "designate_successor": "Désigner son successeur",
     "kick_player": "Expulser",
     "reorder_seats": "Réordonner les places",
@@ -352,7 +352,11 @@
     },
     "seer": {
       "title": "Voyante",
-      "prompt": "Choisissez le joueur dont vous voulez percer le secret."
+      "prompt": "Choisissez le joueur dont vous voulez percer le secret.",
+      "result_title": "Ce que vous avez vu",
+      "result_role": "{{name}} est {{role}}.",
+      "result_team": "{{name}} appartient au camp {{team}}.",
+      "no_probe": "Vous n’avez sondé personne cette nuit."
     },
     "witch": {
       "title": "Sorcière",
@@ -415,12 +419,19 @@
     "votes": "{{count}} voix",
     "outcome": {
       "execute": "Le village a désigné {{name}}.",
-      "nobody_spare": "Le village épargne tout le monde.",
-      "nobody_tie": "L’égalité persiste : personne n’est exécuté.",
+      "nobody_spare": "« Épargner » arrive en tête ou à égalité : personne n’est exécuté.",
+      "nobody_tie": "Égalité : personne n’est exécuté.",
       "tie": "Égalité entre {{names}}.",
-      "nobody_no_ballots": "Personne n’a voté : personne n’est exécuté."
+      "nobody_no_ballots": "Personne n’a voté : personne n’est exécuté.",
+      "mayor_decides": "Égalité entre {{names}}. Le Maire, {{mayor}}, choisit qui est exécuté.",
+      "you_decide": "Égalité entre {{names}}. En tant que Maire, choisissez qui est exécuté.",
+      "mayor_chose": "Le Maire a tranché en désignant {{name}}.",
+      "mayor_silent": "Le Maire n’a pas tranché : personne n’est exécuté.",
+      "second_round": "Égalité : second tour entre {{names}}."
     },
-    "votes_one": "{{count}} voix"
+    "votes_one": "{{count}} voix",
+    "candidates": "Candidats à la mairie",
+    "no_candidates": "Personne ne s’est encore présenté. Sans candidat, tous les vivants seront éligibles."
   },
   "dawn": {
     "title": "Ce matin…",

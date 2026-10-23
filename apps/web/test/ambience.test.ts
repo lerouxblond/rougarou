@@ -87,6 +87,7 @@ describe('Moments de la partie', () => {
       spare: true,
       round: 1 as const,
       tie: null,
+      tieBroken: null,
       closed: false,
       ballots: {},
       tally: null,

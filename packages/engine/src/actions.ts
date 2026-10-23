@@ -145,9 +145,14 @@ function livingPlayerActions(state: GameState, playerId: PlayerId): ActionDescri
     return [{ type: 'CastVote', targets: [...election.eligible], spare: false, abstain: false }];
   }
 
-  if (state.phase === 'DAY_VOTE' && vote !== null && !vote.closed) {
+  if (state.phase === 'DAY_VOTE' && vote !== null) {
+    // L'egalite nait a la cloture : le vote est deja clos quand le Maire tranche (`R-33`).
     if (vote.tie !== null) {
       return state.mayor === playerId ? [{ type: 'BreakTie', targets: [...vote.tie] }] : [];
+    }
+
+    if (vote.closed) {
+      return [];
     }
 
     return [

@@ -296,7 +296,7 @@
     "declare_candidacy": "Run for mayor",
     "withdraw_candidacy": "Withdraw",
     "cast_vote": "Vote",
-    "break_tie": "Break the tie",
+    "break_tie": "Break the tie: who is executed?",
     "designate_successor": "Choose a successor",
     "kick_player": "Kick",
     "reorder_seats": "Reorder seats",
@@ -352,7 +352,11 @@
     },
     "seer": {
       "title": "Seer",
-      "prompt": "Pick the player whose secret you want to uncover."
+      "prompt": "Pick the player whose secret you want to uncover.",
+      "result_title": "What you saw",
+      "result_role": "{{name}} is {{role}}.",
+      "result_team": "{{name}} belongs to the {{team}} side.",
+      "no_probe": "You probed no one tonight."
     },
     "witch": {
       "title": "Witch",
@@ -416,11 +420,18 @@
     "votes_one": "{{count}} vote",
     "outcome": {
       "execute": "The village chose {{name}}.",
-      "nobody_spare": "The village spares everyone.",
-      "nobody_tie": "The tie remains: nobody is executed.",
+      "nobody_spare": "“Spare” came first or tied: nobody is executed.",
+      "nobody_tie": "Tie: nobody is executed.",
       "tie": "Tie between {{names}}.",
-      "nobody_no_ballots": "Nobody voted: nobody is executed."
-    }
+      "nobody_no_ballots": "Nobody voted: nobody is executed.",
+      "mayor_decides": "Tie between {{names}}. The Mayor, {{mayor}}, chooses who is executed.",
+      "you_decide": "Tie between {{names}}. As Mayor, choose who is executed.",
+      "mayor_chose": "The Mayor broke the tie by choosing {{name}}.",
+      "mayor_silent": "The Mayor did not decide: nobody is executed.",
+      "second_round": "Tie: second round between {{names}}."
+    },
+    "candidates": "Candidates for Mayor",
+    "no_candidates": "Nobody has stood yet. Without candidates, every living player will be eligible."
   },
   "dawn": {
     "title": "This morning…",

@@ -280,6 +280,7 @@ export function evolve(state: GameState, event: GameEvent): GameState {
           ballots: {},
           round: event.round,
           tie: null,
+          tieBroken: null,
           closed: false,
           result: null,
         },
@@ -302,7 +303,11 @@ export function evolve(state: GameState, event: GameEvent): GameState {
       return withVote(state, (vote) => ({ ...vote, tie: [...event.tied] }));
 
     case 'TieBroken':
-      return withVote(state, (vote) => ({ ...vote, tie: null }));
+      return withVote(state, (vote) => ({
+        ...vote,
+        tie: null,
+        tieBroken: { playerId: event.playerId },
+      }));
 
     case 'ExecutionStarted':
       return state;

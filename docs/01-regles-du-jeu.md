@@ -91,7 +91,7 @@ Le **mode de jeu** (`docs/11-modes-de-jeu.md`) peut ajouter des sous-étapes de 
 - `R-35` Élection du Maire : vote de tous les joueurs **vivants**. En cas d'égalité, on fait un second vote entre les ex æquo, puis un tirage au sort entre eux. On peut voter pour soi-même (la règle « pas de vote contre soi-même » de D-08 vise l'exécution). Il n'y a pas d'abstention. Si aucun bulletin n'est déposé, le Maire est tiré au sort parmi les éligibles.
 - `R-37` **Clôture d'un vote.** Le vote du village et celui du Maire ne se closent jamais seuls : c'est le meneur qui les clôt, ou la fin du minuteur. Quand tous les votants ont voté, le moteur le signale au meneur, sans rien clore (`R-31` permet de changer d'avis jusqu'au bout).
 - `R-38` **Précisions sur l'égalité au vote du village** (`R-33`) :
-  - `mayor` : le Maire dispose de 30 s pour choisir parmi les ex æquo. Passé ce délai, personne n'est exécuté.
+  - `mayor` : le Maire dispose de 30 s pour choisir parmi les ex æquo. Passé ce délai, personne n'est exécuté. Tous les joueurs savent que le Maire tranche, puis apprennent sa décision (ou son absence) : elle est publique, comme l'issue du vote.
   - `revote` : seuls les ex æquo sont candidats au second vote, sans le choix « Épargner ».
   - Si aucun bulletin n'est déposé, personne n'est exécuté.
 

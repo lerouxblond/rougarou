@@ -672,3 +672,80 @@ Neuf PR de moins de 400 lignes de code non généré : **A** (T1, #17), **B1** (
 - [ ] **T14 — Déploiement, partie réelle et rapport**
   - Fichiers : `docs/progress.md`
   - Tests attendus : `pnpm check` et e2e contre la production ; **une partie en présentiel à 8 ou plus, sans papier, jouée par l'utilisateur et sa table** (je fournis une liste de contrôle et j'attends le retour) ; définition de « terminé » vérifiée point par point
+
+### Passe sur la boucle de jeu (après la partie test du 2026-10-23)
+
+Retour de la partie test : l'interface est jugée primitive (elle sera reprise juste après, en M4b
+réorienté vers une base d'interface), et des phases manquent. Ordre validé : **boucle de jeu, puis
+base d'interface, puis M5**. Cette passe ne refait pas l'habillage : elle rend chaque décision du
+jeu possible et compréhensible à l'écran.
+
+**Méthode** : pour chaque moment où le moteur attend quelqu'un, comparer ce que `apply` accepte, ce
+que `availableActions` propose et ce que l'écran affiche.
+
+#### Écarts trouvés
+
+| # | Écart | Cause | Gravité |
+|---|---|---|---|
+| G1 | **Le Maire ne peut pas trancher une égalité** (`R-33`, `tieBreak: 'mayor'` par défaut) | Moteur : à la clôture, `VoteClosed` passe le vote à `closed`, puis `TieBreakRequested` pose l'égalité ; `availableActions` ne propose `BreakTie` que si le vote n'est **pas** clos. Le Maire reçoit `[]` ; au bout de 30 s, personne n'est exécuté. Les tests envoient `BreakTie` directement à `apply`, sans passer par `availableActions` | **Bloquant** |
+| G2 | **La Voyante ne voit pas son résultat** (`docs/03` : « le résultat s'affiche en privé ») | Web : après la sonde, l'écran de nuit répète « Choisis un joueur » ; le résultat n'est que dans l'onglet « Infos » | **Bloquant** |
+| G3 | **Égalité : personne ne sait ce qui se passe** | Web : « Égalité entre A, B. » sans dire que le Maire tranche (ni en combien de temps), ni qu'un second tour s'ouvre. Une égalité avec « Épargner » épargne tout le monde (`R-36`) sans l'expliquer | Majeur |
+| G4 | **Élection du Maire : les candidats ne sont pas listés** pendant les candidatures | Web (noté en T12) | Majeur |
+| G5 | **Les loups ne se reconnaissent pas** avant d'avoir voté (`docs/02` : « les loups se reconnaissent ») | Moteur : l'étape des loups ne montre que les votes déjà faits ; un loup qui n'a pas voté est invisible pour la meute | Majeur, **à préciser** (voir Q1) |
+| G6 | **Aucun test ne vérifie que chaque décision attendue est proposée** | Tests : le bot vérifie que ce qui est proposé est accepté, jamais l'inverse | Cause de G1 |
+
+#### Question de règle (règle 5 de `CLAUDE.md`)
+
+- **Q1 (G5)** : proposition : pendant l'étape des loups, chaque loup voit **toute la meute vivante**
+  (noms), en plus des votes ; et dès la première nuit, une info « Ta meute : A, B » entre dans « Mes
+  infos » de chaque loup (mise à jour aux morts). Non-fuite : jamais chez un non-loup, ni chez la
+  Petite fille (elle ne voit que des masques).
+
+#### Tâches
+
+- [x] **GL1 — Décisions attendues toujours proposées** (G1, G6)
+  - Fichiers : `packages/engine/src/actions.ts`, `test/decisions.test.ts` (nouveau)
+  - Tests : pour chaque point de décision (égalité du Maire, Chasseur, successeur, égalité des loups,
+    candidature, vote du Maire, chaque étape de nuit), `availableActions` propose l'action à la bonne
+    personne et à elle seule ; le bot joue une partie où l'égalité est tranchée par le Maire
+  - Fait : `test/properties/decisions.test.ts`, réciproque du robot : à chaque coup de 60 parties
+    aléatoires (5 à 10 joueurs, options de vote et de Maire tirées au hasard), toute décision
+    qu'`apply` accepterait d'un joueur ou du meneur (et qui change l'état) doit figurer dans
+    `availableActions`. Il a trouvé G1 du premier coup (contre-exemple à 9 joueurs). Correction :
+    l'égalité se traite avant le test « vote clos » ; le robot tranche désormais les égalités, donc
+    les 1 000 parties de `random-games` passent aussi par `BreakTie`
+- [x] **GL2 — Résultat de la Voyante à l'écran** (G2)
+  - Fichiers : `apps/web/src/game/NightPanel.tsx`, i18n, `test/player-screen.test.tsx`
+  - Tests : après la sonde, la Voyante voit le rôle (ou le camp) du joueur sondé cette nuit ; la nuit
+    uniforme des autres ne change pas
+  - Fait : `SeerResult.tsx`. Une fois l'étape résolue, le panneau de la Voyante remplace la consigne
+    par ce qu'elle a appris cette nuit, lu dans ses infos (`me.knowledge`, entrée datée de la nuit) :
+    la carte du rôle et « Bob est Loup-garou », ou l'icône et le camp en mode `team`, ou « Vous
+    n'avez sondé personne cette nuit » après un minuteur ou un forçage. Annoncé par `role="status"`.
+    Aucun changement de protocole. 2 tests dans `test/player-screen.test.tsx`, avec axe
+- [x] **GL3 — Égalités et « Épargner » expliqués** (G3)
+  - Fichiers : `apps/web/src/game/VotePanel.tsx`, i18n, tests
+  - Tests : égalité → « Le Maire tranche entre A et B » (ou « Second tour entre A et B ») chez tous ;
+    le Maire voit son choix en premier ; égalité avec « Épargner » expliquée
+  - Fait : `VotePanel` annonce, du plus récent au plus ancien : la décision du Maire (« Le Maire a
+    tranché en désignant Bob » ou « Le Maire n'a pas tranché : personne n'est exécuté »), l'égalité à
+    trancher (avec le nom du Maire, ou « En tant que Maire, choisissez » chez lui), le second tour,
+    puis l'issue. « Épargner » en tête ou à égalité est expliqué. Le choix du Maire s'intitule
+    « Trancher : qui est exécuté ? ». **Protocole v5** : la vue du vote porte `tieBroken` (la décision
+    du Maire, publique, rangée par le moteur à `TieBroken`), car sans elle l'écran de l'exécution
+    n'aurait montré que « Égalité entre A et B » ; le client ne la déduit pas des morts (règle 1).
+    `R-38` précisé. 4 tests web, 2 assertions moteur
+- [x] **GL4 — Candidats à la mairie listés** (G4)
+  - Fichiers : `apps/web/src/game/VotePanel.tsx` (ou un panneau d'élection), i18n, tests
+  - Fait : pendant les candidatures, `VotePanel` liste les candidats en direct (ou dit que, sans
+    candidat, tous les vivants seront éligibles) ; une égalité à l'élection annonce le second tour
+    entre les ex æquo. 3 tests web
+- [ ] **GL5 — La meute se reconnaît** (G5, après réponse à Q1)
+  - Fichiers : `packages/engine/src/roles/werewolf.ts`, `packages/protocol/src/views.ts`, `project.ts`,
+    `docs/02`, `test/leaks/`, web, i18n
+  - Tests : un loup voit toute la meute dès la nuit 1 ; non-fuite chez les autres
+- [ ] **GL6 — Tour complet en captures** : une partie jouée par le bot, une capture par phase et par
+  rôle (375 px), relue écran par écran pour trouver les trous restants ; ces captures servent aussi de
+  point de départ à la base d'interface
+- [ ] **GL7 — e2e** : une partie à 8 qui passe par une égalité tranchée par le Maire, la Voyante qui
+  lit son résultat et le tir du Chasseur ; puis nouvelle partie test par l'utilisateur

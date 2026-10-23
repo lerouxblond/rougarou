@@ -1,6 +1,7 @@
 import type { GameOptionsInput } from '@rougarou/protocol';
 import { describe, expect, it } from 'vitest';
 
+import { availableActions, projectView } from '../src/index.ts';
 import {
   EIGHT_ROLES,
   electMayor,
@@ -171,6 +172,11 @@ describe('Le Maire au vote du village (R-32, R-33, R-51)', () => {
 
     expect(game.state.vote?.tie).toEqual(['Alice', 'Bob']);
     expect(game.state.deadline).toBe(T0 + 30_000);
+    // Le vote est clos, mais le Maire, et lui seul, recoit le choix (l'ecran n'affiche que ca).
+    expect(availableActions(game.state, { kind: 'player', playerId: 'Chloe' })).toEqual([
+      { type: 'BreakTie', targets: ['Alice', 'Bob'] },
+    ]);
+    expect(availableActions(game.state, { kind: 'player', playerId: 'David' })).toEqual([]);
     game
       .rejects(player('David'), { type: 'BreakTie', playerId: 'Alice' }, 'NOT_YOUR_TURN')
       .rejects(player('Chloe'), { type: 'BreakTie', playerId: 'Eve' }, 'INVALID_TARGET')
@@ -183,6 +189,11 @@ describe('Le Maire au vote du village (R-32, R-33, R-51)', () => {
 
     expect(game.state.phase).toBe('EXECUTION');
     expect(game.state.players.Bob?.alive).toBe(false);
+    // Tout le monde apprend ce que le Maire a decide, pas seulement qu'il y avait egalite.
+    expect(projectView(game.state, { kind: 'player', playerId: 'David' }).vote).toMatchObject({
+      outcome: { kind: 'tie', tied: ['Alice', 'Bob'] },
+      tieBroken: { playerId: 'Bob' },
+    });
   });
 
   it('sans decision du Maire a la fin du minuteur, personne n est execute (R-38)', () => {
@@ -192,6 +203,9 @@ describe('Le Maire au vote du village (R-32, R-33, R-51)', () => {
     expect(types(game.last)).toContain('TieBroken');
     expect(game.state.players.Alice?.alive).toBe(true);
     expect(game.state.players.Bob?.alive).toBe(true);
+    expect(projectView(game.state, { kind: 'player', playerId: 'David' }).vote?.tieBroken).toEqual({
+      playerId: null,
+    });
   });
 
   it('le meneur doit forcer pour passer l egalite ; personne n est execute', () => {

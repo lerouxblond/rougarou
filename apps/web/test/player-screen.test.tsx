@@ -73,6 +73,62 @@ describe('Vue joueur (US-40, docs/06)', () => {
     expect(screen.getByRole('heading', { name: fr.night.seer.title })).toBeDefined();
   });
 
+  it('apres sa sonde, la Voyante voit le role du joueur sonde (docs/03, US-40)', async () => {
+    const view = seated({ night: { step: 'seer', resolved: true } }, 'seer');
+
+    const { container } = renderWithProviders(
+      <PlayerScreen
+        view={{
+          ...view,
+          me: {
+            ...view.me!,
+            knowledge: [{ kind: 'seerRole', night: 1, playerId: 'p2', role: 'werewolf' }],
+          },
+        }}
+        me={ME}
+      />,
+    );
+
+    const result = screen.getByRole('status', { name: fr.night.seer.result_title });
+
+    expect(result.textContent).toContain('Bob');
+    expect(result.textContent).toContain(fr.roles.werewolf.name);
+    expect(screen.queryByText(fr.night.seer.prompt)).toBeNull();
+    expect(await axeViolations(container)).toEqual([]);
+  });
+
+  it('en mode camp, elle ne voit que le camp ; sans sonde, elle le sait', () => {
+    const view = seated({ night: { step: 'seer', resolved: true }, nightNumber: 2 }, 'seer');
+
+    renderWithProviders(
+      <PlayerScreen
+        view={{
+          ...view,
+          me: {
+            ...view.me!,
+            knowledge: [
+              { kind: 'seerRole', night: 1, playerId: 'p3', role: 'seer' },
+              { kind: 'seerTeam', night: 2, playerId: 'p2', team: 'wolves' },
+            ],
+          },
+        }}
+        me={ME}
+      />,
+    );
+
+    const result = screen.getByRole('status', { name: fr.night.seer.result_title });
+
+    expect(result.textContent).toContain(fr.teams.wolves);
+    expect(result.textContent).not.toContain('Chloe');
+
+    cleanup();
+    renderWithProviders(
+      <PlayerScreen view={seated({ night: { step: 'seer', resolved: true } }, 'seer')} me={ME} />,
+    );
+
+    expect(screen.getByText(fr.night.seer.no_probe)).toBeDefined();
+  });
+
   it('en ceremonie, sans la main, on ne voit que qui decouvre son role (R-17)', () => {
     renderWithProviders(
       <PlayerScreen view={seated({ phase: 'DEAL', ceremony: { turn: 'p2' } }, null)} me={ME} />,
@@ -143,6 +199,7 @@ describe('Vue joueur (US-40, docs/06)', () => {
       spare: true,
       round: 1 as const,
       tie: null,
+      tieBroken: null,
       closed: true,
       ballots: { p1: { kind: 'player' as const, playerId: 'p2' } },
       tally: { p2: 2 },
@@ -166,6 +223,165 @@ describe('Vue joueur (US-40, docs/06)', () => {
     expect(screen.getByRole('status').textContent).toBe('Le village a désigné Bob.');
   });
 
+  describe('election du Maire (R-35, US-49)', () => {
+    const election = {
+      stage: 'candidacy' as const,
+      candidates: ['p2', 'p3'],
+      eligible: [],
+      round: 1 as const,
+      ballots: {},
+    };
+
+    it('pendant les candidatures, chacun voit qui se presente', () => {
+      renderWithProviders(
+        <PlayerScreen
+          view={seated({
+            phase: 'MAYOR_ELECTION',
+            election,
+            actions: [{ type: 'DeclareCandidacy' }],
+          })}
+          me={ME}
+        />,
+      );
+
+      const list = screen.getByRole('list', { name: fr.vote.candidates });
+
+      expect(list.textContent).toContain('Bob');
+      expect(list.textContent).toContain('Chloe');
+      expect(screen.getByRole('button', { name: fr.actions.declare_candidacy })).toBeDefined();
+    });
+
+    it('sans candidat, il sait que tous les vivants seront eligibles', () => {
+      renderWithProviders(
+        <PlayerScreen
+          view={seated({ phase: 'MAYOR_ELECTION', election: { ...election, candidates: [] } })}
+          me={ME}
+        />,
+      );
+
+      expect(screen.getByText(fr.vote.no_candidates)).toBeDefined();
+    });
+
+    it('une egalite a l election ouvre un second tour annonce', () => {
+      renderWithProviders(
+        <PlayerScreen
+          view={seated({
+            phase: 'MAYOR_ELECTION',
+            election: { ...election, stage: 'vote', eligible: ['p1', 'p2'], round: 2 },
+          })}
+          me={ME}
+        />,
+      );
+
+      expect(screen.getByRole('status').textContent).toBe(
+        'Égalité : second tour entre Alice et Bob.',
+      );
+    });
+  });
+
+  describe('egalites (R-33, R-36, R-38)', () => {
+    const tied = {
+      candidates: ['p1', 'p2', 'p3'],
+      spare: false,
+      round: 1 as const,
+      tie: ['p1', 'p2'],
+      tieBroken: null,
+      closed: true,
+      ballots: {},
+      tally: null,
+      outcome: { kind: 'tie' as const, tied: ['p1', 'p2'] },
+    };
+    const players = [
+      { id: 'p1', name: 'Alice', alive: true, mayor: false, role: null },
+      { id: 'p2', name: 'Bob', alive: true, mayor: false, role: null },
+      { id: 'p3', name: 'Chloe', alive: true, mayor: true, role: null },
+    ];
+
+    function status(): string {
+      return screen.getByRole('status').textContent;
+    }
+
+    it('chacun sait que le Maire tranche, et qui il est', () => {
+      renderWithProviders(
+        <PlayerScreen view={seated({ phase: 'DAY_VOTE', vote: tied, players })} me={ME} />,
+      );
+
+      expect(status()).toBe(
+        'Égalité entre Alice et Bob. Le Maire, Chloe, choisit qui est exécuté.',
+      );
+    });
+
+    it('le Maire est invite a trancher, avec le choix sous les yeux', () => {
+      renderWithProviders(
+        <PlayerScreen
+          view={seated({
+            phase: 'DAY_VOTE',
+            vote: tied,
+            players: players.map((p) => ({ ...p, mayor: p.id === 'p1' })),
+            actions: [{ type: 'BreakTie', targets: ['p1', 'p2'] }],
+          })}
+          me={ME}
+        />,
+      );
+
+      expect(status()).toBe(
+        'Égalité entre Alice et Bob. En tant que Maire, choisissez qui est exécuté.',
+      );
+      expect(screen.getByRole('group', { name: fr.actions.break_tie })).toBeDefined();
+    });
+
+    it('puis tout le monde apprend la decision, ou son absence', () => {
+      renderWithProviders(
+        <PlayerScreen
+          view={seated({
+            phase: 'EXECUTION',
+            vote: { ...tied, tie: null, tieBroken: { playerId: 'p2' } },
+            players,
+          })}
+          me={ME}
+        />,
+      );
+
+      expect(status()).toBe('Le Maire a tranché en désignant Bob.');
+
+      cleanup();
+      renderWithProviders(
+        <PlayerScreen
+          view={seated({
+            phase: 'EXECUTION',
+            vote: { ...tied, tie: null, tieBroken: { playerId: null } },
+            players,
+          })}
+          me={ME}
+        />,
+      );
+
+      expect(status()).toBe('Le Maire n’a pas tranché : personne n’est exécuté.');
+    });
+
+    it('sans Maire, un second tour entre les ex aequo', () => {
+      renderWithProviders(
+        <PlayerScreen
+          view={seated({
+            phase: 'DAY_VOTE',
+            vote: {
+              ...tied,
+              candidates: ['p1', 'p2'],
+              round: 2,
+              tie: null,
+              closed: false,
+              outcome: null,
+            },
+            players,
+          })}
+          me={ME}
+        />,
+      );
+
+      expect(status()).toBe('Égalité : second tour entre Alice et Bob.');
+    });
+  });
+
   it('en vote secret, seulement l annonce du vote secret', () => {
     renderWithProviders(
       <PlayerScreen
@@ -176,6 +392,7 @@ describe('Vue joueur (US-40, docs/06)', () => {
             spare: false,
             round: 1,
             tie: null,
+            tieBroken: null,
             closed: false,
             ballots: {},
             tally: null,
