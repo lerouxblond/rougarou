@@ -32,5 +32,14 @@
     "typescript": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:"
+  },
+  "dependencies": {
+    "@fontsource/cormorant-garamond": "catalog:",
+    "@fontsource/dm-sans": "catalog:",
+    "@fontsource/pixelify-sans": "catalog:",
+    "@radix-ui/react-dialog": "catalog:",
+    "@radix-ui/react-switch": "catalog:",
+    "@radix-ui/react-tabs": "catalog:",
+    "@radix-ui/react-toast": "catalog:"
   }
 }

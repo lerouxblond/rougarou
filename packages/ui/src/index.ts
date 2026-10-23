@@ -2,3 +2,9 @@ export { Button, type ButtonProps, type ButtonSize, type ButtonVariant } from '.
 export { RoleCardArt, type RoleCardArtProps } from './RoleCardArt.tsx';
 export { ROLE_ICON_IDS, RoleIcon, type RoleIconId } from './RoleIcon.tsx';
 export { TEAM_ICON_IDS, TeamIcon, type TeamIconId } from './TeamIcon.tsx';
+export { Avatar } from './Avatar.tsx';
+export { Badge, type BadgeTone } from './Badge.tsx';
+export { EmptyState } from './EmptyState.tsx';
+export { IconButton, type IconButtonProps } from './IconButton.tsx';
+export { Skeleton } from './Skeleton.tsx';
+export { Stepper, type StepperProps } from './Stepper.tsx';

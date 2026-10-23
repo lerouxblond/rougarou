@@ -6,6 +6,17 @@
 @import 'tailwindcss';
 @import '../../../design/tokens.css';
 
+/* Polices auto-hebergees (`docs/05`, `docs/06`) : sous-ensemble latin, qui
+   couvre les accents du francais, dans les graisses utilisees. */
+@import '@fontsource/cormorant-garamond/latin-500.css';
+@import '@fontsource/cormorant-garamond/latin-600.css';
+@import '@fontsource/cormorant-garamond/latin-700.css';
+@import '@fontsource/dm-sans/latin-400.css';
+@import '@fontsource/dm-sans/latin-500.css';
+@import '@fontsource/dm-sans/latin-700.css';
+@import '@fontsource/pixelify-sans/latin-400.css';
+@import '@fontsource/pixelify-sans/latin-600.css';
+
 /* Tailwind v4 detecte ses sources en partant du fichier CSS. Ladle, lui, place
    la racine de Vite dans son propre paquet, donc la detection automatique ne
    trouve rien. On declare les sources explicitement : c'est vrai quel que soit
@@ -111,4 +122,38 @@
 @utility tap-target {
   min-width: var(--tap-min);
   min-height: var(--tap-min);
+}
+
+/* Bordures, ombres et voile des composants de `docs/06`. Le voile derive du
+   fond : il suit le theme sans nouveau token. */
+@utility border-accent {
+  border-color: var(--color-accent);
+}
+@utility border-danger {
+  border-color: var(--color-danger);
+}
+@utility border-team-village {
+  border-color: var(--team-village);
+}
+@utility border-team-wolves {
+  border-color: var(--team-wolves);
+}
+@utility border-team-solo {
+  border-color: var(--team-solo);
+}
+@utility bg-on-accent {
+  background-color: var(--color-on-accent);
+}
+@utility bg-text {
+  background-color: var(--color-text);
+}
+@utility bg-scrim {
+  background-color: color-mix(in srgb, var(--color-bg) 80%, transparent);
+}
+@utility shadow-raised {
+  box-shadow: var(--shadow-raised);
+}
+@utility rounded-t-card {
+  border-top-left-radius: var(--radius-card);
+  border-top-right-radius: var(--radius-card);
 }

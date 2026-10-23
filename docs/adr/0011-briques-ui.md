@@ -10,7 +10,7 @@ M4 remplace les écrans bruts par le design system « Lanterne » (`docs/06`). `
 On ajoute, au moment où une tâche s'en sert et à la dernière version stable :
 - **Radix UI Primitives** (dialog, tabs, toast, switch), **Motion** et **`@fontsource`** (Cormorant Garamond, DM Sans, Pixelify Sans), comme le prévoit `docs/05` ;
 - **`lucide-react`** pour les icônes génériques (`docs/06` §Iconographie), importées une par une ;
-- **`@dnd-kit`** (core et sortable) pour le glisser-déposer : il gère le pointeur, le toucher et le clavier, et annonce les déplacements aux lecteurs d'écran ;
+- **`@dnd-kit/react`** pour le glisser-déposer : il gère le pointeur, le toucher et le clavier, et annonce les déplacements aux lecteurs d'écran. Les anciens paquets `@dnd-kit/core` et `sortable` ne sont plus publiés depuis décembre 2024, plus de 12 mois (`docs/05` §Ajouter une dépendance) ;
 - **`uqr`** pour le QR : un encodeur sans dépendance qui produit un SVG.
 
 Les sons publics de M4 sont **synthétisés** par la Web Audio API, sans fichier (P31).
