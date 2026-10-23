@@ -116,6 +116,76 @@ describe('Vue joueur (US-40, docs/06)', () => {
     expect(screen.getAllByText(fr.players.mayor).length).toBeGreaterThan(0);
   });
 
+  it('l aube annonce les morts sans leur cause, et le role selon la vue (US-50)', () => {
+    renderWithProviders(
+      <PlayerScreen
+        view={seated({
+          phase: 'DAWN',
+          deaths: ['p3'],
+          pending: [{ kind: 'hunterShot', from: 'p3' }],
+        })}
+        me={ME}
+      />,
+    );
+
+    expect(screen.getByText('Chloe a été retrouvé mort. C’était : Voyante.')).toBeDefined();
+    expect(screen.getByText('Chloe, le Chasseur, va tirer.')).toBeDefined();
+  });
+
+  it('le vote public montre qui vote pour qui, puis l issue du serveur (US-52)', () => {
+    const vote = {
+      candidates: ['p1', 'p2'],
+      spare: true,
+      round: 1 as const,
+      tie: null,
+      closed: true,
+      ballots: { p1: { kind: 'player' as const, playerId: 'p2' } },
+      tally: { p2: 2 },
+      outcome: { kind: 'execute' as const, playerId: 'p2' },
+    };
+
+    renderWithProviders(
+      <PlayerScreen
+        view={seated({
+          phase: 'DAY_VOTE',
+          vote,
+          options: { voteVisibility: 'public' } as PlayerView['options'],
+        })}
+        me={ME}
+      />,
+    );
+
+    expect(screen.getByText('1 sur 2 a voté')).toBeDefined();
+    // Le decompte pondere du serveur (voix double du Maire), pas un calcul du client.
+    expect(screen.getByText('2 voix')).toBeDefined();
+    expect(screen.getByRole('status').textContent).toBe('Le village a désigné Bob.');
+  });
+
+  it('en vote secret, seulement l annonce du vote secret', () => {
+    renderWithProviders(
+      <PlayerScreen
+        view={seated({
+          phase: 'DAY_VOTE',
+          vote: {
+            candidates: ['p1', 'p2'],
+            spare: false,
+            round: 1,
+            tie: null,
+            closed: false,
+            ballots: {},
+            tally: null,
+            outcome: null,
+          },
+          options: { voteVisibility: 'secret' } as PlayerView['options'],
+        })}
+        me={ME}
+      />,
+    );
+
+    expect(screen.getByText(fr.vote.secret)).toBeDefined();
+    expect(screen.queryByText(/voix/)).toBeNull();
+  });
+
   it.each([
     ['nuit', seated()],
     ['distribution', seated({ phase: 'DEAL', actions: [{ type: 'ConfirmRoleSeen' }] })],

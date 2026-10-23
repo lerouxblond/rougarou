@@ -183,11 +183,15 @@ export function assertNoRoleLeak(view: View): void {
   }
 }
 
-/** Choisit une cible dans le formulaire libelle `label`, puis confirme. */
+/** Choisit une cible dans le choix de cibles intitule `label`, puis confirme. */
 async function choose(page: Page, label: string, target: string): Promise<void> {
-  const form = page.locator('form').filter({ has: page.getByLabel(label, { exact: true }) });
+  const form = page
+    .locator('form')
+    .filter({ has: page.getByRole('group', { name: label, exact: true }) });
 
-  await form.getByLabel(label, { exact: true }).selectOption({ label: target });
+  // On touche l'etiquette, comme un joueur : le bouton radio lui-meme est masque.
+  await form.getByText(target, { exact: true }).click();
+  await expect(form.getByRole('radio', { name: target, exact: true })).toBeChecked();
   await form.getByRole('button', { name: 'Confirmer' }).click();
 }
 
@@ -401,10 +405,12 @@ async function play(
   if (action.kind === 'cupidLink') {
     const targets = action.targets ?? [];
     const [first, second] = policy.couple?.(view, action) ?? [targets[0] ?? '', targets[1] ?? ''];
-    const form = page.locator('form').filter({ hasText: 'Former le couple' });
+    const form = page
+      .locator('form')
+      .filter({ has: page.getByRole('group', { name: 'Former le couple' }) });
 
-    await form.getByLabel('Premier amoureux').selectOption({ label: nameOf(first) });
-    await form.getByLabel('Second amoureux').selectOption({ label: nameOf(second) });
+    await form.getByText(nameOf(first), { exact: true }).click();
+    await form.getByText(nameOf(second), { exact: true }).click();
     await form.getByRole('button', { name: 'Confirmer' }).click();
     return true;
   }

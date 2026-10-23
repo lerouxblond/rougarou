@@ -1,5 +1,5 @@
 import type { ActionDescriptor, CommandInput } from '@rougarou/protocol';
-import { Button } from '@rougarou/ui';
+import { Button, TargetPicker } from '@rougarou/ui';
 import { useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -229,49 +229,32 @@ function TargetControl({
   readonly names: ReadonlyMap<string, string>;
 }) {
   const { t } = useTranslation();
-  const id = useId();
   const { send, busy, error } = useSendCommand();
-  const choices = [
-    ...action.targets.map((target) => ({ value: target, label: names.get(target) ?? target })),
+  const options = [
+    ...action.targets.map((target) => ({ id: target, label: names.get(target) ?? target })),
     ...(action.type === 'CastVote' && action.spare
-      ? [{ value: SPARE, label: t('actions.spare') }]
+      ? [{ id: SPARE, label: t('actions.spare') }]
       : []),
     ...(action.type === 'CastVote' && action.abstain
-      ? [{ value: ABSTAIN, label: t('actions.abstain') }]
+      ? [{ id: ABSTAIN, label: t('actions.abstain') }]
       : []),
   ];
-  const [choice, setChoice] = useState(choices[0]?.value ?? '');
 
   return (
-    <form
-      className="flex flex-col gap-2"
-      onSubmit={(event) => {
-        event.preventDefault();
-        void send(toCommand(action, choice));
-      }}
-    >
-      <label htmlFor={id} className="text-sm text-text">
-        {t(labelOf(action))}
-      </label>
-      <select
-        id={id}
-        value={choice}
-        onChange={(event) => {
-          setChoice(event.target.value);
+    <div className="flex flex-col gap-1">
+      <TargetPicker
+        legend={t(labelOf(action))}
+        options={options}
+        confirmLabel={t('common.confirm')}
+        busy={busy}
+        onConfirm={([choice]) => {
+          if (choice !== undefined) {
+            void send(toCommand(action, choice));
+          }
         }}
-        className="min-h-11 rounded-card border border-border bg-surface px-3 text-text"
-      >
-        {choices.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
-      <Button type="submit" disabled={busy || choice === ''}>
-        {t('common.confirm')}
-      </Button>
+      />
       <FormError message={error === null ? null : t(error)} />
-    </form>
+    </div>
   );
 }
 
@@ -375,7 +358,7 @@ function WitchControl({
 
 type CoupleAction = Extract<ActionDescriptor, { kind: 'cupidLink' }>;
 
-/** Cupidon choisit deux amoureux distincts (`docs/02`) : le serveur refuse deux fois le meme. */
+/** Cupidon choisit deux amoureux distincts (`docs/02`), lui compris. */
 function CoupleControl({
   action,
   names,
@@ -384,59 +367,29 @@ function CoupleControl({
   readonly names: ReadonlyMap<string, string>;
 }) {
   const { t } = useTranslation();
-  const firstId = useId();
-  const secondId = useId();
   const { send, busy, error } = useSendCommand();
-  const [first, setFirst] = useState(action.targets[0] ?? '');
-  const [second, setSecond] = useState(action.targets[1] ?? '');
-  const options = action.targets.map((target) => (
-    <option key={target} value={target}>
-      {names.get(target) ?? target}
-    </option>
-  ));
 
   return (
-    <form
-      className="flex flex-col gap-2"
-      onSubmit={(event) => {
-        event.preventDefault();
-        void send({
-          type: 'SubmitNightAction',
-          action: { kind: 'cupidLink', lovers: [first, second] },
-        });
-      }}
-    >
-      <p className="text-sm text-text">{t(NIGHT_LABELS.cupidLink)}</p>
-      <label htmlFor={firstId} className="text-sm text-text">
-        {t('actions.cupid_first')}
-      </label>
-      <select
-        id={firstId}
-        value={first}
-        onChange={(event) => {
-          setFirst(event.target.value);
+    <div className="flex flex-col gap-1">
+      <TargetPicker
+        legend={t(NIGHT_LABELS.cupidLink)}
+        options={action.targets.map((target) => ({
+          id: target,
+          label: names.get(target) ?? target,
+        }))}
+        count={2}
+        confirmLabel={t('common.confirm')}
+        busy={busy}
+        onConfirm={([first, second]) => {
+          if (first !== undefined && second !== undefined) {
+            void send({
+              type: 'SubmitNightAction',
+              action: { kind: 'cupidLink', lovers: [first, second] },
+            });
+          }
         }}
-        className="min-h-11 rounded-card border border-border bg-surface px-3 text-text"
-      >
-        {options}
-      </select>
-      <label htmlFor={secondId} className="text-sm text-text">
-        {t('actions.cupid_second')}
-      </label>
-      <select
-        id={secondId}
-        value={second}
-        onChange={(event) => {
-          setSecond(event.target.value);
-        }}
-        className="min-h-11 rounded-card border border-border bg-surface px-3 text-text"
-      >
-        {options}
-      </select>
-      <Button type="submit" disabled={busy || first === second}>
-        {t('common.confirm')}
-      </Button>
+      />
       <FormError message={error === null ? null : t(error)} />
-    </form>
+    </div>
   );
 }

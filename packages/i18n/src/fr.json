@@ -405,5 +405,30 @@
     "label": "Joueurs",
     "dead": "Mort",
     "mayor": "Maire"
+  },
+  "vote": {
+    "board": "Votes",
+    "progress": "{{count}} sur {{total}} ont voté",
+    "progress_one": "{{count}} sur {{total}} a voté",
+    "secret": "Vote secret : seul le résultat sera annoncé.",
+    "votes": "{{count}} voix",
+    "outcome": {
+      "execute": "Le village a désigné {{name}}.",
+      "nobody_spare": "Le village épargne tout le monde.",
+      "nobody_tie": "L’égalité persiste : personne n’est exécuté.",
+      "tie": "Égalité entre {{names}}.",
+      "nobody_no_ballots": "Personne n’a voté : personne n’est exécuté."
+    },
+    "votes_one": "{{count}} voix"
+  },
+  "dawn": {
+    "title": "Ce matin…",
+    "nobody": "Personne n’est mort cette nuit.",
+    "death": "{{name}} a été retrouvé mort.",
+    "death_role": "{{name}} a été retrouvé mort. C’était : {{role}}."
+  },
+  "pending": {
+    "hunter_shot": "{{name}}, le Chasseur, va tirer.",
+    "mayor_succession": "{{name}} désigne son successeur."
   }
 }
