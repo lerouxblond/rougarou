@@ -100,6 +100,7 @@ const state = (seq: number) => ({
     vote: null,
     pending: [],
     winner: null,
+    journal: null,
     actions: [],
   },
 });

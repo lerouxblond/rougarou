@@ -2,7 +2,9 @@ import {
   gameOptionsSchema,
   type Ballot,
   type Composition,
+  type DeathCause,
   type GameOptions,
+  type JournalEntry,
   type Knowledge,
   type Phase,
   type PlayerId,
@@ -62,6 +64,8 @@ export interface GameState {
    * Egale a `seats.length` apres le dernier ; `null` hors ceremonie.
    */
   readonly ceremonyTurn: number | null;
+  /** Les faits de la partie, dans l'ordre (`R-19`). */
+  readonly journal: readonly JournalEntry[];
 }
 
 export interface PlayerState {
@@ -133,7 +137,7 @@ export interface WitchChoice {
 }
 
 /** Cause d'une mort, connue du seul meneur (`docs/04` §Projection). */
-export type DeathCause = 'wolves' | 'witch' | 'vote' | 'hunter' | 'grief';
+export type { DeathCause };
 
 export interface Death {
   readonly playerId: PlayerId;
@@ -215,6 +219,7 @@ export function emptyState(): GameState {
     pausedRemaining: null,
     winner: null,
     ceremonyTurn: null,
+    journal: [],
   };
 }
 

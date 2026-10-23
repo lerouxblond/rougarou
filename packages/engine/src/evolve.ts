@@ -62,6 +62,9 @@ export function evolve(state: GameState, event: GameEvent): GameState {
     case 'CeremonyTurnPassed':
       return { ...state, ceremonyTurn: event.turn };
 
+    case 'Journaled':
+      return { ...state, journal: [...state.journal, event.entry] };
+
     case 'PhaseChanged':
       return enterPhase(state, event.phase);
 

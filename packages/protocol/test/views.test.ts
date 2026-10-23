@@ -26,6 +26,7 @@ const playerView = {
   vote: null,
   pending: [],
   winner: null,
+  journal: null,
   actions: [],
 };
 
@@ -147,6 +148,7 @@ describe('Vue du meneur', () => {
       pending: [],
       winner: null,
       everyoneVoted: false,
+      journal: [],
       actions: [],
     };
 

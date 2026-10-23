@@ -257,6 +257,68 @@ const playerVoteSchema = z.strictObject({
   outcome: voteOutcomeSchema.nullable(),
 });
 
+/** Cause d'une mort : connue du meneur seul (`docs/04` §Projection). */
+export const deathCauseSchema = z.enum(['wolves', 'witch', 'vote', 'hunter', 'grief']);
+
+export type DeathCause = z.infer<typeof deathCauseSchema>;
+
+const deathSchema = z.strictObject({ playerId: playerIdSchema, cause: deathCauseSchema });
+
+/** Un fait journalise (`R-19`). */
+export const journalFactSchema = z.discriminatedUnion('kind', [
+  z.strictObject({ kind: z.literal('nightStarted') }),
+  z.strictObject({ kind: z.literal('wolvesChose'), victim: playerIdSchema.nullable() }),
+  z.strictObject({ kind: z.literal('seerProbed'), seer: playerIdSchema, target: playerIdSchema }),
+  z.strictObject({
+    kind: z.literal('witchActed'),
+    witch: playerIdSchema,
+    save: z.boolean(),
+    kill: playerIdSchema.nullable(),
+  }),
+  z.strictObject({
+    kind: z.literal('loversLinked'),
+    cupid: playerIdSchema,
+    lovers: z.tuple([playerIdSchema, playerIdSchema]),
+  }),
+  z.strictObject({
+    kind: z.literal('littleGirlSpied'),
+    playerId: playerIdSchema,
+    caught: z.boolean(),
+  }),
+  z.strictObject({
+    kind: z.literal('playerKilled'),
+    playerId: playerIdSchema,
+    cause: deathCauseSchema,
+  }),
+  z.strictObject({ kind: z.literal('hunterShot'), hunter: playerIdSchema, target: playerIdSchema }),
+  z.strictObject({ kind: z.literal('mayorElected'), playerId: playerIdSchema, drawn: z.boolean() }),
+  z.strictObject({
+    kind: z.literal('mayorDesignated'),
+    from: playerIdSchema,
+    to: playerIdSchema,
+    drawn: z.boolean(),
+  }),
+  z.strictObject({ kind: z.literal('voteClosed'), outcome: voteOutcomeSchema }),
+  z.strictObject({ kind: z.literal('phaseForced'), phase: phaseSchema }),
+  z.strictObject({ kind: z.literal('timerExpired'), phase: phaseSchema }),
+  z.strictObject({ kind: z.literal('gameEnded'), winner: winnerSchema }),
+]);
+
+export type JournalFact = z.infer<typeof journalFactSchema>;
+
+/**
+ * Une entree du journal : l'heure de la commande qui l'a produite, la nuit
+ * en cours (le jour N suit la nuit N) et la phase, pour la chronologie.
+ */
+export const journalEntrySchema = z.strictObject({
+  at: z.int(),
+  night: z.int().min(0),
+  phase: phaseSchema,
+  fact: journalFactSchema,
+});
+
+export type JournalEntry = z.infer<typeof journalEntrySchema>;
+
 /** Distribution en ceremonie (`R-17`) : qui a la main, `null` apres le dernier joueur. */
 const ceremonySchema = z.strictObject({ turn: playerIdSchema.nullable() });
 
@@ -284,6 +346,8 @@ export const playerViewSchema = z.strictObject({
   vote: playerVoteSchema.nullable(),
   pending: z.array(pendingSchema),
   winner: winnerSchema.nullable(),
+  /** La chronologie complete, seulement a `ENDED` (`R-19`). */
+  journal: z.array(journalEntrySchema).nullable(),
   actions: z.array(actionDescriptorSchema),
 });
 
@@ -316,11 +380,6 @@ const narratorNightSchema = z.strictObject({
   spy: z.strictObject({ playerId: playerIdSchema, caught: z.boolean() }).nullable(),
 });
 
-const deathSchema = z.strictObject({
-  playerId: playerIdSchema,
-  cause: z.enum(['wolves', 'witch', 'vote', 'hunter', 'grief']),
-});
-
 export const narratorViewSchema = z.strictObject({
   kind: z.literal('narrator'),
   gameId: z.string(),
@@ -344,6 +403,8 @@ export const narratorViewSchema = z.strictObject({
   winner: winnerSchema.nullable(),
   /** Tous les votants ont vote : le bouton de cloture le signale (`R-37`). */
   everyoneVoted: z.boolean(),
+  /** Le journal, en direct (`R-19`). */
+  journal: z.array(journalEntrySchema),
   actions: z.array(actionDescriptorSchema),
 });
 

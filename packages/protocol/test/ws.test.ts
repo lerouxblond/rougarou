@@ -30,6 +30,7 @@ const playerView = {
   vote: null,
   pending: [],
   winner: null,
+  journal: null,
   actions: [{ type: 'JoinGame' }],
 };
 

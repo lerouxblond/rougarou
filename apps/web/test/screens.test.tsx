@@ -40,6 +40,7 @@ const playerView: PlayerView = {
   vote: null,
   pending: [],
   winner: null,
+  journal: null,
   actions: [{ type: 'JoinGame' }],
 };
 
@@ -84,6 +85,7 @@ const narratorView: NarratorView = {
   pending: [],
   winner: null,
   everyoneVoted: false,
+  journal: [],
   actions: [],
 };
 

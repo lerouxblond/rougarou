@@ -144,6 +144,8 @@ function playerView(state: GameState, viewerId: PlayerId): PlayerView {
           },
     pending: state.pending.map((effect) => ({ kind: effect.kind, from: effect.from })),
     winner: state.winner,
+    // Le journal ne part vers un joueur qu'a la fin (`R-19`).
+    journal: state.phase === 'ENDED' ? [...state.journal] : null,
     actions: availableActions(state, { kind: 'player', playerId: viewerId }),
   };
 }
@@ -260,6 +262,7 @@ function narratorView(state: GameState): NarratorView {
     pending: state.pending.map((effect) => ({ kind: effect.kind, from: effect.from })),
     winner: state.winner,
     everyoneVoted: everyoneVoted(state),
+    journal: [...state.journal],
     actions: availableActions(state, { kind: 'narrator' }),
   };
 }
