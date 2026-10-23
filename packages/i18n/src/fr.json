@@ -429,7 +429,9 @@
       "mayor_silent": "Le Maire n’a pas tranché : personne n’est exécuté.",
       "second_round": "Égalité : second tour entre {{names}}."
     },
-    "votes_one": "{{count}} voix"
+    "votes_one": "{{count}} voix",
+    "candidates": "Candidats à la mairie",
+    "no_candidates": "Personne ne s’est encore présenté. Sans candidat, tous les vivants seront éligibles."
   },
   "dawn": {
     "title": "Ce matin…",

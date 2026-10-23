@@ -223,6 +223,62 @@ describe('Vue joueur (US-40, docs/06)', () => {
     expect(screen.getByRole('status').textContent).toBe('Le village a désigné Bob.');
   });
 
+  describe('election du Maire (R-35, US-49)', () => {
+    const election = {
+      stage: 'candidacy' as const,
+      candidates: ['p2', 'p3'],
+      eligible: [],
+      round: 1 as const,
+      ballots: {},
+    };
+
+    it('pendant les candidatures, chacun voit qui se presente', () => {
+      renderWithProviders(
+        <PlayerScreen
+          view={seated({
+            phase: 'MAYOR_ELECTION',
+            election,
+            actions: [{ type: 'DeclareCandidacy' }],
+          })}
+          me={ME}
+        />,
+      );
+
+      const list = screen.getByRole('list', { name: fr.vote.candidates });
+
+      expect(list.textContent).toContain('Bob');
+      expect(list.textContent).toContain('Chloe');
+      expect(screen.getByRole('button', { name: fr.actions.declare_candidacy })).toBeDefined();
+    });
+
+    it('sans candidat, il sait que tous les vivants seront eligibles', () => {
+      renderWithProviders(
+        <PlayerScreen
+          view={seated({ phase: 'MAYOR_ELECTION', election: { ...election, candidates: [] } })}
+          me={ME}
+        />,
+      );
+
+      expect(screen.getByText(fr.vote.no_candidates)).toBeDefined();
+    });
+
+    it('une egalite a l election ouvre un second tour annonce', () => {
+      renderWithProviders(
+        <PlayerScreen
+          view={seated({
+            phase: 'MAYOR_ELECTION',
+            election: { ...election, stage: 'vote', eligible: ['p1', 'p2'], round: 2 },
+          })}
+          me={ME}
+        />,
+      );
+
+      expect(screen.getByRole('status').textContent).toBe(
+        'Égalité : second tour entre Alice et Bob.',
+      );
+    });
+  });
+
   describe('egalites (R-33, R-36, R-38)', () => {
     const tied = {
       candidates: ['p1', 'p2', 'p3'],

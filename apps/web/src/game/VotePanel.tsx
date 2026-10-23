@@ -1,6 +1,7 @@
 import type { NarratorView, PlayerView, VoteOutcome } from '@rougarou/protocol';
 import { VoteBoard, type VoteEntry } from '@rougarou/ui';
 import type { TFunction } from 'i18next';
+import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type View = PlayerView | NarratorView;
@@ -21,6 +22,10 @@ export function VotePanel({ view }: { readonly view: View }) {
   const alive = view.players.filter((player) => player.alive).length;
 
   const box = ballotBox(view);
+
+  if (view.election?.stage === 'candidacy') {
+    return <Candidacies candidates={view.election.candidates} name={name} />;
+  }
 
   if (box === null) {
     return null;
@@ -101,6 +106,37 @@ const NOBODY_KEYS: Record<Extract<VoteOutcome, { kind: 'nobody' }>['reason'], st
 };
 
 /** L'issue d'un vote, en toutes lettres (aussi pour le journal). */
+/** Les candidatures a la mairie, en direct (`R-35`, US-49). */
+function Candidacies({
+  candidates,
+  name,
+}: {
+  readonly candidates: readonly string[];
+  readonly name: (id: string) => string;
+}) {
+  const { t } = useTranslation();
+  const title = useId();
+
+  return (
+    <section aria-labelledby={title} className="flex flex-col gap-2 text-text">
+      <h2 id={title} className="font-display text-xl">
+        {t('vote.candidates')}
+      </h2>
+      {candidates.length === 0 ? (
+        <p className="text-text-muted">{t('vote.no_candidates')}</p>
+      ) : (
+        <ul aria-labelledby={title} className="flex flex-wrap gap-2">
+          {candidates.map((id) => (
+            <li key={id} className="rounded-pill border border-border px-3 py-1">
+              {name(id)}
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  );
+}
+
 /**
  * Ce que le vote du village annonce a tous, du plus recent au plus ancien :
  * la decision du Maire, l'egalite qu'il doit trancher, le second tour, puis
@@ -112,14 +148,16 @@ function voteMessage(
   t: TFunction,
   locale: string,
 ): string | null {
-  const { vote } = view;
-
-  if (vote === null) {
-    return null;
-  }
-
+  const { vote, election } = view;
   const names = (ids: readonly string[]) =>
     new Intl.ListFormat(locale, { type: 'conjunction' }).format(ids.map(name));
+
+  if (vote === null) {
+    // Egalite a l'election : second tour entre les ex aequo (`R-35`).
+    return election?.stage === 'vote' && election.round === 2
+      ? t('vote.outcome.second_round', { names: names(election.eligible) })
+      : null;
+  }
 
   if (vote.tieBroken !== null) {
     return vote.tieBroken.playerId === null

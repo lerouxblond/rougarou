@@ -735,8 +735,11 @@ que `availableActions` propose et ce que l'écran affiche.
     du Maire, publique, rangée par le moteur à `TieBroken`), car sans elle l'écran de l'exécution
     n'aurait montré que « Égalité entre A et B » ; le client ne la déduit pas des morts (règle 1).
     `R-38` précisé. 4 tests web, 2 assertions moteur
-- [ ] **GL4 — Candidats à la mairie listés** (G4)
+- [x] **GL4 — Candidats à la mairie listés** (G4)
   - Fichiers : `apps/web/src/game/VotePanel.tsx` (ou un panneau d'élection), i18n, tests
+  - Fait : pendant les candidatures, `VotePanel` liste les candidats en direct (ou dit que, sans
+    candidat, tous les vivants seront éligibles) ; une égalité à l'élection annonce le second tour
+    entre les ex æquo. 3 tests web
 - [ ] **GL5 — La meute se reconnaît** (G5, après réponse à Q1)
   - Fichiers : `packages/engine/src/roles/werewolf.ts`, `packages/protocol/src/views.ts`, `project.ts`,
     `docs/02`, `test/leaks/`, web, i18n

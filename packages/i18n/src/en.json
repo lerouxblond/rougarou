@@ -429,7 +429,9 @@
       "mayor_chose": "The Mayor broke the tie by choosing {{name}}.",
       "mayor_silent": "The Mayor did not decide: nobody is executed.",
       "second_round": "Tie: second round between {{names}}."
-    }
+    },
+    "candidates": "Candidates for Mayor",
+    "no_candidates": "Nobody has stood yet. Without candidates, every living player will be eligible."
   },
   "dawn": {
     "title": "This morning…",
