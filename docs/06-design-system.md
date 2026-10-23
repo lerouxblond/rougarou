@@ -110,7 +110,8 @@ Avec `prefers-reduced-motion: reduce`, toutes les durées passent à 0 ou à un 
 | `PresentationCard` | Grande fiche du joueur qui a la parole au jour 1, avec l'ordre de passage |
 | `PhaseBanner` | Nom de la phase, numéro du jour ou de la nuit, minuteur |
 | `Timer` | Anneau ou barre, avec `aria-live` aux paliers 30 s, 10 s, 0 s |
-| `NarratorScript` | Grand texte à lire avec les étapes précédentes et suivantes |
+| `NarratorScript` | Grand texte à lire avec les étapes précédentes et suivantes. Le meneur le lit lui-même (pas de synthèse vocale en V1, D-22) |
+| `BalanceMeter` | Indicateur d'équilibre de la composition (`docs/02`) : jauge **et** libellé (« Avantage village », « Équilibré », « Avantage loups ») |
 | `NightStepList` | Ordre de nuit avec l'état de chaque étape (à venir, en cours, faite, passée) |
 | `ChatPanel` | Onglets par canal, messages, champ de saisie, état coupé |
 | `Toast`, `Dialog`, `Sheet` (panneau bas sur mobile), `Tabs`, `Switch`, `Stepper` (+/−), `Badge`, `Avatar`, `EmptyState`, `Skeleton` | Basés sur Radix |

@@ -181,7 +181,18 @@ Le moteur propose une composition par défaut (`suggestComposition(playerCount, 
 | 16–19 | 4 | + Idiot du village, Renard |
 | 20–24 | 5 | + Corbeau, Montreur d'ours |
 
-Le reste des places est complété par des Simples villageois. Un **indicateur d'équilibre** (score heuristique du poids de chaque camp) s'affiche dans l'écran de configuration.
+Le reste des places est complété par des Simples villageois. Un rôle qui n'est pas encore disponible (palier `extension` avant M6) n'est pas suggéré : sa place revient à un Simple villageois.
+
+Un **indicateur d'équilibre** s'affiche dans l'écran de configuration et suit chaque + et − du meneur. C'est la somme des poids des rôles de la composition :
+
+| Rôle | Poids | Rôle | Poids |
+|---|---|---|---|
+| Simple villageois | +1 | Chasseur | +3 |
+| Loup-garou | −6 | Cupidon | −2 |
+| Voyante | +7 | Petite fille | +3 |
+| Sorcière | +4 | | |
+
+Un total de −3 à +3 s'affiche « Équilibré », au-dessus « Avantage village », en dessous « Avantage loups », toujours avec un libellé et pas seulement une couleur. Chaque rôle ajouté plus tard déclare son poids. La suggestion et les poids sont des **données de configuration**, pas un résultat de jeu : ils vivent dans `packages/protocol/src/composition.ts`, à côté du schéma des options, pour que l'écran de configuration les affiche sans aller-retour avec le serveur (P29, M4).
 
 ## Cas limites (tous doivent avoir un test)
 

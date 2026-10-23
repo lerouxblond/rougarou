@@ -571,9 +571,12 @@ Lighthouse (PWA, accessibilité) est d'au moins 90 et axe ne signale aucune viol
 | D-03 | Sons et vibrations : aucun ne trahit le jeu | ✅ |
 | D-23 | Distribution `simultaneous` par défaut, `ceremony` en option | ✅ |
 | D-24 | Direction Lanterne + pixel art | ✅ |
-| D-22 | Synthèse vocale du texte à lire : optionnelle, voix du navigateur | 🟡 **à valider** |
+| D-22 | Synthèse vocale du texte à lire : **refusée pour la V1** (le meneur lit lui-même) | ✅ décidé le 2026-10-23 |
 
-### Précisions de règles (règle 5 de `CLAUDE.md`) — 🟡 à valider
+### Précisions de règles (règle 5 de `CLAUDE.md`) — ✅ validées le 2026-10-23
+
+P28, P30, P31 et P32 ont été validées explicitement ; P26, P27 et P29 ont été présentées
+sans objection.
 
 | # | Sujet | Proposition |
 |---|---|---|
@@ -603,8 +606,8 @@ Huit PR de moins de 400 lignes de code non généré : **A** (T1), **B** (T2–T
 **C** (T6–T7, design system), **D** (T8, joueur), **E** (T9, meneur), **F** (T10–T11, salon,
 configuration, fin), **G** (T12, ambiance), **H** (T13), puis T14.
 
-- [ ] **T1 — Docs, règles, ADR 0011** *(PR A)*
-  - Fichiers : `docs/01` (P26, P28, `timers.ceremonyCard`, `R-15` sans `ceremony`), `docs/02` (P29), `docs/03` (P27, P32), `docs/04` (journal dans la vue), `docs/06` (`Stepper`, `BalanceMeter`), `docs/07` (P31), `docs/10` (P30, P32), `docs/12` (D-22 → ✅), `docs/05` (versions), `docs/adr/0011-briques-ui.md`
+- [x] **T1 — Docs, règles, ADR 0011** *(PR A)*
+  - Fichiers : `docs/01` (P26, P28, `timers.ceremonyCard`, `R-15` sans `ceremony`), `docs/02` (P29), `docs/03` (P27, P32), `docs/04` (journal dans la vue), `docs/06` (`Stepper`, `BalanceMeter`), `docs/07` (P31), `docs/10` (P30, P32), `docs/03` et `docs/06` (D-22 : pas de synthèse vocale), `docs/12` (D-22 → ✅), `docs/adr/0011-briques-ui.md`. Les versions entrent dans `docs/05` avec la tâche qui ajoute chaque dépendance. Règles nouvelles : `R-17` (cérémonie), `R-18` (correction), `R-19` (journal)
   - Tests attendus : aucun (document)
 
 - [ ] **T2 — Distribution `ceremony`** *(PR B)*
@@ -636,8 +639,8 @@ configuration, fin), **G** (T12, ambiance), **H** (T13), puis T14.
   - Tests attendus : nuit uniforme (un joueur sans action rend exactement le même DOM toute la nuit) ; un contrôle par action reçue ; « Mes informations » annoncé ; axe sur chaque écran, nuit et jour, 375 px et 1280 px
 
 - [ ] **T9 — Vue meneur** *(PR E)*
-  - Fichiers : `apps/web/src/game/narrator/*.tsx` (trois colonnes ou onglets, `NightStepList`, `NarratorScript` avec synthèse vocale selon D-22, bouton principal et ligne « ce qui bloque », cercle avec les rôles, journal, annuler, forcer, pause, +30 s, mode correction), i18n, tests
-  - Tests attendus : le libellé du bouton principal suit l'action reçue ; « ce qui bloque » ; la synthèse vocale ne parle que si l'option est active ; axe ; raccourcis clavier
+  - Fichiers : `apps/web/src/game/narrator/*.tsx` (trois colonnes ou onglets, `NightStepList`, `NarratorScript` (sans synthèse vocale, D-22), bouton principal et ligne « ce qui bloque », cercle avec les rôles, journal, annuler, forcer, pause, +30 s, mode correction), i18n, tests
+  - Tests attendus : le libellé du bouton principal suit l'action reçue ; « ce qui bloque » ; axe ; raccourcis clavier
 
 - [ ] **T10 — Salon et configuration** *(PR F)*
   - Fichiers : `apps/web/src/game/{Lobby,Config}.tsx` (QR, glisser-déposer, suggestion, compteurs, `BalanceMeter`, options groupées avec aide), i18n, tests

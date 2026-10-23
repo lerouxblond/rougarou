@@ -59,6 +59,13 @@ Le **mode de jeu** (`docs/11-modes-de-jeu.md`) peut ajouter des sous-étapes de 
 - `R-14` **Minuteurs.** Le moteur n'a pas d'horloge : il range une échéance (`deadline = now + durée`, `now` étant injecté) sur l'étape en cours, et accepte la commande système `Timeout` seulement si `now ≥ deadline`. L'expiration applique les mêmes valeurs par défaut qu'un forçage (`R-13`), mais ne fait jamais avancer une phase dont la sortie appartient au meneur : à l'aube et à l'exécution, elle résout l'effet en attente (successeur du Maire) et le meneur passe ensuite à la suite. En pilotage `manual`, une étape de nuit expirée attend aussi le meneur. Le Durable Object programme l'alarme à partir de cette échéance (`docs/04`).
 - `R-15` Une option prévue par le schéma mais pas encore prise en charge par le moteur est **refusée** à la configuration, avec une erreur explicite, plutôt qu'ignorée.
 - `R-16` **Pause et +30 s.** Le meneur peut mettre en pause le minuteur en cours, le reprendre, ou lui ajouter 30 secondes. En pause, le moteur range la durée restante (`remaining = deadline − now`) et retire l'échéance, donc `Timeout` est refusé. À la reprise, `deadline = now + remaining`. « +30 s » ajoute 30 secondes à l'échéance, ou à la durée restante si le minuteur est en pause. Ces trois commandes sont refusées quand aucun minuteur ne court, et la pause tombe d'elle-même quand l'étape change (le nouveau minuteur démarre normalement). Elles ne révèlent rien et s'annulent (`R-11`). Seuls ceux qui voyaient le minuteur voient la nouvelle échéance ou la pause, ce qui garde la nuit uniforme.
+- `R-17` **Distribution en cérémonie** (`dealMode: 'ceremony'`, `docs/12` §3). Les joueurs découvrent leur rôle **un par un, dans l'ordre des places**. Seul celui qui a la main voit sa carte et peut confirmer « J'ai vu mon rôle » ; les autres voient seulement qui découvre son rôle. La main passe au suivant à sa confirmation, quand le meneur clique « Suivant », ou à la fin du minuteur `timers.ceremonyCard` (8 s par défaut, `null` = pas de minuteur). Après le dernier joueur, le meneur lance la nuit comme en distribution simultanée. Revoir sa carte plus tard (« Ma carte ») ne rejoue rien.
+- `R-18` **Mode correction** (US-80). Entre la distribution et la fin de partie, le meneur peut corriger la table :
+  - **Tuer** un joueur : il meurt avec la cause `correction`, et la chaîne normale s'applique (chagrin, Chasseur, succession du Maire, `R-41`, puis victoire, `R-44`).
+  - **Ressusciter** un joueur mort : il revient vivant, sans rien rejouer (son amoureux reste mort, un tir ou une succession déjà faits restent faits).
+  - **Changer le rôle** d'un joueur : il reçoit le nouveau rôle avec des pouvoirs remis à neuf (par exemple, les deux potions) et l'information privée « Ton rôle a changé ».
+  - Chaque correction est annulable (`R-11`) et marquée d'un badge dans le journal (`R-19`). Comme toute cause de mort, `correction` n'est jamais montrée aux joueurs.
+- `R-19` **Journal.** Chaque fait de la partie (actions de nuit, votes, morts et leurs causes, forçages, minuteurs expirés, corrections) entre dans le journal, avec l'heure de la commande qui l'a produit. Le meneur le voit en direct. Les joueurs le reçoivent **seulement à `ENDED`**, sous forme de chronologie nuit par nuit (US-60) ; avant, il ne quitte jamais le serveur vers eux.
 
 ## 3. Déroulé de la nuit
 
@@ -95,7 +102,7 @@ Le **mode de jeu** (`docs/11-modes-de-jeu.md`) peut ajouter des sous-étapes de 
   2. La cible de la potion de mort de la Sorcière (non bloquée par le Salvateur), cause `witch`. Si c'est aussi la victime des loups, elle ne meurt qu'une fois, de la cause `wolves`.
   3. Les autres morts de nuit (Loup blanc, etc.).
 
-  Chaque étape de nuit déclare ses morts de l'aube, et le moteur les calcule dans l'ordre de nuit, ce qui donne l'ordre ci-dessus. Les causes (`wolves`, `witch`, `vote`, `hunter`, `grief`) ne sont connues que du meneur (`docs/04` §Projection).
+  Chaque étape de nuit déclare ses morts de l'aube, et le moteur les calcule dans l'ordre de nuit, ce qui donne l'ordre ci-dessus. Les causes (`wolves`, `witch`, `vote`, `hunter`, `grief`, et `correction` pour `R-18`) ne sont connues que du meneur (`docs/04` §Projection).
 - `R-41` **Morts en chaîne** : à chaque mort, on applique les effets « à la mort » (le Chasseur tire, l'amoureux meurt de chagrin, l'Enfant sauvage se transforme, le Maire désigne son successeur…). On répète jusqu'à ce qu'il n'y ait plus de nouveaux effets, puis on vérifie la victoire (`R-05`).
 - `R-42` L'ordre des effets à la mort est : chagrin des amoureux → Chasseur → succession du Maire. Pour une même vague de morts (l'aube, l'exécution, un tir) :
   1. on tue d'abord tous les chagrins, de proche en proche (cause `grief`) ;
@@ -133,7 +140,7 @@ Le Maire est un **titre** (badge), pas un rôle. Il se cumule avec n'importe que
 | `playMode` | `inPerson` \| `remote` | `inPerson` | — |
 | `gameMode` | `classic` \| `white-night` \| `vampire` | `classic` | `docs/11` |
 | `mayor` | bool | `true` | §6 |
-| `dealMode` | `simultaneous` \| `ceremony` | `simultaneous` | `docs/12` §3 |
+| `dealMode` | `simultaneous` \| `ceremony` | `simultaneous` | `R-17`, `docs/12` §3 |
 | `pilotMode` | `manual` \| `assisted` | `assisted` | `docs/12` §1 |
 | `roleplay` | bool | `false` | §9 (modificateur) |
 | `mayorSuccession` | `designate` \| `reelect` | `designate` | R-52 |
@@ -181,4 +188,4 @@ DEAL (+ fiches) → PRESENTATIONS (jour 1) → NIGHT 1 (sans mort) → DAWN → 
 
 Chaque option est définie dans un schéma Zod unique (`packages/protocol/src/options.ts`, ADR 0008), qui alimente à la fois le moteur et l'écran de configuration.
 
-Options présentes dans le schéma mais refusées par le moteur tant que leur jalon n'est pas atteint (`R-15`) : `roleplay: true` (M5), `dealMode: 'ceremony'` (M4), `parallelNight: true` (M5), et un `gameMode` autre que `classic` (M7).
+Options présentes dans le schéma mais refusées par le moteur tant que leur jalon n'est pas atteint (`R-15`) : `roleplay: true` (M5), `parallelNight: true` (M5), et un `gameMode` autre que `classic` (M7). `dealMode: 'ceremony'` est accepté depuis M4 (`R-17`).

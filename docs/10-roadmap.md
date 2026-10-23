@@ -49,18 +49,20 @@ Chaque jalon est livrable et déployé. Ne commence pas un jalon tant que la dé
 ## M4 — Interface complète (présentiel jouable)
 - Design system complet (`docs/06`) avec Ladle.
 - Vue joueur : carte « maintenir pour révéler », écran de nuit uniforme, actions, vote, « Mes informations ».
-- Vue meneur : `NightStepList`, `NarratorScript` (avec synthèse vocale en option), cercle des joueurs, journal, annuler, forcer, mode correction.
+- Vue meneur : `NightStepList`, `NarratorScript` (sans synthèse vocale, D-22), cercle des joueurs, journal, annuler, forcer, mode correction (`R-18`).
+- Distribution en cérémonie (`R-17`), QR du code de partie, glisser-déposer des places.
 - Écran de configuration : suggestion de composition, indicateur d'équilibre, options.
 - Écran de fin et chronologie.
-- Transitions jour et nuit, haptique, sons (option).
+- Transitions jour et nuit, haptique, sons publics synthétisés sur l'appareil du meneur (option, P31).
 
-**Terminé quand** : une vraie partie en présentiel à 8 ou plus est jouée sans papier, le score Lighthouse (PWA, accessibilité) est d'au moins 90 et axe ne signale aucune violation sérieuse.
+**Terminé quand** : une vraie partie en présentiel à 8 ou plus est jouée sans papier, les scores Lighthouse (mobile) d'accessibilité, de bonnes pratiques et de performance sont d'au moins 90, l'installabilité de la PWA est vérifiée par les tests (la catégorie « PWA » a disparu de Lighthouse en 2024, P30), et axe ne signale aucune violation sérieuse.
 
 ## M4b — UI vivante
 **But** : passer d'une interface jouable à une interface vivante, sur la direction Lanterne.
 - Composant `PixelSprite` (planches de 12 images, échelles ×1, ×2, ×4, ×6, mouvement réduit) et sprites de travail de `design/sprites/` pour tous les rôles (fallback généré pour les rôles sans sprite).
 - Les **six moments vivants** de `docs/06` §Mouvement, avec la bibliothèque Motion, et l'ambiance de nuit (étoiles, brume).
-- Sons publics synchronisés par horodatage serveur, profils audio (`docs/12` §5).
+- Sons publics synchronisés par horodatage serveur, profils audio (`docs/12` §5), fichiers de sons de `docs/07`.
+- Avatar et galerie de portraits (US-01), avec `PixelSprite`.
 - Catalogue Ladle avec tous les composants en nuit et en jour, sur téléphone, tablette et ordinateur.
 - Vérification visuelle : captures Playwright des écrans clés, comparées aux écrans de référence « Directions premium » du canevas.
 
@@ -70,6 +72,7 @@ Chaque jalon est livrable et déployé. Ne commence pas un jalon tant que la dé
 - Canaux de chat (US-70) avec contrôle d'accès côté serveur, limitation de débit, mise en sourdine.
 - Option `parallelNight`.
 - Historique des parties, statistiques de base, presets de composition.
+- « Rejouer avec les mêmes joueurs » (US-60).
 - Remplacement d'un joueur (`R-62`), transfert du rôle de meneur (US-81).
 
 **Terminé quand** : une partie entière est jouée à distance avec un appel vocal externe, et le test de non-fuite du chat (un message des loups n'est jamais reçu par un non-loup) passe.
