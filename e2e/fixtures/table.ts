@@ -129,10 +129,15 @@ export type Composition = Readonly<Record<string, number>>;
 export async function startNight(
   table: Table,
   composition: Composition = { 'Loup-garou': 1, Villageois: 4 },
+  { configured = false }: { readonly configured?: boolean } = {},
 ): Promise<void> {
   const { narrator, seats } = table;
 
-  await narrator.getByTestId('primary-action').click();
+  // `configured` : le meneur a deja ouvert la configuration.
+  if (!configured) {
+    await narrator.getByTestId('primary-action').click();
+  }
+
   await expect.poll(async () => (await readView(narrator)).phase).toBe('CONFIG');
 
   for (const [role, count] of Object.entries(composition)) {
