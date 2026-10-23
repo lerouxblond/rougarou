@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.3.0](https://github.com/lerouxblond/rougarou/compare/v0.2.0...v0.3.0) (2026-10-23)
+
+
+### Fonctionnalites
+
+* **engine:** add generic role hooks and private knowledge ([#11](https://github.com/lerouxblond/rougarou/issues/11)) ([a62055a](https://github.com/lerouxblond/rougarou/commit/a62055ad35bab351172bd5f177fd8c7603d32a0a))
+* **engine:** add seer, witch, hunter, cupid and little girl ([#12](https://github.com/lerouxblond/rougarou/issues/12)) ([65a8252](https://github.com/lerouxblond/rougarou/commit/65a825214c5b5aa7c4b78958812b81102885ca5d))
+* **web:** role cards, night panel and 8-player end-to-end game ([#13](https://github.com/lerouxblond/rougarou/issues/13)) ([04ce19c](https://github.com/lerouxblond/rougarou/commit/04ce19c78121c816fde9d8edb48c9d9182ba62c4))
+
+
+### Documentation
+
+* close milestone M3 ([#16](https://github.com/lerouxblond/rougarou/issues/16)) ([95f80cc](https://github.com/lerouxblond/rougarou/commit/95f80cc69fa5cfe4dbf5bb835677d4eca0044425))
+
 ## [0.2.0](https://github.com/lerouxblond/rougarou/compare/v0.1.0...v0.2.0) (2026-10-22)
 
 
