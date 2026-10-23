@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from './zod.ts';
 
 import { compositionSchema, playerIdSchema, roleIdSchema } from './ids.ts';
 import { gameOptionsSchema } from './options.ts';

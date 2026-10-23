@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from './zod.ts';
 
 /**
  * Alphabet des codes de partie : chiffres et majuscules, sans `0`, `O`, `1`

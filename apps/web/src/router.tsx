@@ -1,9 +1,13 @@
-import { createRootRoute, createRoute, createRouter, Outlet } from '@tanstack/react-router';
+import {
+  createRootRoute,
+  createRoute,
+  createRouter,
+  lazyRouteComponent,
+  Outlet,
+} from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 
-import { Game } from './routes/Game.tsx';
 import { Home } from './routes/Home.tsx';
-import { Join } from './routes/Join.tsx';
 
 /**
  * Racine du routage. Le lien d'evitement est le premier element focusable de
@@ -37,13 +41,15 @@ const homeRoute = createRoute({
 const joinRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/join/$code',
-  component: Join,
+  component: lazyRouteComponent(() => import('./routes/Join.tsx'), 'Join'),
 });
 
 const gameRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/game/$gameId',
-  component: Game,
+  // La partie (design system, protocole, moteur d'ecrans) se charge a la
+  // demande : l'accueil reste leger sur un telephone moyen (P30).
+  component: lazyRouteComponent(() => import('./routes/Game.tsx'), 'Game'),
 });
 
 // Routage par code plutot que par fichiers : peu de routes, et cela evite une

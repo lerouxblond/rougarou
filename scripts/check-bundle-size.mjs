@@ -40,7 +40,12 @@ function referenced(pattern) {
     .map((href) => href.replace(/^\//, ''));
 }
 
-const scripts = referenced(/<script[^>]+src="([^"]+)"/g);
+// Les morceaux en `modulepreload` sont telecharges et evalues au premier rendu,
+// au meme titre que le point d'entree.
+const scripts = [
+  ...referenced(/<script[^>]+src="([^"]+)"/g),
+  ...referenced(/<link[^>]+rel="modulepreload"[^>]+href="([^"]+)"/g),
+];
 const styles = referenced(/<link[^>]+rel="stylesheet"[^>]+href="([^"]+)"/g);
 
 if (scripts.length === 0) {

@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from './zod.ts';
 
 import { PROTOCOL_VERSION } from './version.ts';
 

@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from './zod.ts';
 
 /**
  * Codes d'erreur metier du moteur. Ils sont stables : le client les traduit.
