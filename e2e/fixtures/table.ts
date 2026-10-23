@@ -57,6 +57,12 @@ export interface Table {
 
 export const PLAYERS = ['Alice', 'Bob', 'Chloe', 'David', 'Eve'] as const;
 
+/**
+ * Attente d'une (re)connexion : en production, une connexion WebSocket peut
+ * echouer et reprendre apres plusieurs essais (0,5 + 1 + 2 + 4 s, US-90).
+ */
+export const CONNECTION_TIMEOUT = 15_000;
+
 export async function readView(page: Page): Promise<View> {
   const text = await page.getByTestId('view-json').textContent();
 
@@ -102,7 +108,7 @@ export async function openTable(
     await page.goto(`/join/${code}`);
     await signInGuest(page, name);
     await page.waitForURL(/\/game\//);
-    await expect(page.getByLabel('Pseudo')).toHaveValue(name);
+    await expect(page.getByLabel('Pseudo')).toHaveValue(name, { timeout: CONNECTION_TIMEOUT });
     await page.getByRole('button', { name: 'Rejoindre' }).click();
     await expect.poll(async () => (await readView(page)).me?.id).toBeTruthy();
     seats.push({ name, page });
@@ -145,6 +151,11 @@ export async function startNight(
   await expect(narrator.getByRole('button', { name: 'Phase suivante' })).toBeVisible();
   await narrator.getByRole('button', { name: 'Phase suivante' }).click();
   await expect.poll(async () => (await readView(narrator)).phase).toBe('NIGHT');
+
+  // La vue d'un joueur peut arriver apres celle du meneur.
+  for (const { page } of seats) {
+    await expect.poll(async () => (await readView(page)).phase).toBe('NIGHT');
+  }
 }
 
 /**
@@ -247,13 +258,19 @@ export async function playToTheEnd(
   seen = new Set<string>(),
 ): Promise<View> {
   const done = new Set<string>();
+  // Le meneur ne passe a la suite qu'apres deux tours calmes sur une meme vue :
+  // un seul tour ne suffit pas, la vue d'un joueur pouvant arriver apres celle
+  // du meneur, et un forcage jouerait alors son action par defaut (R-10).
+  let calm: string | null = null;
 
-  for (let round = 0; round < 200; round += 1) {
+  for (let round = 0; round < 400; round += 1) {
     const narratorView = await readView(table.narrator);
 
     if (narratorView.phase === 'ENDED') {
       return narratorView;
     }
+
+    const snapshot = JSON.stringify(narratorView);
 
     const views = await Promise.all(
       table.seats.map(async (seat) => ({ seat, view: await readView(seat.page) })),
@@ -270,16 +287,46 @@ export async function playToTheEnd(
       acted = (await actAsPlayer(seat.page, view, policy, done, seen)) || acted;
     }
 
-    if (!acted) {
-      await table.narrator
-        .getByRole('button', { name: /^(Phase suivante|Forcer la suite)$/ })
-        .click();
+    if (acted) {
+      calm = null;
+    } else if (calm === snapshot) {
+      calm = null;
+      await advance(table.narrator);
+    } else {
+      calm = snapshot;
     }
 
     await table.narrator.waitForTimeout(250);
   }
 
   throw new Error('La partie ne se termine pas');
+}
+
+/**
+ * Le meneur passe a la suite, puis attend que sa vue change. Sans cette
+ * attente, le tour suivant peut relire la vue d'avant le clic (latence de la
+ * production) et cliquer une seconde fois, voire attendre un bouton que la fin
+ * de partie a retire. Une etape bloquee (`R-10`) refuse la commande et ne
+ * change rien : l'attente est donc bornee, sans echec.
+ */
+async function advance(narrator: Page): Promise<void> {
+  const next = narrator.getByRole('button', { name: /^(Phase suivante|Forcer la suite)$/ });
+
+  if (!(await next.isVisible())) {
+    return;
+  }
+
+  const before = JSON.stringify(await readView(narrator));
+
+  await next.click();
+
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    if (JSON.stringify(await readView(narrator)) !== before) {
+      return;
+    }
+
+    await narrator.waitForTimeout(100);
+  }
 }
 
 async function actAsPlayer(

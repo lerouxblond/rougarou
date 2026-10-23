@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { openTable, readView, startNight } from './fixtures/table.ts';
+import { CONNECTION_TIMEOUT, openTable, readView, startNight } from './fixtures/table.ts';
 
 /**
  * Definition de « termine » de M2 (`docs/10`, US-90) : recharger une page en
@@ -20,7 +20,9 @@ test.describe('US-90 : reconnexion en pleine nuit', () => {
         const before = await readView(seat.page);
 
         await seat.page.reload();
-        await expect.poll(() => readView(seat.page)).toEqual(before);
+        await expect
+          .poll(() => readView(seat.page), { timeout: CONNECTION_TIMEOUT })
+          .toEqual(before);
         expect(before.phase).toBe('NIGHT');
       }
 
@@ -28,7 +30,9 @@ test.describe('US-90 : reconnexion en pleine nuit', () => {
       const before = await readView(table.narrator);
 
       await table.narrator.reload();
-      await expect.poll(() => readView(table.narrator)).toEqual(before);
+      await expect
+        .poll(() => readView(table.narrator), { timeout: CONNECTION_TIMEOUT })
+        .toEqual(before);
     } finally {
       for (const context of table.contexts) {
         await context.close();
