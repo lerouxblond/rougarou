@@ -620,9 +620,10 @@ configuration, fin), **G** (T12, ambiance), **H** (T13), puis T14.
   - Tests attendus : P27 (une entrée par fait, heure de la commande, `Undo` retire l'entrée) ; non-fuite : aucune entrée dans une vue de joueur avant `ENDED`, la chronologie complète après
   - Fait : la transaction émet un événement `Journaled` juste après chaque fait journalisé (`src/journal.ts`), dans le même groupe, avec le `now` de la commande, la nuit et la phase : le rejeu et `Undo` n'ont rien de spécial à faire. 14 genres de faits (`journalFactSchema`). `test/journal.test.ts` (7 tests) et une ligne de l'oracle de `test/leaks/generic.test.ts`. Les clés `journal.*` arrivent avec les écrans qui les affichent (T9, T11)
 
-- [ ] **T4 — Mode correction** *(PR B)*
+- [x] **T4 — Mode correction** *(PR B)*
   - Fichiers : `packages/engine/src/phases/correction.ts`, `apply.ts`, `deaths.ts`, `packages/protocol/src/commands.ts`, `test/correction.test.ts`, `test/leaks/correction.test.ts`, i18n
   - Tests attendus : P28 (tuer déclenche chagrin, Chasseur et victoire ; ressusciter ; changer de rôle remet les potions ; refus avant la distribution et après la fin ; annulable) ; non-fuite : la cause `correction` n'apparaît jamais chez un joueur
+  - Fait : `src/phases/correction.ts`, `test/correction.test.ts` (14 tests). **Précision** (ajoutée à `R-18`) : on ne corrige pas la nuit ni à l'aube masquée, sinon une mort ou un rôle qui change trahirait l'étape en cours (règle 2, nuit uniforme) ; on corrige à l'aube annoncée, au débat ou à l'exécution, et un rôle aussi pendant la distribution. Le débat attend les effets à la mort d'une correction avant d'ouvrir le vote. Le changement de rôle passe par `RoleCorrected` et non `KnowledgeGained`, qui rendrait la correction non annulable (`R-11`). Côté web : tuer et ressusciter passent par la liste de cibles existante ; changer de rôle attend l'écran du meneur (T9)
 
 - [ ] **T5 — Composition suggérée et équilibre** *(PR B)*
   - Fichiers : `packages/protocol/src/composition.ts`, `test/composition.test.ts`, `packages/engine/src/modes/classic.ts` (réutilise la suggestion)

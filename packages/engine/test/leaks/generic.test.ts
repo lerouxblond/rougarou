@@ -23,14 +23,20 @@ import type { GameDriver } from '../dsl.ts';
 
 const OUTSIDER = 'zz-outsider';
 
-/** Les roles qui ont le droit de recevoir chaque genre d'info (ADR 0010). */
-const KNOWLEDGE_HOLDERS: Readonly<Record<Knowledge['kind'], readonly RoleId[] | 'lovers'>> = {
+/**
+ * Les roles qui ont le droit de recevoir chaque genre d'info (ADR 0010).
+ * `anyone` : une info sur soi-meme, comme une correction de son role (`R-18`).
+ */
+const KNOWLEDGE_HOLDERS: Readonly<
+  Record<Knowledge['kind'], readonly RoleId[] | 'lovers' | 'anyone'>
+> = {
   seerRole: ['seer'],
   seerTeam: ['seer'],
   couple: ['cupid'],
   lover: 'lovers',
   wolfGlimpse: ['little-girl'],
   littleGirlSuspects: ['werewolf'],
+  roleChanged: 'anyone',
 };
 
 /** Une info du lecteur lui donne-t-elle le role actuel de `target` ? */
@@ -96,9 +102,10 @@ function checkKnowledge(state: GameState, viewerId: string, view: PlayerView): v
   for (const info of viewer?.knowledge ?? []) {
     const holders = KNOWLEDGE_HOLDERS[info.kind];
     const allowed =
-      holders === 'lovers'
+      holders === 'anyone' ||
+      (holders === 'lovers'
         ? state.lovers?.includes(viewerId) === true
-        : viewer?.role !== null && viewer !== undefined && holders.includes(viewer.role);
+        : viewer?.role !== null && viewer !== undefined && holders.includes(viewer.role));
 
     expect(allowed, `${viewerId} detient une info ${info.kind}`).toBe(true);
   }

@@ -185,6 +185,23 @@ export function evolve(state: GameState, event: GameEvent): GameState {
 
       return { ...state, dawn: { ...state.dawn, announced: true } };
 
+    case 'PlayerRevived':
+      return updatePlayer(state, event.playerId, { alive: true });
+
+    case 'RoleCorrected': {
+      // Pouvoirs remis a neuf : potions pleines, espionnage remis a zero (`R-18`).
+      const { [event.playerId]: _potions, ...potions } = state.potions;
+      const { [event.playerId]: _spied, ...spyNights } = state.spyNights;
+
+      return updatePlayer({ ...state, potions, spyNights }, event.playerId, {
+        role: event.to,
+        knowledge: [
+          ...getPlayer(state, event.playerId).knowledge,
+          { kind: 'roleChanged', role: event.to },
+        ],
+      });
+    }
+
     case 'PlayerKilled':
       return updatePlayer(state, event.playerId, {
         alive: false,

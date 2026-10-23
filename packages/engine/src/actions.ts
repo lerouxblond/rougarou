@@ -3,6 +3,7 @@ import type { ActionDescriptor, PlayerId } from '@rougarou/protocol';
 import { CLASSIC_MAX_PLAYERS } from './modes/classic.ts';
 import { currentStep, observerSpecOf } from './night/flow.ts';
 import { compositionIssues } from './phases/config.ts';
+import { correctionActions } from './phases/correction.ts';
 import { cardReached } from './phases/deal.ts';
 import { alivePlayers, seatedPlayers, type GameState } from './state.ts';
 
@@ -21,7 +22,7 @@ export function availableActions(state: GameState, viewer: Viewer): ActionDescri
   }
 
   return viewer.kind === 'narrator'
-    ? [...narratorActions(state), ...timerActions(state)]
+    ? [...narratorActions(state), ...correctionActions(state), ...timerActions(state)]
     : playerActions(state, viewer.playerId);
 }
 
@@ -81,6 +82,7 @@ function narratorActions(state: GameState): ActionDescriptor[] {
       ];
     case 'DAY_VOTE':
       return [{ type: 'AdvancePhase', blocked: state.vote?.tie !== null }];
+    case 'DAY_DEBATE':
     case 'EXECUTION':
       return [{ type: 'AdvancePhase', blocked: state.pending.length > 0 }];
     default:

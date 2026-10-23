@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { compositionSchema, playerIdSchema } from './ids.ts';
+import { compositionSchema, playerIdSchema, roleIdSchema } from './ids.ts';
 import { gameOptionsSchema } from './options.ts';
 import { displayNameSchema } from './rest.ts';
 
@@ -90,6 +90,10 @@ export const commandSchema = z.discriminatedUnion('type', [
   z.strictObject({ type: z.literal('DesignateSuccessor'), playerId: playerIdSchema }),
   // Effets a la mort (`R-42`)
   z.strictObject({ type: z.literal('HunterShoot'), playerId: playerIdSchema }),
+  // Mode correction du meneur (`R-18`)
+  z.strictObject({ type: z.literal('CorrectKill'), playerId: playerIdSchema }),
+  z.strictObject({ type: z.literal('CorrectRevive'), playerId: playerIdSchema }),
+  z.strictObject({ type: z.literal('CorrectRole'), playerId: playerIdSchema, role: roleIdSchema }),
   // Votes
   z.strictObject({ type: z.literal('CastVote'), ballot: ballotSchema }),
   z.strictObject({ type: z.literal('BreakTie'), playerId: playerIdSchema }),

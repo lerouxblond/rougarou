@@ -84,6 +84,8 @@ function InfoLine({
           ))}
         </span>
       );
+    case 'roleChanged':
+      return t('my_info.role_changed', { role: t(`roles.${roleKey(info.role)}.name`) });
     case 'littleGirlSuspects':
       return t('my_info.little_girl_suspects', {
         night: info.night,

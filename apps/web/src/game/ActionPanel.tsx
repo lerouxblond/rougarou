@@ -27,6 +27,9 @@ const LABELS: Record<ActionType, string> = {
   Deal: 'actions.deal',
   AdvancePhase: 'actions.advance_phase',
   ResolveWolfTie: 'actions.resolve_wolf_tie',
+  CorrectKill: 'actions.correct_kill',
+  CorrectRevive: 'actions.correct_revive',
+  CorrectRole: 'actions.correct_role',
   PauseTimer: 'actions.pause_timer',
   ResumeTimer: 'actions.resume_timer',
   ExtendTimer: 'actions.extend_timer',
@@ -65,7 +68,9 @@ export function ActionPanel({ actions, names, skip = [] }: ActionPanelProps) {
 
 /** Les actions qui se reglent ailleurs (pseudo, ordre, options, composition) n'ont pas de bouton ici. */
 function hasControl(action: ActionDescriptor): boolean {
-  return !['JoinGame', 'ReorderSeats', 'SetOptions', 'SetComposition'].includes(action.type);
+  return !['JoinGame', 'ReorderSeats', 'SetOptions', 'SetComposition', 'CorrectRole'].includes(
+    action.type,
+  );
 }
 
 function ActionControl({
@@ -112,6 +117,8 @@ function ActionControl({
     case 'HunterShoot':
     case 'ResolveWolfTie':
     case 'KickPlayer':
+    case 'CorrectKill':
+    case 'CorrectRevive':
       return <TargetControl action={action} names={names} />;
     case 'AdvancePhase':
       return (
@@ -162,6 +169,9 @@ function ActionControl({
     case 'SetComposition':
       // Reglees par l'ecran du salon ou de la configuration.
       return null;
+    case 'CorrectRole':
+      // Choix d'un joueur et d'un role : ecran du meneur (M4, T9).
+      return null;
   }
 }
 
@@ -191,7 +201,7 @@ function SimpleButton({
 /** Les actions qui se reglent en choisissant un joueur dans une liste. */
 type TargetAction = Exclude<
   Extract<ActionDescriptor, { targets: readonly string[] }>,
-  { kind: 'cupidLink' }
+  { kind: 'cupidLink' } | { type: 'CorrectRole' }
 >;
 
 /** Libelle de chaque action de nuit ; `Record` exhaustif, comme `LABELS`. */
@@ -285,6 +295,8 @@ function toCommand(action: TargetAction, choice: string): CommandInput {
     case 'DesignateSuccessor':
     case 'HunterShoot':
     case 'KickPlayer':
+    case 'CorrectKill':
+    case 'CorrectRevive':
       return { type: action.type, playerId: choice };
   }
 }
