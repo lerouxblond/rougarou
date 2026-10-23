@@ -79,6 +79,7 @@ export {
   type TicketResponse,
   type UpdateMeRequest,
 } from './rest.ts';
+export { balanceOf, ROLE_WEIGHTS, type Balance } from './composition.ts';
 export { PROTOCOL_VERSION } from './version.ts';
 export {
   actionDescriptorSchema,

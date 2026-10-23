@@ -625,9 +625,10 @@ configuration, fin), **G** (T12, ambiance), **H** (T13), puis T14.
   - Tests attendus : P28 (tuer déclenche chagrin, Chasseur et victoire ; ressusciter ; changer de rôle remet les potions ; refus avant la distribution et après la fin ; annulable) ; non-fuite : la cause `correction` n'apparaît jamais chez un joueur
   - Fait : `src/phases/correction.ts`, `test/correction.test.ts` (14 tests). **Précision** (ajoutée à `R-18`) : on ne corrige pas la nuit ni à l'aube masquée, sinon une mort ou un rôle qui change trahirait l'étape en cours (règle 2, nuit uniforme) ; on corrige à l'aube annoncée, au débat ou à l'exécution, et un rôle aussi pendant la distribution. Le débat attend les effets à la mort d'une correction avant d'ouvrir le vote. Le changement de rôle passe par `RoleCorrected` et non `KnowledgeGained`, qui rendrait la correction non annulable (`R-11`). Côté web : tuer et ressusciter passent par la liste de cibles existante ; changer de rôle attend l'écran du meneur (T9)
 
-- [ ] **T5 — Composition suggérée et équilibre** *(PR B)*
+- [x] **T5 — Composition suggérée et équilibre** *(PR B)*
   - Fichiers : `packages/protocol/src/composition.ts`, `test/composition.test.ts`, `packages/engine/src/modes/classic.ts` (réutilise la suggestion)
   - Tests attendus : P29 (une suggestion valide pour chaque taille de 5 à 24, aucun rôle d'extension, `R-07` respecté ; poids et paliers de l'indicateur)
+  - Fait : `packages/protocol/src/composition.ts` (`ROLE_WEIGHTS`, `balanceOf`, 8 tests). **Écart à P29** : la suggestion reste une fonction du mode dans le moteur (`suggestComposition`, `docs/11`), qui dépend du registre des rôles ; le moteur l'envoie au meneur en `CONFIG` (`suggestion` dans sa vue). Seuls les poids sont dans `protocol`, ce qui suffit pour que l'indicateur suive les + et − sans aller-retour. `docs/02` et `docs/04` corrigés. Couverture du moteur après PR B : 96,7 % des lignes, 93,4 % des branches
 
 - [ ] **T6 — Design system : fondations** *(PR C)*
   - Fichiers : `packages/ui/src/{IconButton,Badge,Avatar,Stepper,Switch,Tabs,Dialog,Sheet,Toast,EmptyState,Skeleton}.tsx` (Radix), polices `@fontsource` dans `styles.css`, histoires Ladle en nuit et en jour, `test/*.test.tsx`

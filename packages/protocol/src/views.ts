@@ -426,6 +426,8 @@ export const narratorViewSchema = z.strictObject({
   winner: winnerSchema.nullable(),
   /** Tous les votants ont vote : le bouton de cloture le signale (`R-37`). */
   everyoneVoted: z.boolean(),
+  /** En `CONFIG` : la composition que le mode suggere pour ce nombre de joueurs (`docs/02`). */
+  suggestion: compositionSchema.nullable(),
   /** Le journal, en direct (`R-19`). */
   journal: z.array(journalEntrySchema),
   actions: z.array(actionDescriptorSchema),
