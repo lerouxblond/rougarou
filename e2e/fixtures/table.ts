@@ -94,7 +94,8 @@ export async function openTable(
   await narrator.getByRole('button', { name: 'Créer une partie' }).click();
   await narrator.waitForURL(/\/game\//);
 
-  const codeText = await narrator.getByText(/Code de la partie : [A-Z0-9]{6}/).textContent();
+  // Le code s'affiche dans la carte d'invitation au salon, en ligne ensuite.
+  const codeText = await narrator.getByTestId('game-code').textContent();
   const code = /([A-Z0-9]{6})$/.exec(codeText ?? '')?.[1] ?? '';
 
   expect(code).toHaveLength(6);

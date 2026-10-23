@@ -10,7 +10,8 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import { ActionPanel } from '../src/game/ActionPanel.tsx';
 import { Config } from '../src/game/Config.tsx';
-import { NarratorLobby, PlayerLobby } from '../src/game/Lobby.tsx';
+import { PlayerLobby } from '../src/game/Lobby.tsx';
+import { NarratorLobby } from '../src/game/NarratorLobby.tsx';
 import { RoleCard } from '../src/game/RoleCard.tsx';
 import { useGameStore } from '../src/game/store.ts';
 import { axeViolations, renderWithProviders } from './render.tsx';

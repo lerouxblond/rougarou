@@ -1,19 +1,31 @@
 import type { NarratorView, Phase } from '@rougarou/protocol';
-import { Button, NarratorScript, NightStepList, Tabs, type StepState } from '@rougarou/ui';
-import { useSyncExternalStore, type ReactNode } from 'react';
+import {
+  Button,
+  NarratorScript,
+  NightStepList,
+  Skeleton,
+  Tabs,
+  type StepState,
+} from '@rougarou/ui';
+import { lazy, Suspense, useSyncExternalStore, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { FormError } from '../components/Field.tsx';
 import { ActionPanel } from './ActionPanel.tsx';
 import { Config } from './Config.tsx';
 import { CorrectionDialog } from './CorrectionDialog.tsx';
+import { EndScreen } from './EndScreen.tsx';
 import { useSendCommand } from './hooks.ts';
-import { NarratorLobby } from './Lobby.tsx';
 import { blockerOf, primaryLabel, scriptOf, stepTexts, type Line } from './narrator-script.ts';
 import { JournalPanel } from './JournalPanel.tsx';
 import { NightIntents } from './NightIntents.tsx';
 import { PlayersList } from './PlayersPanel.tsx';
 import { VotePanel } from './VotePanel.tsx';
+
+/** Le salon du meneur et son glisser-deposer, charges a la demande (ADR 0011). */
+const NarratorLobby = lazy(() =>
+  import('./NarratorLobby.tsx').then((module) => ({ default: module.NarratorLobby })),
+);
 
 /** Les actions que le bouton principal et la barre d'outils presentent deja. */
 const HANDLED = [
@@ -48,15 +60,22 @@ function useWide(): boolean {
 
 /** Ce que le meneur voit de la phase en cours, sous le texte a lire. */
 const PHASE_PANELS: Partial<Record<Phase, (view: NarratorView) => ReactNode>> = {
-  LOBBY: (view) => <NarratorLobby view={view} />,
+  LOBBY: (view) => (
+    <Suspense fallback={<Skeleton className="h-40 w-full" />}>
+      <NarratorLobby view={view} />
+    </Suspense>
+  ),
   CONFIG: (view) => (
     <>
-      <NarratorLobby view={view} />
+      <Suspense fallback={<Skeleton className="h-40 w-full" />}>
+        <NarratorLobby view={view} />
+      </Suspense>
       <Config view={view} />
     </>
   ),
   MAYOR_ELECTION: (view) => <VotePanel view={view} />,
   DAY_VOTE: (view) => <VotePanel view={view} />,
+  ENDED: (view) => <EndScreen view={view} />,
 };
 
 function useLine(): (line: Line) => string {

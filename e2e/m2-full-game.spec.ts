@@ -36,7 +36,9 @@ test.describe('US-10, US-11, US-30 : une partie a six navigateurs', () => {
       expect(end.winner).toBe('village');
 
       for (const { page } of table.seats) {
-        await expect(page.getByText("Le village l'emporte.")).toBeVisible();
+        await expect(
+          page.getByRole('status').filter({ hasText: "Le village l'emporte." }),
+        ).toBeVisible();
       }
     } finally {
       for (const context of table.contexts) {

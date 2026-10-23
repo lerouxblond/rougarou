@@ -1,7 +1,8 @@
 import type { MeResponse, NarratorView, PlayerView } from '@rougarou/protocol';
-import { PhaseBanner, Timer } from '@rougarou/ui';
+import { PhaseBanner, Skeleton, Timer } from '@rougarou/ui';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from '@tanstack/react-router';
+import { lazy, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { api } from '../api.ts';
@@ -12,6 +13,11 @@ import { useGameConnection, useGameView } from '../game/hooks.ts';
 import { NarratorScreen } from '../game/NarratorScreen.tsx';
 import { PlayerScreen } from '../game/PlayerScreen.tsx';
 import { useGameStore } from '../game/store.ts';
+
+/** Le code et son QR ne servent qu'au meneur, au salon : charges a la demande (ADR 0011). */
+const JoinCard = lazy(() =>
+  import('../game/JoinCard.tsx').then((module) => ({ default: module.JoinCard })),
+);
 
 /** `/game/:gameId` : un seul composant routeur selon (phase × lecteur) (`docs/03`, `docs/04`). */
 export function Game() {
@@ -70,11 +76,16 @@ function Table({ gameId, me }: { readonly gameId: string; readonly me: MeRespons
           }
         />
         <ConnectionIndicator status={status} />
-        {summary.data?.narrator === true ? (
-          <p className="font-pixel text-lg tracking-widest text-accent">
+        {summary.data?.narrator !== true ? null : view?.phase === 'LOBBY' ||
+          view?.phase === 'CONFIG' ? (
+          <Suspense fallback={<Skeleton className="h-36 w-full" />}>
+            <JoinCard code={summary.data.code} />
+          </Suspense>
+        ) : (
+          <p data-testid="game-code" className="font-pixel text-lg tracking-widest text-accent">
             {t('game.code', { code: summary.data.code })}
           </p>
-        ) : null}
+        )}
         <FormError message={storeError === null ? null : t(storeError.messageKey)} />
       </header>
 

@@ -98,15 +98,18 @@ function clock(at: number, locale: string): string {
 export function JournalPanel({
   view,
   entries,
+  label,
 }: {
   readonly view: PlayerView | NarratorView;
   readonly entries: readonly JournalEntry[];
+  /** Nom de la liste, quand plusieurs se suivent (chronologie de fin). */
+  readonly label?: string;
 }) {
   const { t, i18n } = useTranslation();
   const name = (id: string) => view.players.find((player) => player.id === id)?.name ?? id;
 
   return (
-    <ol aria-label={t('journal.title')} className="flex flex-col gap-2 text-sm">
+    <ol aria-label={label ?? t('journal.title')} className="flex flex-col gap-2 text-sm">
       {entries.map((entry, index) => (
         <li key={index} className="flex flex-wrap items-baseline gap-2">
           <time
