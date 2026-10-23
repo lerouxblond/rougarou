@@ -16,7 +16,8 @@
     "loading": "Loading…",
     "cancel": "Cancel",
     "confirm": "Confirm",
-    "back": "Back"
+    "back": "Back",
+    "close": "Close"
   },
   "errors": {
     "forbidden": "You are not allowed to do that.",
@@ -282,7 +283,9 @@
     "unknown_game": "This game cannot be found.",
     "composition_count_one": "{{count}} role for {{players}} players",
     "players_one": "Players ({{count}})",
-    "reveal_timed": "Reveal for 5 s"
+    "reveal_timed": "Reveal for 5 s",
+    "night_number": "Night {{count}}",
+    "day_number": "Day {{count}}"
   },
   "actions": {
     "join_game": "Join",
@@ -337,7 +340,8 @@
     "lover": "You love {{name}} ({{role}}). If one of you dies, the other follows out of grief.",
     "wolf_glimpse": "Night {{night}}: you caught a glimpse of the pack.",
     "little_girl_suspects": "Night {{night}}: the Little Girl is watching you. She is one of these players: {{names}}.",
-    "role_changed": "The narrator corrected your role: you are now {{role}}."
+    "role_changed": "The narrator corrected your role: you are now {{role}}.",
+    "empty": "You have not learned anything yet."
   },
   "night": {
     "resolved": "Step over.",
@@ -374,6 +378,32 @@
       "space": "space",
       "undecided": "has not chosen yet",
       "target": "→ {{name}}"
+    },
+    "uniform": {
+      "title": "The village sleeps.",
+      "hint": "Keep your eyes closed until morning."
     }
+  },
+  "timer": {
+    "label": "Time left",
+    "paused": "Paused",
+    "announce_one": "{{count}} second left",
+    "announce": "{{count}} seconds left"
+  },
+  "deal": {
+    "prompt": "Look at your card in secret, then confirm.",
+    "discovering": "{{name}} is discovering their role…",
+    "waiting": "Waiting for the other players…"
+  },
+  "bar": {
+    "label": "Shortcuts",
+    "card": "My card",
+    "info": "Info",
+    "players": "Players"
+  },
+  "players": {
+    "label": "Players",
+    "dead": "Dead",
+    "mayor": "Mayor"
   }
 }

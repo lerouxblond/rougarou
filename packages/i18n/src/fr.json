@@ -16,7 +16,8 @@
     "loading": "Chargement…",
     "cancel": "Annuler",
     "confirm": "Confirmer",
-    "back": "Retour"
+    "back": "Retour",
+    "close": "Fermer"
   },
   "errors": {
     "forbidden": "Vous n'avez pas le droit de faire cela.",
@@ -282,7 +283,9 @@
     "unknown_game": "Cette partie est introuvable.",
     "composition_count_one": "{{count}} rôle pour {{players}} joueurs",
     "players_one": "Joueurs ({{count}})",
-    "reveal_timed": "Révéler 5 s"
+    "reveal_timed": "Révéler 5 s",
+    "night_number": "Nuit {{count}}",
+    "day_number": "Jour {{count}}"
   },
   "actions": {
     "join_game": "Rejoindre",
@@ -337,7 +340,8 @@
     "lover": "Vous aimez {{name}} ({{role}}). Si l'un de vous meurt, l'autre le suit de chagrin.",
     "wolf_glimpse": "Nuit {{night}} : vous avez aperçu la meute.",
     "little_girl_suspects": "Nuit {{night}} : la Petite fille vous observe. C'est l'une de ces personnes : {{names}}.",
-    "role_changed": "Le meneur a corrigé votre rôle : vous êtes maintenant {{role}}."
+    "role_changed": "Le meneur a corrigé votre rôle : vous êtes maintenant {{role}}.",
+    "empty": "Vous n’avez rien appris pour l’instant."
   },
   "night": {
     "resolved": "Étape terminée.",
@@ -374,6 +378,32 @@
       "space": "espace",
       "undecided": "n'a pas encore choisi",
       "target": "→ {{name}}"
+    },
+    "uniform": {
+      "title": "Le village dort.",
+      "hint": "Gardez les yeux fermés jusqu’au matin."
     }
+  },
+  "timer": {
+    "label": "Temps restant",
+    "paused": "En pause",
+    "announce_one": "Plus que {{count}} seconde",
+    "announce": "Plus que {{count}} secondes"
+  },
+  "deal": {
+    "prompt": "Découvrez votre carte en secret, puis confirmez.",
+    "discovering": "{{name}} découvre son rôle…",
+    "waiting": "En attente des autres joueurs…"
+  },
+  "bar": {
+    "label": "Raccourcis",
+    "card": "Ma carte",
+    "info": "Infos",
+    "players": "Joueurs"
+  },
+  "players": {
+    "label": "Joueurs",
+    "dead": "Mort",
+    "mayor": "Maire"
   }
 }

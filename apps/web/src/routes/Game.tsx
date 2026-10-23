@@ -1,5 +1,5 @@
 import type { MeResponse, NarratorView, Phase, PlayerView } from '@rougarou/protocol';
-import { Button } from '@rougarou/ui';
+import { Button, PhaseBanner, Timer } from '@rougarou/ui';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from '@tanstack/react-router';
 import type { ReactNode } from 'react';
@@ -12,10 +12,8 @@ import { FormError } from '../components/Field.tsx';
 import { ActionPanel } from '../game/ActionPanel.tsx';
 import { useGameConnection, useGameView, useSendCommand } from '../game/hooks.ts';
 import { Config } from '../game/Config.tsx';
-import { NarratorLobby, PlayerLobby } from '../game/Lobby.tsx';
-import { MyInfo } from '../game/MyInfo.tsx';
-import { NightPanel } from '../game/NightPanel.tsx';
-import { RoleCard } from '../game/RoleCard.tsx';
+import { NarratorLobby } from '../game/Lobby.tsx';
+import { PlayerScreen } from '../game/PlayerScreen.tsx';
 import { useGameStore } from '../game/store.ts';
 
 /** `/game/:gameId` : un seul composant routeur selon (phase × lecteur) (`docs/03`, `docs/04`). */
@@ -23,36 +21,38 @@ export function Game() {
   const { gameId } = useParams({ from: '/game/$gameId' });
 
   return (
-    <main id="contenu" className="mx-auto flex min-h-dvh max-w-2xl flex-col gap-6 p-6">
+    <main id="contenu" className="mx-auto flex min-h-dvh max-w-6xl flex-col gap-6 p-4 sm:p-6">
       <AuthGate>{(me) => <Table gameId={gameId} me={me} />}</AuthGate>
     </main>
   );
 }
 
-interface Screens {
-  readonly narrator?: (view: NarratorView) => ReactNode;
-  readonly player?: (view: PlayerView, me: MeResponse) => ReactNode;
-}
-
 /**
- * La table `(phase, lecteur) → ecran`, sans cascade de `if` (`docs/04`
- * §Client web). Les phases absentes n'ont, en M2, que la vue de debogage.
+ * Les ecrans du meneur par phase, sans cascade de `if` (`docs/04` §Client
+ * web). Ceux du joueur sont dans `PlayerScreen`. Les phases absentes n'ont
+ * encore que les actions brutes (M4, T9).
  */
-const SCREENS: Partial<Record<Phase, Screens>> = {
-  LOBBY: {
-    narrator: (view) => <NarratorLobby view={view} />,
-    player: (view, me) => <PlayerLobby view={view} displayName={me.displayName} />,
-  },
-  CONFIG: {
-    narrator: (view) => (
-      <>
-        <NarratorLobby view={view} />
-        <Config view={view} />
-      </>
-    ),
-    player: (view, me) => <PlayerLobby view={view} displayName={me.displayName} />,
-  },
+const NARRATOR_SCREENS: Partial<Record<Phase, (view: NarratorView) => ReactNode>> = {
+  LOBBY: (view) => <NarratorLobby view={view} />,
+  CONFIG: (view) => (
+    <>
+      <NarratorLobby view={view} />
+      <Config view={view} />
+    </>
+  ),
 };
+
+/** Le numero sous le titre : la nuit en cours, ou le jour qui la suit. */
+function counterOf(view: PlayerView | NarratorView): { key: string; count: number } | null {
+  if (view.nightNumber === 0 || view.phase === 'ENDED') {
+    return null;
+  }
+
+  return {
+    key: view.phase === 'NIGHT' ? 'game.night_number' : 'game.day_number',
+    count: view.nightNumber,
+  };
+}
 
 function Table({ gameId, me }: { readonly gameId: string; readonly me: MeResponse }) {
   const { t } = useTranslation();
@@ -63,6 +63,8 @@ function Table({ gameId, me }: { readonly gameId: string; readonly me: MeRespons
 
   useGameConnection(gameId);
 
+  const counter = view === null ? null : counterOf(view);
+
   if (summary.isError) {
     return <FormError message={t('game.unknown_game')} />;
   }
@@ -70,9 +72,21 @@ function Table({ gameId, me }: { readonly gameId: string; readonly me: MeRespons
   return (
     <>
       <header className="flex flex-col gap-2">
-        <h1 className="font-display text-3xl text-text" aria-live="polite">
-          {view === null ? t('common.loading') : t(`phase.${view.phase.toLowerCase()}.title`)}
-        </h1>
+        <PhaseBanner
+          title={view === null ? t('common.loading') : t(`phase.${view.phase.toLowerCase()}.title`)}
+          {...(counter === null ? {} : { subtitle: t(counter.key, { count: counter.count }) })}
+          timer={
+            view === null ? null : (
+              <Timer
+                deadline={view.deadline}
+                pausedRemaining={view.pausedRemaining}
+                label={t('timer.label')}
+                pausedLabel={t('timer.paused')}
+                announce={(seconds) => t('timer.announce', { count: seconds })}
+              />
+            )
+          }
+        />
         <ConnectionIndicator status={status} />
         {summary.data?.narrator === true ? (
           <p className="font-pixel text-lg tracking-widest text-accent">
@@ -85,7 +99,7 @@ function Table({ gameId, me }: { readonly gameId: string; readonly me: MeRespons
       {view === null ? null : view.kind === 'narrator' ? (
         <NarratorTable view={view} />
       ) : (
-        <PlayerTable view={view} me={me} />
+        <PlayerScreen view={view} me={me} />
       )}
 
       {view === null ? null : <DebugView view={view} />}
@@ -104,7 +118,7 @@ function NarratorTable({ view }: { readonly view: NarratorView }) {
 
   return (
     <>
-      {SCREENS[view.phase]?.narrator?.(view)}
+      {NARRATOR_SCREENS[view.phase]?.(view)}
       {view.phase === 'DEAL' ? (
         <p className="text-text-muted">
           {t('game.confirmations', { count: confirmed, total: view.players.length })}
@@ -121,25 +135,6 @@ function NarratorTable({ view }: { readonly view: NarratorView }) {
         {t('actions.undo')}
       </Button>
       <FormError message={error === null ? null : t(error)} />
-    </>
-  );
-}
-
-function PlayerTable({ view, me }: { readonly view: PlayerView; readonly me: MeResponse }) {
-  const { t } = useTranslation();
-  const role = view.me?.role ?? null;
-
-  return (
-    <>
-      {SCREENS[view.phase]?.player?.(view, me)}
-      {role === null ? null : <RoleCard role={role} />}
-      {view.night === null ? null : <NightPanel night={view.night} names={namesOf(view)} />}
-      <MyInfo knowledge={view.me?.knowledge ?? []} names={namesOf(view)} />
-      {view.me?.alive === false ? <p className="text-danger">{t('game.you_are_dead')}</p> : null}
-      {view.winner === null ? null : (
-        <p className="font-display text-2xl text-accent">{t(`winner.${view.winner}`)}</p>
-      )}
-      <ActionPanel actions={view.actions} names={namesOf(view)} />
     </>
   );
 }

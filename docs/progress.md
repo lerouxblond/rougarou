@@ -603,7 +603,7 @@ au moment de les ajouter) : Radix UI Primitives (dialog, tabs, toast, switch), M
 ### Tâches
 
 Neuf PR de moins de 400 lignes de code non généré : **A** (T1, #17), **B1** (T2–T3, #18) et **B2** (T4–T5, #19) pour le moteur, la B ayant été coupée en deux pour tenir la limite,
-**C1**, **C2** (T6), **C3** et **C4** (T7) pour le design system, **D** (T8, joueur), **E** (T9, meneur), **F** (T10–T11, salon,
+**C1**, **C2** (T6), **C3** et **C4** (T7) pour le design system, **D1** et **D2** (T8, joueur), **E** (T9, meneur), **F** (T10–T11, salon,
 configuration, fin), **G** (T12, ambiance), **H** (T13), puis T14.
 
 - [x] **T1 — Docs, règles, ADR 0011** *(PR A)*
@@ -643,6 +643,7 @@ configuration, fin), **G** (T12, ambiance), **H** (T13), puis T14.
 - [ ] **T8 — Vue joueur** *(PR D)*
   - Fichiers : `apps/web/src/game/player/*.tsx` (mise en page par taille, barre basse « Ma carte », « Infos », « Joueurs », nuit uniforme, action, vote, élection, aube, cimetière), `routes/Game.tsx` (table `(phase, lecteur) → écran`), i18n, tests
   - Tests attendus : nuit uniforme (un joueur sans action rend exactement le même DOM toute la nuit) ; un contrôle par action reçue ; « Mes informations » annoncé ; axe sur chaque écran, nuit et jour, 375 px et 1280 px
+  - **D1 fait** : bandeau de phase avec numéro et minuteur, mise en page par taille (une colonne et barre basse « Ma carte », « Infos », « Joueurs » ; jeu et joueurs côte à côte dès 640 px ; carte et infos à gauche, cercle sous le jeu dès 1024 px), nuit uniforme identique quel que soit le rôle, distribution et cérémonie. `test/player-screen.test.tsx` (10 tests). Vérifié en capture à 375 et 1280 px. **Correction** trouvée à la capture : le cercle affichait le rôle du joueur lui-même sous son nom, à la vue de ses voisins ; il ne l'écrit plus (la carte reste le seul moyen de le voir). Reste **D2** : actions, votes, élection, aube et cimetière avec les composants du design system
 
 - [ ] **T9 — Vue meneur** *(PR E)*
   - Fichiers : `apps/web/src/game/narrator/*.tsx` (trois colonnes ou onglets, `NightStepList`, `NarratorScript` (sans synthèse vocale, D-22), bouton principal et ligne « ce qui bloque », cercle avec les rôles, journal, annuler, forcer, pause, +30 s, mode correction), i18n, tests
