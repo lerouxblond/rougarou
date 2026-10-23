@@ -100,7 +100,12 @@ const NOBODY_KEYS: Record<Extract<VoteOutcome, { kind: 'nobody' }>['reason'], st
   tie: 'vote.outcome.nobody_tie',
 };
 
-function outcomeText(outcome: VoteOutcome, name: (id: string) => string, t: TFunction): string {
+/** L'issue d'un vote, en toutes lettres (aussi pour le journal). */
+export function outcomeText(
+  outcome: VoteOutcome,
+  name: (id: string) => string,
+  t: TFunction,
+): string {
   switch (outcome.kind) {
     case 'execute':
       return t('vote.outcome.execute', { name: name(outcome.playerId) });

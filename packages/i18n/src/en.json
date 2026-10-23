@@ -477,5 +477,45 @@
       "tie": "Waiting: the Mayor breaks the tie.",
       "generic": "Actions are pending."
     }
+  },
+  "journal": {
+    "title": "Log",
+    "correction": "Correction",
+    "night_started": "Night falls.",
+    "wolves_chose": "The wolves chose {{name}}.",
+    "wolves_none": "The wolves chose nobody.",
+    "seer_probed": "{{seer}} probed {{target}}.",
+    "witch_acted": "{{witch}}: {{choice}}.",
+    "witch_save": "life potion on the victim",
+    "witch_kill": "death potion on {{name}}",
+    "witch_nothing": "no potion",
+    "lovers_linked": "{{cupid}} linked {{first}} and {{second}}.",
+    "spied": "{{name}} spied on the pack.",
+    "spied_caught": "{{name}} spied on the pack and was spotted.",
+    "player_killed": "{{name}} died ({{cause}}).",
+    "hunter_shot": "{{hunter}} shot {{target}}.",
+    "mayor_elected": "{{name}} is elected Mayor.",
+    "mayor_drawn": "{{name}} is Mayor, drawn at random.",
+    "successor": "{{from}} chose {{to}} as successor.",
+    "successor_drawn": "{{to}} succeeds {{from}}, drawn at random.",
+    "player_revived": "{{name}} is brought back to life.",
+    "role_corrected": "{{name}} is now {{role}}.",
+    "phase_forced": "The narrator forced: {{phase}}.",
+    "timer_expired": "Time is up: {{phase}}."
+  },
+  "death_cause": {
+    "wolves": "the wolves",
+    "witch": "the death potion",
+    "vote": "the village vote",
+    "hunter": "the Hunter’s shot",
+    "grief": "grief",
+    "correction": "narrator correction"
+  },
+  "correction": {
+    "open": "Correction mode",
+    "title": "Correction mode",
+    "help": "Fix the table after a mistake. Every correction is logged and can be undone.",
+    "player": "Player",
+    "role": "New role"
   }
 }
