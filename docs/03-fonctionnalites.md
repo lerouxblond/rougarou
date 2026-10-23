@@ -69,6 +69,7 @@ Format : **US-xx** (user story) suivie de ses critères d'acceptation (CA). Les 
 - CA : la carte est face cachée par défaut. Le joueur **maintient appuyé** pour la retourner, et elle se recache dès qu'il relâche. Sur desktop, il maintient la barre d'espace ou clique sur « Révéler 5 s ».
 - CA : la carte montre l'illustration, le nom, le camp, une description courte et un lien « Règles du rôle ».
 - CA : le joueur appuie sur « J'ai vu mon rôle » pour confirmer. Le meneur voit le compteur de confirmations.
+- CA : en distribution « cérémonie », la main passe d'un joueur à l'autre dans l'ordre des places (`R-17`) ; les autres voient seulement « X découvre son rôle… ».
 - CA : le rôle reste consultable à tout moment par le même geste (bouton flottant « Ma carte »).
 
 **US-31 — Fiche de personnage (role play)**
@@ -87,7 +88,7 @@ Format : **US-xx** (user story) suivie de ses critères d'acceptation (CA). Les 
 - CA : le résultat d'une action immédiate (Voyante, Renard) s'affiche en privé et reste consultable dans « Mes informations ».
 
 **US-41 — Nuit, côté meneur**
-- CA : le meneur voit la liste ordonnée des sous-étapes, l'étape en cours et le **texte à lire** (« La Voyante se réveille… ») en grand caractère. Une option de synthèse vocale du navigateur peut le lire à sa place.
+- CA : le meneur voit la liste ordonnée des sous-étapes, l'étape en cours et le **texte à lire** (« La Voyante se réveille… ») en grand caractère. Il le lit lui-même : pas de synthèse vocale en V1 (D-22).
 - CA : le meneur voit en direct les intentions déjà saisies, ainsi que les boutons « Étape suivante », « Forcer » et « Annuler ».
 - CA : en mode présentiel, si `fakeWakeForDeadRoles` est actif, l'app fait quand même appeler un rôle mort, avec une durée aléatoire.
 
@@ -120,8 +121,8 @@ Format : **US-xx** (user story) suivie de ses critères d'acceptation (CA). Les 
 ## Fin de partie
 
 **US-60 — Écran de fin**
-- CA : le camp vainqueur est annoncé, tous les rôles sont révélés, et une **chronologie** nuit par nuit montre qui a fait quoi.
-- CA : un bouton « Rejouer avec les mêmes joueurs » ramène tout le monde au salon avec la même composition.
+- CA : le camp vainqueur est annoncé, tous les rôles sont révélés, et une **chronologie** nuit par nuit montre qui a fait quoi : c'est le journal (`R-19`), que les joueurs ne reçoivent qu'à ce moment.
+- CA (**M5**) : un bouton « Rejouer avec les mêmes joueurs » ramène tout le monde au salon avec la même composition. En M4, un bouton « Nouvelle partie » ramène à l'accueil.
 - CA : la partie est enregistrée dans l'historique de chaque compte participant.
 
 ## Chat (mode distanciel)
@@ -138,9 +139,9 @@ Format : **US-xx** (user story) suivie de ses critères d'acceptation (CA). Les 
 - CA : en Nuit blanche, il déclenche la victoire du village. Dans les autres modes, il journalise la déclaration et affiche au meneur « Déclaration fausse : annoncez-le » (ou entraîne la défaite si `falseDeclarationPenalty` est active).
 
 **US-80 — Journal et correction**
-- CA : le journal horodaté de toutes les commandes est visible par le meneur.
+- CA : le journal horodaté de la partie est visible par le meneur (`R-19`).
 - CA : le bouton « Annuler la dernière action » respecte `R-11`.
-- CA : le meneur peut tuer ou ressusciter manuellement un joueur et modifier son rôle (mode « correction », avec un badge visible dans le journal de fin).
+- CA : le meneur peut tuer ou ressusciter manuellement un joueur et modifier son rôle (mode « correction », `R-18`, avec un badge visible dans le journal de fin).
 
 **US-81 — Transfert de meneur**
 - CA : si le meneur se déconnecte plus de 2 minutes, la partie se met en pause. Il peut transférer son rôle à un autre utilisateur non joueur.

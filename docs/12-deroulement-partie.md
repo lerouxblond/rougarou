@@ -49,7 +49,7 @@ Légende des sons : 🔊 M = son sur l'appareil du meneur · 🔊 J = son sur le
 
 - **Quand** : à la distribution (#3). Deux façons, au choix du meneur (option `dealMode`, D-23 ✅) :
   - `simultaneous` (proposé par défaut) : **tous les joueurs en même temps**, dès que le meneur clique « Distribuer ». C'est rapide (moins de 30 s pour la table) et ça marche aussi bien à distance.
-  - `ceremony` : **un par un, dans l'ordre des places**. Le joueur dont c'est le tour voit sa carte se lever. Les autres voient « Isaure découvre son rôle… » avec une silhouette neutre, la même pour tous les rôles. Le meneur passe au suivant (ou automatiquement après 8 s). C'est plus lent (environ 1 min 30 à 10 joueurs), mais très immersif en présentiel et en role play. Ça ne révèle rien de plus, puisque l'écran de chacun reste privé.
+  - `ceremony` : **un par un, dans l'ordre des places**. Le joueur dont c'est le tour voit sa carte se lever. Les autres voient « Isaure découvre son rôle… » avec une silhouette neutre, la même pour tous les rôles. Le meneur passe au suivant (ou automatiquement après 8 s, `timers.ceremonyCard`, `R-17`). C'est plus lent (environ 1 min 30 à 10 joueurs), mais très immersif en présentiel et en role play. Ça ne révèle rien de plus, puisque l'écran de chacun reste privé.
   - En role play, la fiche de personnage suit juste après la carte.
 - **Comment** : la carte arrive face cachée. Le joueur **maintient appuyé** pour la retourner (sur desktop : maintenir Espace, ou « Révéler 5 s »), et elle se recache dès qu'il relâche. Un conseil s'affiche : « Incline ton écran vers toi ».
 - **Ensuite** : on peut la revoir à tout moment avec le bouton « Ma carte » (même geste). Les informations obtenues (Voyante, Renard, amoureux, conversion…) sont rangées dans « Mes infos » (J22).
@@ -87,7 +87,7 @@ Toutes les valeurs restent réglables par partie (M06), et chaque minuteur peut 
 - **Sons privés** (« c'est ton tour », résultat de la Voyante, conversion…) : autorisés **seulement** en distanciel, ou en présentiel si le joueur a choisi le profil **Écouteurs**.
 - **Vibrations** : jamais la nuit en présentiel, même avec écouteurs, car une vibration s'entend sur une table. De jour, seulement pour soi (sa mort, vote ouvert).
 - **Aucun son déclenché par une action** : valider une cible, boire une potion ou voter ne joue jamais de son, sinon la durée ou le moment trahirait le joueur.
-- **Profil audio** choisi par chaque joueur (J23) : *Sans son* · *Avec son* (sons publics) · *Écouteurs* (sons publics + privés). Le meneur règle en plus l'ambiance et la synthèse vocale.
+- **Profil audio** choisi par chaque joueur (J23) : *Sans son* · *Avec son* (sons publics) · *Écouteurs* (sons publics + privés). Le meneur règle en plus l'ambiance (pas de synthèse vocale en V1, D-22).
 
 | Événement | Type | Meneur | Joueur présentiel | Joueur présentiel (écouteurs) | Joueur distanciel |
 |---|---|---|---|---|---|
@@ -143,4 +143,4 @@ Chaque ligne doit passer en ✅ (ou être modifiée) avant le jalon indiqué. Cl
 | D-21 ✅ | Données personnelles | **Validé** : pseudo, e-mail, historique. Suppression du compte en libre-service : le compte disparaît et ses lignes de parties sont anonymisées. Aucun traqueur | M2 |
 | D-23 ✅ | Distribution des rôles | **Validé** : `simultaneous` par défaut, `ceremony` (un par un) en option (§3) | M4 |
 | D-24 ✅ | Direction visuelle | **Validé** : Lanterne (nocturne cinématique, sobre) + pixel art animé 32×32 pour les personnages | M4 |
-| D-22 | Synthèse vocale du texte à lire | Optionnelle, voix du navigateur (gratuite) | M4 |
+| D-22 ✅ | Synthèse vocale du texte à lire | **Décidé** le 2026-10-23 : pas de synthèse vocale en V1, le meneur lit lui-même le texte affiché | M4 |

@@ -60,7 +60,9 @@ Il faut une illustration par rôle (27 au total, Vampire originel compris), une 
 
 ### Sons
 
-Qui entend quoi, et quand : matrice de `docs/12-deroulement-partie.md` §5. En résumé, en présentiel seul l'appareil du meneur joue des sons.
+Qui entend quoi, et quand : matrice de `docs/12-deroulement-partie.md` §5.
+
+**En M4** (P31), les sons publics sont **synthétisés** dans le navigateur par la Web Audio API (création originale du projet : aucun fichier, aucune licence) et ne sont joués que sur l'appareil du meneur, avec une option « Sons » désactivable. Les fichiers du tableau ci-dessous, les sons des joueurs, leurs profils audio et la synchronisation par le serveur arrivent en **M4b**.
 
 | Événement | Fichier | Durée |
 |---|---|---|
