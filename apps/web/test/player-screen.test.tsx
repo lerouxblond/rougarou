@@ -1,5 +1,10 @@
 import { catalogs } from '@rougarou/i18n';
-import type { MeResponse, PlayerView, RoleId } from '@rougarou/protocol';
+import {
+  gameOptionsSchema,
+  type MeResponse,
+  type PlayerView,
+  type RoleId,
+} from '@rougarou/protocol';
 import { cleanup, fireEvent, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
 
@@ -23,7 +28,7 @@ function seated(overrides: Partial<PlayerView> = {}, role: RoleId | null = 'vill
       { id: 'p2', name: 'Bob', alive: true, mayor: false, role: null },
       { id: 'p3', name: 'Chloe', alive: false, mayor: true, role: 'seer' },
     ],
-    options: {} as PlayerView['options'],
+    options: gameOptionsSchema.parse({}),
     composition: {},
     nightNumber: 1,
     deadline: null,
@@ -149,7 +154,7 @@ describe('Vue joueur (US-40, docs/06)', () => {
         view={seated({
           phase: 'DAY_VOTE',
           vote,
-          options: { voteVisibility: 'public' } as PlayerView['options'],
+          options: gameOptionsSchema.parse({ voteVisibility: 'public' }),
         })}
         me={ME}
       />,
@@ -176,7 +181,7 @@ describe('Vue joueur (US-40, docs/06)', () => {
             tally: null,
             outcome: null,
           },
-          options: { voteVisibility: 'secret' } as PlayerView['options'],
+          options: gameOptionsSchema.parse({ voteVisibility: 'secret' }),
         })}
         me={ME}
       />,

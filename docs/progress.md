@@ -603,8 +603,7 @@ au moment de les ajouter) : Radix UI Primitives (dialog, tabs, toast, switch), M
 ### Tâches
 
 Neuf PR de moins de 400 lignes de code non généré : **A** (T1, #17), **B1** (T2–T3, #18) et **B2** (T4–T5, #19) pour le moteur, la B ayant été coupée en deux pour tenir la limite,
-**C1**, **C2** (T6), **C3** et **C4** (T7) pour le design system, **D1** et **D2** (T8, joueur), **E1** et **E2** (T9, meneur), **F** (T10–T11, salon,
-configuration, fin), **G** (T12, ambiance), **H** (T13), puis T14.
+**C1**, **C2** (T6), **C3** et **C4** (T7) pour le design system, **D1** et **D2** (T8, joueur), **E1** et **E2** (T9, meneur), **F1**, **F2** (T10) et **F3** (T11) pour la configuration, le salon et la fin, **G** (T12, ambiance), **H** (T13), puis T14.
 
 - [x] **T1 — Docs, règles, ADR 0011** *(PR A)*
   - Fichiers : `docs/01` (P26, P28, `timers.ceremonyCard`, `R-15` sans `ceremony`), `docs/02` (P29), `docs/03` (P27, P32), `docs/04` (journal dans la vue), `docs/06` (`Stepper`, `BalanceMeter`), `docs/07` (P31), `docs/10` (P30, P32), `docs/03` et `docs/06` (D-22 : pas de synthèse vocale), `docs/12` (D-22 → ✅), `docs/adr/0011-briques-ui.md`. Les versions entrent dans `docs/05` avec la tâche qui ajoute chaque dépendance. Règles nouvelles : `R-17` (cérémonie), `R-18` (correction), `R-19` (journal)
@@ -653,6 +652,7 @@ configuration, fin), **G** (T12, ambiance), **H** (T13), puis T14.
 - [ ] **T10 — Salon et configuration** *(PR F)*
   - Fichiers : `apps/web/src/game/{Lobby,Config}.tsx` (QR, glisser-déposer, suggestion, compteurs, `BalanceMeter`, options groupées avec aide), i18n, tests
   - Tests attendus : la suggestion remplit les compteurs ; l'équilibre suit chaque + et − ; options groupées (Votes, Nuit, Révélations, Minuteurs) ; glisser-déposer et boutons clavier envoient le même ordre ; le QR encode `/join/:code`
+  - **F1 fait** (configuration) : « Utiliser la composition suggérée » (la suggestion du serveur), compteurs `Stepper` (un rôle unique plafonne à 1), `BalanceMeter` qui suit chaque + et −, options groupées Table, Votes, Nuit, Révélations, Minuteurs, chacune avec son aide (toutes celles de `docs/01` §8, sauf le role play, la nuit parallèle et le mode, refusés par `R-15`). `test/config.test.tsx` (5 tests). Libellés « Ajouter : Voyante » au lieu de « Ajouter un Voyante ». **Correction trouvée en capture** : passer de moins de 1024 px à plus (rotation d'une tablette) remontait l'éditeur et perdait le brouillon ; la colonne principale garde maintenant sa place dans l'arbre, et sur petit écran le texte et les actions restent visibles au-dessus des onglets (Étapes, Joueurs, Journal) au lieu d'être un onglet. Reste **F2** : QR et glisser-déposer du salon
 
 - [ ] **T11 — Écran de fin et chronologie** *(PR F)*
   - Fichiers : `apps/web/src/game/End.tsx`, i18n, tests

@@ -1,5 +1,10 @@
 import { catalogs } from '@rougarou/i18n';
-import type { ActionDescriptor, NarratorView, PlayerView } from '@rougarou/protocol';
+import {
+  gameOptionsSchema,
+  type ActionDescriptor,
+  type NarratorView,
+  type PlayerView,
+} from '@rougarou/protocol';
 import { cleanup, fireEvent, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
 
@@ -28,7 +33,7 @@ const playerView: PlayerView = {
     { id: 'p1', name: 'Alice', alive: true, mayor: false, role: null },
     { id: 'p2', name: 'Bob', alive: true, mayor: false, role: null },
   ],
-  options: {} as PlayerView['options'],
+  options: gameOptionsSchema.parse({}),
   composition: {},
   nightNumber: 0,
   deadline: null,
@@ -70,7 +75,7 @@ const narratorView: NarratorView = {
       knowledge: [],
     },
   ],
-  options: {} as NarratorView['options'],
+  options: gameOptionsSchema.parse({}),
   composition: {},
   nightNumber: 0,
   deadline: null,
@@ -155,7 +160,7 @@ describe('Configuration', () => {
   it('compte les roles et passe axe', async () => {
     const { container } = renderWithProviders(<Config view={narratorView} />);
 
-    fireEvent.click(screen.getByRole('button', { name: 'Ajouter un Loup-garou' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Ajouter : Loup-garou' }));
     expect(screen.getByText('1 rôle pour 2 joueurs')).toBeDefined();
     expect(await axeViolations(container)).toEqual([]);
   });

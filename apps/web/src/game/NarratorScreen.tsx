@@ -180,8 +180,8 @@ function steps(view: NarratorView) {
 
 /**
  * Le tableau de bord du meneur (`docs/06` §Mises en page) : etapes, texte a
- * lire et actions, joueurs avec leurs roles. Trois colonnes sur ordinateur,
- * des onglets sur telephone et tablette, avec l'action principale en bas.
+ * lire et actions, joueurs avec leurs roles. Trois colonnes sur ordinateur ;
+ * sur telephone et tablette, le texte et les actions, puis des onglets.
  */
 export function NarratorScreen({ view }: { readonly view: NarratorView }) {
   const { t } = useTranslation();
@@ -227,11 +227,13 @@ export function NarratorScreen({ view }: { readonly view: NarratorView }) {
     </div>
   );
 
-  if (wide) {
-    return (
-      <div className="grid grid-cols-[14rem_1fr_18rem] gap-6">
-        <aside>{stepList}</aside>
-        {main}
+  // La colonne principale garde la meme place dans l'arbre quelle que soit la
+  // largeur : un brouillon (composition, options) survit a la rotation d'une tablette.
+  return (
+    <div className={wide ? 'grid grid-cols-[14rem_1fr_18rem] gap-6' : 'flex flex-col gap-8'}>
+      {wide ? <aside>{stepList}</aside> : null}
+      {main}
+      {wide ? (
         <aside className="flex flex-col gap-6">
           <PlayersList players={view.players} />
           <section className="flex flex-col gap-2">
@@ -239,23 +241,20 @@ export function NarratorScreen({ view }: { readonly view: NarratorView }) {
             {journal}
           </section>
         </aside>
-      </div>
-    );
-  }
-
-  return (
-    <Tabs
-      label={t('narrator.tabs')}
-      items={[
-        { value: 'script', label: t('narrator.script'), content: main },
-        { value: 'steps', label: t('narrator.steps'), content: stepList },
-        {
-          value: 'players',
-          label: t('players.label'),
-          content: <PlayersList players={view.players} />,
-        },
-        { value: 'journal', label: t('journal.title'), content: journal },
-      ]}
-    />
+      ) : (
+        <Tabs
+          label={t('narrator.tabs')}
+          items={[
+            { value: 'steps', label: t('narrator.steps'), content: stepList },
+            {
+              value: 'players',
+              label: t('players.label'),
+              content: <PlayersList players={view.players} />,
+            },
+            { value: 'journal', label: t('journal.title'), content: journal },
+          ]}
+        />
+      )}
+    </div>
   );
 }
