@@ -1,10 +1,12 @@
 import type { MeResponse, NarratorView, PlayerView } from '@rougarou/protocol';
-import { PhaseBanner, Skeleton, Timer } from '@rougarou/ui';
+import { PhaseBanner, Skeleton, Switch, Timer } from '@rougarou/ui';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from '@tanstack/react-router';
 import { lazy, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { usePref, writePref } from '../ambience/prefs.ts';
+import { useAmbience } from '../ambience/useAmbience.ts';
 import { api } from '../api.ts';
 import { AuthGate } from '../components/AuthGate.tsx';
 import { ConnectionIndicator } from '../components/ConnectionIndicator.tsx';
@@ -50,6 +52,7 @@ function Table({ gameId, me }: { readonly gameId: string; readonly me: MeRespons
   const summary = useQuery({ queryKey: ['game', gameId], queryFn: () => api.game(gameId) });
 
   useGameConnection(gameId);
+  useAmbience(view);
 
   const counter = view === null ? null : counterOf(view);
 
@@ -75,7 +78,10 @@ function Table({ gameId, me }: { readonly gameId: string; readonly me: MeRespons
             )
           }
         />
-        <ConnectionIndicator status={status} />
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <ConnectionIndicator status={status} />
+          {view === null ? null : <FeedbackToggle narrator={view.kind === 'narrator'} />}
+        </div>
         {summary.data?.narrator !== true ? null : view?.phase === 'LOBBY' ||
           view?.phase === 'CONFIG' ? (
           <Suspense fallback={<Skeleton className="h-36 w-full" />}>
@@ -97,6 +103,28 @@ function Table({ gameId, me }: { readonly gameId: string; readonly me: MeRespons
 
       {view === null ? null : <DebugView view={view} />}
     </>
+  );
+}
+
+/**
+ * Sons chez le meneur, vibrations chez le joueur (`docs/12` §5) : chacun les
+ * coupe sur son appareil.
+ */
+function FeedbackToggle({ narrator }: { readonly narrator: boolean }) {
+  const { t } = useTranslation();
+  const pref = narrator ? 'sounds' : 'vibrations';
+  const on = usePref(pref);
+
+  return (
+    <div className="w-56">
+      <Switch
+        label={t(`ambience.${pref}`)}
+        checked={on}
+        onCheckedChange={(checked) => {
+          writePref(pref, checked);
+        }}
+      />
+    </div>
   );
 }
 

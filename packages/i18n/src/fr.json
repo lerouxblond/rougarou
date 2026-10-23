@@ -667,5 +667,9 @@
     "roles": "Tous les rôles",
     "timeline": "Chronologie",
     "new_game": "Nouvelle partie"
+  },
+  "ambience": {
+    "sounds": "Sons",
+    "vibrations": "Vibrations"
   }
 }
