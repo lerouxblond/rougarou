@@ -15,7 +15,7 @@ const SPARE = '@spare';
  * client ne decide de rien : l'issue vient du serveur.
  */
 export function VotePanel({ view }: { readonly view: View }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const name = (id: string) => view.players.find((player) => player.id === id)?.name ?? id;
   const secret = view.options.voteVisibility === 'secret' && view.kind === 'player';
   const alive = view.players.filter((player) => player.alive).length;
@@ -27,7 +27,7 @@ export function VotePanel({ view }: { readonly view: View }) {
   }
 
   const { keys, ballots, tally } = box;
-  const { vote } = view;
+  const message = voteMessage(view, name, t, i18n.language);
   const entries: VoteEntry[] = keys.map((key) => {
     const voters = ballots.filter(([, target]) => target === key).map(([voter]) => name(voter));
 
@@ -50,9 +50,9 @@ export function VotePanel({ view }: { readonly view: View }) {
         }
         votesLabel={(votes) => t('vote.votes', { count: votes })}
       />
-      {vote?.outcome == null ? null : (
+      {message === null ? null : (
         <p role="status" className="font-display text-2xl text-text">
-          {outcomeText(vote.outcome, name, t)}
+          {message}
         </p>
       )}
     </div>
@@ -101,6 +101,48 @@ const NOBODY_KEYS: Record<Extract<VoteOutcome, { kind: 'nobody' }>['reason'], st
 };
 
 /** L'issue d'un vote, en toutes lettres (aussi pour le journal). */
+/**
+ * Ce que le vote du village annonce a tous, du plus recent au plus ancien :
+ * la decision du Maire, l'egalite qu'il doit trancher, le second tour, puis
+ * l'issue. Tout vient de la vue : le client ne decide de rien (`R-33`).
+ */
+function voteMessage(
+  view: View,
+  name: (id: string) => string,
+  t: TFunction,
+  locale: string,
+): string | null {
+  const { vote } = view;
+
+  if (vote === null) {
+    return null;
+  }
+
+  const names = (ids: readonly string[]) =>
+    new Intl.ListFormat(locale, { type: 'conjunction' }).format(ids.map(name));
+
+  if (vote.tieBroken !== null) {
+    return vote.tieBroken.playerId === null
+      ? t('vote.outcome.mayor_silent')
+      : t('vote.outcome.mayor_chose', { name: name(vote.tieBroken.playerId) });
+  }
+
+  if (vote.tie !== null) {
+    const mayor = view.players.find((player) => player.mayor);
+    const self = view.kind === 'player' ? view.me?.id : undefined;
+
+    return mayor !== undefined && mayor.id === self
+      ? t('vote.outcome.you_decide', { names: names(vote.tie) })
+      : t('vote.outcome.mayor_decides', { names: names(vote.tie), mayor: mayor?.name ?? '' });
+  }
+
+  if (vote.round === 2 && !vote.closed) {
+    return t('vote.outcome.second_round', { names: names(vote.candidates) });
+  }
+
+  return vote.outcome === null ? null : outcomeText(vote.outcome, name, t);
+}
+
 export function outcomeText(
   outcome: VoteOutcome,
   name: (id: string) => string,

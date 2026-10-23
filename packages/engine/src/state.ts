@@ -167,6 +167,8 @@ export interface VoteState {
   readonly round: 1 | 2;
   /** Ex aequo que le Maire doit departager (`R-33`, `R-38`). */
   readonly tie: readonly PlayerId[] | null;
+  /** Ce que le Maire a decide d'une egalite : le designe, ou personne (minuteur, forcage). */
+  readonly tieBroken: { readonly playerId: PlayerId | null } | null;
   /** Le vote est clos ; l'execution suit. */
   readonly closed: boolean;
   /** Decompte et issue, une fois le vote clos. */

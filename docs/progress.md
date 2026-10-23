@@ -723,10 +723,18 @@ que `availableActions` propose et ce que l'écran affiche.
     la carte du rôle et « Bob est Loup-garou », ou l'icône et le camp en mode `team`, ou « Vous
     n'avez sondé personne cette nuit » après un minuteur ou un forçage. Annoncé par `role="status"`.
     Aucun changement de protocole. 2 tests dans `test/player-screen.test.tsx`, avec axe
-- [ ] **GL3 — Égalités et « Épargner » expliqués** (G3)
+- [x] **GL3 — Égalités et « Épargner » expliqués** (G3)
   - Fichiers : `apps/web/src/game/VotePanel.tsx`, i18n, tests
   - Tests : égalité → « Le Maire tranche entre A et B » (ou « Second tour entre A et B ») chez tous ;
     le Maire voit son choix en premier ; égalité avec « Épargner » expliquée
+  - Fait : `VotePanel` annonce, du plus récent au plus ancien : la décision du Maire (« Le Maire a
+    tranché en désignant Bob » ou « Le Maire n'a pas tranché : personne n'est exécuté »), l'égalité à
+    trancher (avec le nom du Maire, ou « En tant que Maire, choisissez » chez lui), le second tour,
+    puis l'issue. « Épargner » en tête ou à égalité est expliqué. Le choix du Maire s'intitule
+    « Trancher : qui est exécuté ? ». **Protocole v5** : la vue du vote porte `tieBroken` (la décision
+    du Maire, publique, rangée par le moteur à `TieBroken`), car sans elle l'écran de l'exécution
+    n'aurait montré que « Égalité entre A et B » ; le client ne la déduit pas des morts (règle 1).
+    `R-38` précisé. 4 tests web, 2 assertions moteur
 - [ ] **GL4 — Candidats à la mairie listés** (G4)
   - Fichiers : `apps/web/src/game/VotePanel.tsx` (ou un panneau d'élection), i18n, tests
 - [ ] **GL5 — La meute se reconnaît** (G5, après réponse à Q1)

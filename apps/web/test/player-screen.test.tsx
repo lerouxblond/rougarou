@@ -199,6 +199,7 @@ describe('Vue joueur (US-40, docs/06)', () => {
       spare: true,
       round: 1 as const,
       tie: null,
+      tieBroken: null,
       closed: true,
       ballots: { p1: { kind: 'player' as const, playerId: 'p2' } },
       tally: { p2: 2 },
@@ -222,6 +223,109 @@ describe('Vue joueur (US-40, docs/06)', () => {
     expect(screen.getByRole('status').textContent).toBe('Le village a désigné Bob.');
   });
 
+  describe('egalites (R-33, R-36, R-38)', () => {
+    const tied = {
+      candidates: ['p1', 'p2', 'p3'],
+      spare: false,
+      round: 1 as const,
+      tie: ['p1', 'p2'],
+      tieBroken: null,
+      closed: true,
+      ballots: {},
+      tally: null,
+      outcome: { kind: 'tie' as const, tied: ['p1', 'p2'] },
+    };
+    const players = [
+      { id: 'p1', name: 'Alice', alive: true, mayor: false, role: null },
+      { id: 'p2', name: 'Bob', alive: true, mayor: false, role: null },
+      { id: 'p3', name: 'Chloe', alive: true, mayor: true, role: null },
+    ];
+
+    function status(): string {
+      return screen.getByRole('status').textContent;
+    }
+
+    it('chacun sait que le Maire tranche, et qui il est', () => {
+      renderWithProviders(
+        <PlayerScreen view={seated({ phase: 'DAY_VOTE', vote: tied, players })} me={ME} />,
+      );
+
+      expect(status()).toBe(
+        'Égalité entre Alice et Bob. Le Maire, Chloe, choisit qui est exécuté.',
+      );
+    });
+
+    it('le Maire est invite a trancher, avec le choix sous les yeux', () => {
+      renderWithProviders(
+        <PlayerScreen
+          view={seated({
+            phase: 'DAY_VOTE',
+            vote: tied,
+            players: players.map((p) => ({ ...p, mayor: p.id === 'p1' })),
+            actions: [{ type: 'BreakTie', targets: ['p1', 'p2'] }],
+          })}
+          me={ME}
+        />,
+      );
+
+      expect(status()).toBe(
+        'Égalité entre Alice et Bob. En tant que Maire, choisissez qui est exécuté.',
+      );
+      expect(screen.getByRole('group', { name: fr.actions.break_tie })).toBeDefined();
+    });
+
+    it('puis tout le monde apprend la decision, ou son absence', () => {
+      renderWithProviders(
+        <PlayerScreen
+          view={seated({
+            phase: 'EXECUTION',
+            vote: { ...tied, tie: null, tieBroken: { playerId: 'p2' } },
+            players,
+          })}
+          me={ME}
+        />,
+      );
+
+      expect(status()).toBe('Le Maire a tranché en désignant Bob.');
+
+      cleanup();
+      renderWithProviders(
+        <PlayerScreen
+          view={seated({
+            phase: 'EXECUTION',
+            vote: { ...tied, tie: null, tieBroken: { playerId: null } },
+            players,
+          })}
+          me={ME}
+        />,
+      );
+
+      expect(status()).toBe('Le Maire n’a pas tranché : personne n’est exécuté.');
+    });
+
+    it('sans Maire, un second tour entre les ex aequo', () => {
+      renderWithProviders(
+        <PlayerScreen
+          view={seated({
+            phase: 'DAY_VOTE',
+            vote: {
+              ...tied,
+              candidates: ['p1', 'p2'],
+              round: 2,
+              tie: null,
+              closed: false,
+              outcome: null,
+            },
+            players,
+          })}
+          me={ME}
+        />,
+      );
+
+      expect(status()).toBe('Égalité : second tour entre Alice et Bob.');
+    });
+  });
+
   it('en vote secret, seulement l annonce du vote secret', () => {
     renderWithProviders(
       <PlayerScreen
@@ -232,6 +336,7 @@ describe('Vue joueur (US-40, docs/06)', () => {
             spare: false,
             round: 1,
             tie: null,
+            tieBroken: null,
             closed: false,
             ballots: {},
             tally: null,

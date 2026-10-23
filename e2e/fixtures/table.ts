@@ -207,7 +207,7 @@ const TARGET_LABELS: Readonly<Record<string, string>> = {
   wolfVote: 'Désigner la victime',
   seerProbe: 'Sonder un joueur',
   CastVote: 'Voter',
-  BreakTie: 'Départager',
+  BreakTie: 'Trancher : qui est exécuté ?',
   DesignateSuccessor: 'Désigner son successeur',
   HunterShoot: 'Tirer',
 };

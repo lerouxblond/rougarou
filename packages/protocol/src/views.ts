@@ -259,6 +259,8 @@ const playerVoteSchema = z.strictObject({
   spare: z.boolean(),
   round: z.union([z.literal(1), z.literal(2)]),
   tie: playerIdList.nullable(),
+  /** Ce que le Maire a decide d'une egalite, public comme l'issue (`R-33`, `R-38`). */
+  tieBroken: z.strictObject({ playerId: playerIdSchema.nullable() }).nullable(),
   closed: z.boolean(),
   ballots: z.record(playerIdSchema, ballotSchema),
   /** Le decompte n'est montre qu'en vote public ; l'issue l'est toujours. */
